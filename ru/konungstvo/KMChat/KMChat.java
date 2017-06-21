@@ -1,25 +1,3 @@
-/*
- * Decompiled with CFR 0_122.
- * 
- * Could not load the following classes:
- *  org.bukkit.Bukkit
- *  org.bukkit.Location
- *  org.bukkit.Server
- *  org.bukkit.World
- *  org.bukkit.configuration.file.FileConfiguration
- *  org.bukkit.configuration.file.FileConfigurationOptions
- *  org.bukkit.entity.Player
- *  org.bukkit.event.EventHandler
- *  org.bukkit.event.Listener
- *  org.bukkit.event.player.AsyncPlayerChatEvent
- *  org.bukkit.event.player.PlayerChatTabCompleteEvent
- *  org.bukkit.event.player.PlayerJoinEvent
- *  org.bukkit.event.player.PlayerQuitEvent
- *  org.bukkit.plugin.Plugin
- *  org.bukkit.plugin.PluginDescriptionFile
- *  org.bukkit.plugin.PluginManager
- *  org.bukkit.plugin.java.JavaPlugin
- */
 package ru.konungstvo.KMChat;
 
 import java.util.Collection;
@@ -58,22 +36,22 @@ implements Listener {
         this.getConfig().options().copyDefaults(true);
         this.saveConfig();
         this.getServer().getPluginManager().registerEvents((Listener)this, (Plugin)this);
-        this.nMap.put(-3, "\u0442\u0430\u043a \u0443\u0436\u0430\u0441\u043d\u043e, \u0447\u0442\u043e \u0445\u0443\u0436\u0435 \u0443\u0436\u0435 \u043d\u0435\u043a\u0443\u0434\u0430");
-        this.nMap.put(-2, "\u0443\u0436\u0430\u0441\u043d\u043e---");
-        this.nMap.put(-1, "\u0443\u0436\u0430\u0441\u043d\u043e--");
-        this.nMap.put(0, "\u0443\u0436\u0430\u0441\u043d\u043e-");
-        this.nMap.put(1, "\u0443\u0436\u0430\u0441\u043d\u043e");
-        this.nMap.put(2, "\u043f\u043b\u043e\u0445\u043e");
-        this.nMap.put(3, "\u043f\u043e\u0441\u0440\u0435\u0434\u0441\u0442\u0432\u0435\u043d\u043d\u043e");
-        this.nMap.put(4, "\u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e");
-        this.nMap.put(5, "\u0445\u043e\u0440\u043e\u0448\u043e");
-        this.nMap.put(6, "\u043e\u0442\u043b\u0438\u0447\u043d\u043e");
-        this.nMap.put(7, "\u043f\u0440\u0435\u0432\u043e\u0441\u0445\u043e\u0434\u043d\u043e");
-        this.nMap.put(8, "\u043b\u0435\u0433\u0435\u043d\u0434\u0430\u0440\u043d\u043e");
-        this.nMap.put(9, "\u043b\u0435\u0433\u0435\u043d\u0434\u0430\u0440\u043d\u043e+");
-        this.nMap.put(10, "\u043b\u0435\u0433\u0435\u043d\u0434\u0430\u0440\u043d\u043e++");
-        this.nMap.put(11, "\u043b\u0435\u0433\u0435\u043d\u0434\u0430\u0440\u043d\u043e+++");
-        this.nMap.put(12, "\u0422\u0410\u041a \u041b\u0415\u0413\u0415\u041d\u0414\u0410\u0420\u041d\u041e, \u0427\u0422\u041e \u041f\u041e\u041f\u0410\u0414\u0401\u0422 \u0412\u041e \u0412\u0421\u0415 \u041a\u041d\u0418\u0413\u0418 \u0420\u0415\u041a\u041e\u0420\u0414\u041e\u0412");
+        this.nMap.put(-3, "так ужасно, что хуже уже некуда");
+        this.nMap.put(-2, "ужасно---");
+        this.nMap.put(-1, "ужасно--");
+        this.nMap.put(0, "ужасно-");
+        this.nMap.put(1, "ужасно");
+        this.nMap.put(2, "плохо");
+        this.nMap.put(3, "посредственно");
+        this.nMap.put(4, "нормально");
+        this.nMap.put(5, "хорошо");
+        this.nMap.put(6, "отлично");
+        this.nMap.put(7, "превосходно");
+        this.nMap.put(8, "легендарно");
+        this.nMap.put(9, "легендарно+");
+        this.nMap.put(10, "легендарно++");
+        this.nMap.put(11, "легендарно+++");
+        this.nMap.put(12, "ТАК ЛЕГЕНДАРНО, ЧТО ПОПАДЁТ ВО ВСЕ КНИГИ РЕКОРДОВ");
         this.log.info(String.format("%s is enabled!", this.getDescription().getFullName()));
     }
 
@@ -84,13 +62,13 @@ implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
         String string = playerJoinEvent.getPlayer().getName();
-        playerJoinEvent.setJoinMessage("\u00a7e" + string + "\u00a7f \u0432\u0445\u043e\u0434\u0438\u0442 \u0432 \u0438\u0433\u0440\u0443");
+        playerJoinEvent.setJoinMessage("§e" + string + "§f входит в игру");
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent playerQuitEvent) {
         String string = playerQuitEvent.getPlayer().getName();
-        playerQuitEvent.setQuitMessage("\u00a7e" + string + "\u00a7f \u0432\u044b\u0445\u043e\u0434\u0438\u0442 \u0438\u0437 \u0438\u0433\u0440\u044b");
+        playerQuitEvent.setQuitMessage("§e" + string + "§f выходит из игры");
     }
 
     @EventHandler
@@ -98,36 +76,36 @@ implements Listener {
         if (playerChatTabCompleteEvent.getChatMessage().startsWith("%%% ")) {
             Collection collection = playerChatTabCompleteEvent.getTabCompletions();
             collection.clear();
-            if (playerChatTabCompleteEvent.getLastToken().startsWith("\u0443")) {
-                collection.add("\u0443\u0436\u0430\u0441\u043d\u043e");
-            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("\u043f")) {
-                if (playerChatTabCompleteEvent.getLastToken().startsWith("\u043f\u0440")) {
-                    collection.add("\u043f\u0440\u0435\u0432\u043e\u0441\u0445\u043e\u0434\u043d\u043e");
+            if (playerChatTabCompleteEvent.getLastToken().startsWith("у")) {
+                collection.add("ужасно");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("п")) {
+                if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
+                    collection.add("превосходно");
                 }
-                if (playerChatTabCompleteEvent.getLastToken().startsWith("\u043f\u043b")) {
-                    collection.add("\u043f\u043b\u043e\u0445\u043e");
+                if (playerChatTabCompleteEvent.getLastToken().startsWith("пл")) {
+                    collection.add("плохо");
                 }
-                if (playerChatTabCompleteEvent.getLastToken().startsWith("\u043f\u043e")) {
-                    collection.add("\u043f\u043e\u0441\u0440\u0435\u0434\u0441\u0442\u0432\u0435\u043d\u043d\u043e");
+                if (playerChatTabCompleteEvent.getLastToken().startsWith("по")) {
+                    collection.add("посредственно");
                 } else {
-                    collection.add("\u043f\u043b\u043e\u0445\u043e");
-                    collection.add("\u043f\u0440\u0435\u0432\u043e\u0441\u0445\u043e\u0434\u043d\u043e");
-                    collection.add("\u043f\u043e\u0441\u0440\u0435\u0434\u0441\u0442\u0432\u0435\u043d\u043d\u043e");
+                    collection.add("плохо");
+                    collection.add("посредственно");
+                    collection.add("превосходно");
                 }
-            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("\u043d")) {
-                collection.add("\u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e");
-            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("\u0445")) {
-                collection.add("\u0445\u043e\u0440\u043e\u0448\u043e");
-            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("\u043e")) {
-                collection.add("\u043e\u0442\u043b\u0438\u0447\u043d\u043e");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("н")) {
+                collection.add("нормально");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
+                collection.add("хорошо");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("о")) {
+                collection.add("отлично");
             } else {
-                collection.add("\u0443\u0436\u0430\u0441\u043d\u043e");
-                collection.add("\u043f\u043b\u043e\u0445\u043e");
-                collection.add("\u043f\u043e\u0441\u0440\u0435\u0434\u0441\u0442\u0432\u0435\u043d\u043d\u043e");
-                collection.add("\u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e");
-                collection.add("\u0445\u043e\u0440\u043e\u0448\u043e");
-                collection.add("\u043e\u0442\u043b\u0438\u0447\u043d\u043e");
-                collection.add("\u043f\u0440\u0435\u0432\u043e\u0441\u0445\u043e\u0434\u043d\u043e");
+                collection.add("ужасно");
+                collection.add("плохо");
+                collection.add("посредственно");
+                collection.add("нормально");
+                collection.add("хорошо");
+                collection.add("отлично");
+                collection.add("превосходно");
             }
         }
     }
@@ -144,22 +122,22 @@ implements Listener {
             string3 = this.getConfig().getString("adminprefix");
         }
         String string4 = String.format("%s&a%s&f: %s", string3, string2, string);
-        if ((string.startsWith("d") || string.startsWith("\u043a")) && player.hasPermission("KMChat.dice")) {
+        if ((string.startsWith("d") || string.startsWith("к")) && player.hasPermission("KMChat.dice")) {
             boolean bl2 = false;
             int n = 6;
-            if (string.startsWith("d4") || string.startsWith("\u043a4")) {
+            if (string.startsWith("d4") || string.startsWith("к4")) {
                 n = 4;
-            } else if (string.startsWith("d6") || string.startsWith("\u043a4")) {
+            } else if (string.startsWith("d6") || string.startsWith("к6")) {
                 n = 6;
-            } else if (string.startsWith("d8") || string.startsWith("\u043a8")) {
+            } else if (string.startsWith("d8") || string.startsWith("к8")) {
                 n = 8;
-            } else if (string.startsWith("d10") || string.startsWith("\u043a10")) {
+            } else if (string.startsWith("d10") || string.startsWith("к10")) {
                 n = 10;
-            } else if (string.startsWith("d12") || string.startsWith("\u043a12")) {
+            } else if (string.startsWith("d12") || string.startsWith("к12")) {
                 n = 12;
-            } else if (string.startsWith("d14") || string.startsWith("\u043a14")) {
+            } else if (string.startsWith("d14") || string.startsWith("к14")) {
                 n = 14;
-            } else if (string.startsWith("d20") || string.startsWith("\u043a20")) {
+            } else if (string.startsWith("d20") || string.startsWith("к20")) {
                 n = 20;
             } else {
                 bl2 = true;
@@ -169,7 +147,7 @@ implements Listener {
                 int n2 = random.nextInt();
                 n2 = Math.abs(n2);
                 n2 %= n;
-                string4 = "&e(( " + string2 + "&e \u0431\u0440\u043e\u0441\u0430\u0435\u0442 d" + n + ". \u0412\u044b\u043f\u0430\u0434\u0430\u0435\u0442 " + ++n2 + " ))&f";
+                string4 = "&e(( " + string2 + "&e бросает d" + n + ". Выпадает " + ++n2 + " ))&f";
             }
         } else if (string.startsWith("4dF") || string.startsWith("%%%")) {
             int n = 2;
@@ -180,25 +158,25 @@ implements Listener {
                 n = 666;
                 string4 = string;
             }
-            if (string.startsWith("\u0443\u0436\u0430\u0441\u043d\u043e")) {
+            if (string.startsWith("ужасно")) {
                 n = 1;
-            } else if (string.startsWith("\u043f\u043b\u043e\u0445\u043e")) {
+            } else if (string.startsWith("плохо")) {
                 n = 2;
-            } else if (string.startsWith("\u043f\u043e\u0441\u0440\u0435\u0434\u0441\u0442\u0432\u0435\u043d\u043d\u043e")) {
+            } else if (string.startsWith("посредственно")) {
                 n = 3;
-            } else if (string.startsWith("\u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e")) {
+            } else if (string.startsWith("нормально")) {
                 n = 4;
-            } else if (string.startsWith("\u0445\u043e\u0440\u043e\u0448\u043e")) {
+            } else if (string.startsWith("хорошо")) {
                 n = 5;
-            } else if (string.startsWith("\u043e\u0442\u043b\u0438\u0447\u043d\u043e")) {
+            } else if (string.startsWith("отлично")) {
                 n = 6;
-            } else if (string.startsWith("\u043f\u0440\u0435\u0432\u043e\u0441\u0445\u043e\u0434\u043d\u043e")) {
+            } else if (string.startsWith("превосходно")) {
                 n = 7;
-            } else if (string.startsWith("\u043b\u0435\u0433\u0435\u043d\u0434\u0430\u0440\u043d\u043e")) {
+            } else if (string.startsWith("легендарно")) {
                 n = 8;
             } else {
                 n = 2;
-                string = "\u041f\u041b\u041e\u0425\u041e";
+                string = "ПЛОХО";
             }
             Random random = new Random();
             String string5 = "";
@@ -212,9 +190,9 @@ implements Listener {
             String string6 = "";
             string6 = this.nMap.get(n);
             if (n != 666) {
-                string4 = "&e(( " + string2 + "&e \u0431\u0440\u043e\u0441\u0430\u0435\u0442 4dF (" + string5 + ") \u043e\u0442 " + string + ". \u0420\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442: " + string6 + " ))&f";
+                string4 = "&e(( " + string2 + "&e бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
             }
-        } else if ((string.startsWith("#") || string.startsWith("\u2116")) && player.hasPermission("KMChat.dm")) {
+        } else if ((string.startsWith("#") || string.startsWith("№")) && player.hasPermission("KMChat.dm")) {
             string = string.substring(1);
             d = this.getConfig().getInt("range.dm");
             string4 = "&e***" + string + "***";
@@ -222,7 +200,7 @@ implements Listener {
             string = string.substring(2);
             d = this.getConfig().getInt("range.closedm");
             string4 = "&e***" + string + "***";
-        } else if ((string.startsWith("!#") || string.startsWith("\u0434\u0430\u043b\u2116")) && player.hasPermission("KMChat.dm")) {
+        } else if ((string.startsWith("!#") || string.startsWith("дал№")) && player.hasPermission("KMChat.dm")) {
             string = string.substring(2);
             d = this.getConfig().getInt("range.fardm");
             string4 = "&e***" + string + "***";
@@ -233,27 +211,27 @@ implements Listener {
         } else if ((string.startsWith("@@@") || string.startsWith("===")) && player.hasPermission("KMChat.whisper")) {
             string = string.substring(3);
             d = this.getConfig().getInt("range.strongwhisper");
-            string4 = String.format("%s&a%s&f (\u043f\u0440\u043e \u0441\u0435\u0431\u044f): %s", string3, string2, string);
+            string4 = String.format("%s&a%s&f (про себя): %s", string3, string2, string);
         } else if ((string.startsWith("@@") || string.startsWith("==")) && player.hasPermission("KMChat.whisper")) {
             string = string.substring(2);
             d = this.getConfig().getInt("range.whisper");
-            string4 = String.format("%s&a%s&f (\u0448\u0435\u043f\u0447\u0435\u0442): %s", string3, string2, string);
+            string4 = String.format("%s&a%s&f (шепчет): %s", string3, string2, string);
         } else if ((string.startsWith("@") || string.startsWith("=")) && player.hasPermission("KMChat.whisper")) {
             string = string.substring(1);
             d = this.getConfig().getInt("range.weakwhisper");
-            string4 = String.format("%s&a%s&f (\u0432\u043f\u043e\u043b\u0433\u043e\u043b\u043e\u0441\u0430): %s", string3, string2, string);
+            string4 = String.format("%s&a%s&f (вполголоса): %s", string3, string2, string);
         } else if (string.startsWith("!!!") && player.hasPermission("KMChat.shout")) {
             string = string.substring(3);
             d = this.getConfig().getInt("range.strongshout");
-            string4 = String.format("%s&a%s&f (\u043e\u0440\u0451\u0442): %s", string3, string2, string);
+            string4 = String.format("%s&a%s&f (орёт): %s", string3, string2, string);
         } else if (string.startsWith("!!") && player.hasPermission("KMChat.shout")) {
             string = string.substring(2);
             d = this.getConfig().getInt("range.shout");
-            string4 = String.format("%s&a%s&f (\u043a\u0440\u0438\u0447\u0438\u0442): %s", string3, string2, string);
+            string4 = String.format("%s&a%s&f (кричит): %s", string3, string2, string);
         } else if (string.startsWith("!") && player.hasPermission("KMChat.shout")) {
             string = string.substring(1);
             d = this.getConfig().getInt("range.weakshout");
-            string4 = String.format("%s&a%s&f (\u043f\u0440\u0438\u043a\u0440\u0438\u043a\u0438\u0432\u0430\u0435\u0442): %s", string3, string2, string);
+            string4 = String.format("%s&a%s&f (прикрикивает): %s", string3, string2, string);
         } else if (string.startsWith("?") && player.hasPermission("KMChat.global")) {
             bl = false;
             string = string.substring(1);
@@ -264,7 +242,7 @@ implements Listener {
         if (string.startsWith("((") && string.endsWith("))")) {
             string4 = String.format("%s&a%s&f (OOC): &d%s&f", string3, string2, string);
         }
-        string4 = string4.replaceAll("&([a-z0-9])", "\u00a7$1");
+        string4 = string4.replaceAll("&([a-z0-9])", "§$1");
         string4 = string4.replaceAll("%", "%%");
         asyncPlayerChatEvent.setFormat(string4);
         asyncPlayerChatEvent.setMessage(string);
@@ -281,11 +259,11 @@ implements Listener {
         for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
             if (player2.hasPermission("KMChat.admin")) {
                 if (!player2.getWorld().equals((Object)player.getWorld())) {
-                    player2.sendMessage(string.replaceAll("\u00a7f", "\u00a77"));
+                    player2.sendMessage(string.replaceAll("§f", "§7"));
                     continue;
                 }
                 if (location.distanceSquared(player2.getLocation()) > d2) {
-                    player2.sendMessage(string.replaceAll("\u00a7f", "\u00a77"));
+                    player2.sendMessage(string.replaceAll("§f", "§7"));
                     continue;
                 }
                 linkedList.add(player2);
