@@ -259,10 +259,12 @@ implements Listener {
         for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
             if (player2.hasPermission("KMChat.admin")) {
                 if (!player2.getWorld().equals((Object)player.getWorld())) {
+                    string = string.replaceAll("§e", "§7");
                     player2.sendMessage(string.replaceAll("§f", "§7"));
                     continue;
                 }
                 if (location.distanceSquared(player2.getLocation()) > d2) {
+                    string = string.replaceAll("§e", "§7");
                     player2.sendMessage(string.replaceAll("§f", "§7"));
                     continue;
                 }
