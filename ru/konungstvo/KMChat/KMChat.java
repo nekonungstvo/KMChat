@@ -73,7 +73,7 @@ implements Listener {
 
     @EventHandler
     public void onChatTab(PlayerChatTabCompleteEvent playerChatTabCompleteEvent) {
-        if (playerChatTabCompleteEvent.getChatMessage().startsWith("%%% ")) {
+        if (playerChatTabCompleteEvent.getChatMessage().startsWith("% ")) {
             Collection collection = playerChatTabCompleteEvent.getTabCompletions();
             collection.clear();
             if (playerChatTabCompleteEvent.getLastToken().startsWith("у")) {
@@ -149,7 +149,7 @@ implements Listener {
                 n2 %= n;
                 string4 = "&e(( " + string2 + "&e бросает d" + n + ". Выпадает " + ++n2 + " ))&f";
             }
-        } else if (string.startsWith("4dF") || string.startsWith("%%%")) {
+        } else if (string.startsWith("4dF") || string.startsWith("% ")) {
             int n = 2;
             try {
                 string = string.substring(4);
