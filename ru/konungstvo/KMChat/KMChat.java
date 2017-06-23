@@ -460,15 +460,15 @@ implements Listener {
             string = string.substring(1);
             d = this.getConfig().getInt("range.dm");
             string4 = "&e***" + string + "***";
-        } else if (string.startsWith("=#") || string.startsWith("=№")) && player.hasPermission("KMChat.dm")) {
+        } else if ((string.startsWith("=#") || string.startsWith("=№")) && player.hasPermission("KMChat.dm")) {
             string = string.substring(2);
             d = this.getConfig().getInt("range.closedm");
             string4 = "&e**" + string + "**";
-        } else if (string.startsWith("==#") || string.startsWith("==№")) && player.hasPermission("KMChat.dm")) {
+        } else if ((string.startsWith("==#") || string.startsWith("==№")) && player.hasPermission("KMChat.dm")) {
             string = string.substring(3);
             d = this.getConfig().getInt("range.closerdm");
             string4 = "&e*" + string + "*";
-        } else if (string.startsWith("===#") || string.startsWith("===№")) && player.hasPermission("KMChat.dm")) {
+        } else if ((string.startsWith("===#") || string.startsWith("===№")) && player.hasPermission("KMChat.dm")) {
             string = string.substring(4);
             d = this.getConfig().getInt("range.closestdm");
             string4 = "&e~" + string + "~";
