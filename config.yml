@@ -1,12 +1,13 @@
 adminprefix: "&8[GM]"
-range.default: 40
-range.dm: 40
-range.closedm: 10
-range.fardm: 110
-range.me: 110
-range.strongshout: 160
-range.shout: 110
-range.weakshout: 80
-range.strongwhisper: 16
+range.default: 18
+range.dm: 18
+range.closedm: 5
+range.fardm: 80
+range.me: 18
+range.strongshout: 80
+range.shout: 60
+range.weakshout: 36
+range.strongwhisper: 9
 range.whisper: 3
 range.weakwhisper: 1
+

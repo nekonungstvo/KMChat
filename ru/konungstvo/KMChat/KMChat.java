@@ -236,6 +236,226 @@ implements Listener {
                 d = this.getConfig().getInt("range.weakwhisper");
                 string4 = "&e(( " + string2 + "&e неслышно бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
             }            
+        } else if (string.startsWith("==% ")) {
+            int n = 2;
+            try {
+                string = string.substring(4);
+            }
+            catch (Exception exception) {
+                n = 666;
+                string4 = string;
+            }
+            if (string.startsWith("ужасно")) {
+                n = 1;
+            } else if (string.startsWith("плохо")) {
+                n = 2;
+            } else if (string.startsWith("посредственно")) {
+                n = 3;
+            } else if (string.startsWith("нормально")) {
+                n = 4;
+            } else if (string.startsWith("хорошо")) {
+                n = 5;
+            } else if (string.startsWith("отлично")) {
+                n = 6;
+            } else if (string.startsWith("превосходно")) {
+                n = 7;
+            } else if (string.startsWith("легендарно")) {
+                n = 8;
+            } else {
+                n = 2;
+                string = "ПЛОХО";
+            }
+            Random random = new Random();
+            String string5 = "";
+            int n3 = random.nextInt();
+            for (int i = 0; i < 4; ++i) {
+                n3 = random.nextInt();
+                n3 = Math.abs(n3);
+                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
+                n += n3;
+            }
+            String string6 = "";
+            string6 = this.nMap.get(n);
+            if (n != 666) {
+                d = this.getConfig().getInt("range.whisper");
+                string4 = "&e(( " + string2 + "&e очень тихо бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
+            }      
+        } else if (string.startsWith("=% ")) {
+            int n = 2;
+            try {
+                string = string.substring(3);
+            }
+            catch (Exception exception) {
+                n = 666;
+                string4 = string;
+            }
+            if (string.startsWith("ужасно")) {
+                n = 1;
+            } else if (string.startsWith("плохо")) {
+                n = 2;
+            } else if (string.startsWith("посредственно")) {
+                n = 3;
+            } else if (string.startsWith("нормально")) {
+                n = 4;
+            } else if (string.startsWith("хорошо")) {
+                n = 5;
+            } else if (string.startsWith("отлично")) {
+                n = 6;
+            } else if (string.startsWith("превосходно")) {
+                n = 7;
+            } else if (string.startsWith("легендарно")) {
+                n = 8;
+            } else {
+                n = 2;
+                string = "ПЛОХО";
+            }
+            Random random = new Random();
+            String string5 = "";
+            int n3 = random.nextInt();
+            for (int i = 0; i < 4; ++i) {
+                n3 = random.nextInt();
+                n3 = Math.abs(n3);
+                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
+                n += n3;
+            }
+            String string6 = "";
+            string6 = this.nMap.get(n);
+            if (n != 666) {
+                d = this.getConfig().getInt("range.strongwhisper");
+                string4 = "&e(( " + string2 + "&e тихо бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
+            }      
+        } else if (string.startsWith("!!!% ")) {
+            int n = 2;
+            try {
+                string = string.substring(5);
+            }
+            catch (Exception exception) {
+                n = 666;
+                string4 = string;
+            }
+            if (string.startsWith("ужасно")) {
+                n = 1;
+            } else if (string.startsWith("плохо")) {
+                n = 2;
+            } else if (string.startsWith("посредственно")) {
+                n = 3;
+            } else if (string.startsWith("нормально")) {
+                n = 4;
+            } else if (string.startsWith("хорошо")) {
+                n = 5;
+            } else if (string.startsWith("отлично")) {
+                n = 6;
+            } else if (string.startsWith("превосходно")) {
+                n = 7;
+            } else if (string.startsWith("легендарно")) {
+                n = 8;
+            } else {
+                n = 2;
+                string = "ПЛОХО";
+            }
+            Random random = new Random();
+            String string5 = "";
+            int n3 = random.nextInt();
+            for (int i = 0; i < 4; ++i) {
+                n3 = random.nextInt();
+                n3 = Math.abs(n3);
+                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
+                n += n3;
+            }
+            String string6 = "";
+            string6 = this.nMap.get(n);
+            if (n != 666) {
+                d = this.getConfig().getInt("range.strongshout");
+                string4 = "&e(( " + string2 + "&e КРАЙНЕ ГРОМКО ОБРУШИВАЕТ 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
+            }      
+        } else if (string.startsWith("!!% ")) {
+            int n = 2;
+            try {
+                string = string.substring(4);
+            }
+            catch (Exception exception) {
+                n = 666;
+                string4 = string;
+            }
+            if (string.startsWith("ужасно")) {
+                n = 1;
+            } else if (string.startsWith("плохо")) {
+                n = 2;
+            } else if (string.startsWith("посредственно")) {
+                n = 3;
+            } else if (string.startsWith("нормально")) {
+                n = 4;
+            } else if (string.startsWith("хорошо")) {
+                n = 5;
+            } else if (string.startsWith("отлично")) {
+                n = 6;
+            } else if (string.startsWith("превосходно")) {
+                n = 7;
+            } else if (string.startsWith("легендарно")) {
+                n = 8;
+            } else {
+                n = 2;
+                string = "ПЛОХО";
+            }
+            Random random = new Random();
+            String string5 = "";
+            int n3 = random.nextInt();
+            for (int i = 0; i < 4; ++i) {
+                n3 = random.nextInt();
+                n3 = Math.abs(n3);
+                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
+                n += n3;
+            }
+            String string6 = "";
+            string6 = this.nMap.get(n);
+            if (n != 666) {
+                d = this.getConfig().getInt("range.shout");
+                string4 = "&e(( " + string2 + "&e очень громко бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
+            }      
+        } else if (string.startsWith("!% ")) {
+            int n = 2;
+            try {
+                string = string.substring(3);
+            }
+            catch (Exception exception) {
+                n = 666;
+                string4 = string;
+            }
+            if (string.startsWith("ужасно")) {
+                n = 1;
+            } else if (string.startsWith("плохо")) {
+                n = 2;
+            } else if (string.startsWith("посредственно")) {
+                n = 3;
+            } else if (string.startsWith("нормально")) {
+                n = 4;
+            } else if (string.startsWith("хорошо")) {
+                n = 5;
+            } else if (string.startsWith("отлично")) {
+                n = 6;
+            } else if (string.startsWith("превосходно")) {
+                n = 7;
+            } else if (string.startsWith("легендарно")) {
+                n = 8;
+            } else {
+                n = 2;
+                string = "ПЛОХО";
+            }
+            Random random = new Random();
+            String string5 = "";
+            int n3 = random.nextInt();
+            for (int i = 0; i < 4; ++i) {
+                n3 = random.nextInt();
+                n3 = Math.abs(n3);
+                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
+                n += n3;
+            }
+            String string6 = "";
+            string6 = this.nMap.get(n);
+            if (n != 666) {
+                d = this.getConfig().getInt("range.weakshout");
+                string4 = "&e(( " + string2 + "&e громко бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
+            }                  
         } else if ((string.startsWith("#") || string.startsWith("№")) && player.hasPermission("KMChat.dm")) {
             string = string.substring(1);
             d = this.getConfig().getInt("range.dm");
