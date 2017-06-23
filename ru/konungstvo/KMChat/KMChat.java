@@ -234,7 +234,7 @@ implements Listener {
             string6 = this.nMap.get(n);
             if (n != 666) {
                 d = this.getConfig().getInt("range.weakwhisper");
-                string4 = "&e(( " + string2 + "&e неслышно бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
+                string4 = "&e(( " + string2 + "&e едва слышно бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
             }            
         } else if (string.startsWith("==% ")) {
             int n = 2;
@@ -366,7 +366,7 @@ implements Listener {
             string6 = this.nMap.get(n);
             if (n != 666) {
                 d = this.getConfig().getInt("range.strongshout");
-                string4 = "&e(( " + string2 + "&e КРАЙНЕ ГРОМКО ОБРУШИВАЕТ 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
+                string4 = "&e(( " + string2 + "&e СВЕРХГРОМКО ОБРУШИВАЕТ 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
             }      
         } else if (string.startsWith("!!% ")) {
             int n = 2;
@@ -460,14 +460,30 @@ implements Listener {
             string = string.substring(1);
             d = this.getConfig().getInt("range.dm");
             string4 = "&e***" + string + "***";
-        } else if (string.startsWith("=#") && player.hasPermission("KMChat.dm")) {
+        } else if (string.startsWith("=#") || string.startsWith("=№")) && player.hasPermission("KMChat.dm")) {
             string = string.substring(2);
             d = this.getConfig().getInt("range.closedm");
-            string4 = "&e***" + string + "***";
-        } else if ((string.startsWith("!#") || string.startsWith("дал№")) && player.hasPermission("KMChat.dm")) {
+            string4 = "&e**" + string + "**";
+        } else if (string.startsWith("==#") || string.startsWith("==№")) && player.hasPermission("KMChat.dm")) {
+            string = string.substring(3);
+            d = this.getConfig().getInt("range.closerdm");
+            string4 = "&e*" + string + "*";
+        } else if (string.startsWith("===#") || string.startsWith("===№")) && player.hasPermission("KMChat.dm")) {
+            string = string.substring(4);
+            d = this.getConfig().getInt("range.closestdm");
+            string4 = "&e~" + string + "~";
+        } else if ((string.startsWith("!#") || string.startsWith("!№")) && player.hasPermission("KMChat.dm")) {
             string = string.substring(2);
             d = this.getConfig().getInt("range.fardm");
-            string4 = "&e***" + string + "***";
+            string4 = "&e****" + string + "****";
+        } else if ((string.startsWith("!!#") || string.startsWith("!!№")) && player.hasPermission("KMChat.dm")) {
+            string = string.substring(3);
+            d = this.getConfig().getInt("range.farerdm");
+            string4 = "&e*****" + string + "*****";
+        } else if ((string.startsWith("!!!#") || string.startsWith("!!!№")) && player.hasPermission("KMChat.dm")) {
+            string = string.substring(4);
+            d = this.getConfig().getInt("range.farestdm");
+            string4 = "&e******" + string + "******";
         } else if (string.startsWith("*") && player.hasPermission("KMChat.me")) {
             string = string.substring(1);
             d = this.getConfig().getInt("range.me");
@@ -475,7 +491,7 @@ implements Listener {
         } else if ((string.startsWith("@@@") || string.startsWith("===")) && player.hasPermission("KMChat.whisper")) {
             string = string.substring(3);
             d = this.getConfig().getInt("range.strongwhisper");
-            string4 = String.format("%s&a%s&f (про себя): %s", string3, string2, string);
+            string4 = String.format("%s&a%s&f (едва слышно): %s", string3, string2, string);
         } else if ((string.startsWith("@@") || string.startsWith("==")) && player.hasPermission("KMChat.whisper")) {
             string = string.substring(2);
             d = this.getConfig().getInt("range.whisper");

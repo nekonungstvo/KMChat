@@ -1,8 +1,12 @@
 adminprefix: "&8[GM]"
 range.default: 18
 range.dm: 18
-range.closedm: 5
-range.fardm: 80
+range.closedm: 9
+range.closerdm: 3
+range.closestdm: 1
+range.fardm: 36
+range.farerdm: 60
+range.farestdm: 80
 range.me: 18
 range.strongshout: 80
 range.shout: 60
