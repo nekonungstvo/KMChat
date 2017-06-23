@@ -193,9 +193,9 @@ implements Listener {
                 string4 = "&e(( " + string2 + "&e бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
             }
         } else if (string.startsWith("===% ")) {
-            int n = 5;
+            int n = 2;
             try {
-                string = string.substring(2);
+                string = string.substring(5);
             }
             catch (Exception exception) {
                 n = 666;
