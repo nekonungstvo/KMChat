@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.Date;
+import java.io.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -31,6 +33,7 @@ extends JavaPlugin
 implements Listener {
     private Logger log = Logger.getLogger("Minecraft");
     private Map<Integer, String> nMap = new Hashtable<Integer, String>();
+    private String path = "/home/narg/actualserver/logs/";
 
     public void onEnable() {
         this.getConfig().options().copyDefaults(true);
@@ -59,16 +62,38 @@ implements Listener {
         this.log.info(String.format("%s is disabled!", this.getDescription().getFullName()));
     }
 
+    public void kmlog(String where, String what) {
+		try(FileWriter writer = new FileWriter(path + where + "/" + where + "_current.log", true)) {
+			Date date = new Date();
+			what = what.replaceAll("§.", "");
+	        writer.write("[" + date.toString() + "] " + what + "\n");
+    	}
+	    catch(IOException ex){
+    	  	System.out.println(ex.getMessage());
+	    }
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
-        String string = playerJoinEvent.getPlayer().getName();
-        playerJoinEvent.setJoinMessage("§e" + string + "§f входит в игру");
+        String name = playerJoinEvent.getPlayer().getName();
+        playerJoinEvent.setJoinMessage("§e" + name + "§f входит в игру");
+	String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
+	kmlog("whole", name + " ("+ip+")" + " входит в игру");
+	try(FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
+            writer.write(name + " " + ip);
+        }
+	catch(IOException ex){
+            System.out.println(ex.getMessage());
+        }
+
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent playerQuitEvent) {
-        String string = playerQuitEvent.getPlayer().getName();
-        playerQuitEvent.setQuitMessage("§e" + string + "§f выходит из игры");
+        String name = playerQuitEvent.getPlayer().getName();
+        playerQuitEvent.setQuitMessage("§e" + name + "§f выходит из игры");
+		String ip = playerQuitEvent.getPlayer().getAddress().getHostName();
+        kmlog("whole", name + " ("+ip+")" + " выходит из игры");
     }
 
     @EventHandler
@@ -526,26 +551,34 @@ implements Listener {
         string4 = string4.replaceAll("%", "%%");
         asyncPlayerChatEvent.setFormat(string4);
         asyncPlayerChatEvent.setMessage(string);
+		kmlog("whole", string4);
+		kmlog("chat", string4);
         if (bl) {
             asyncPlayerChatEvent.getRecipients().clear();
             asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, string4, d));
         }
     }
 
-    protected List<Player> getLocalRecipients(Player player, String string, double d) {
+    protected List<Player> getLocalRecipients(Player player, String message, double d) {
         Location location = player.getLocation();
         LinkedList<Player> linkedList = new LinkedList<Player>();
         double d2 = Math.pow(d, 2.0);
         for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
             if (player2.hasPermission("KMChat.admin")) {
                 if (!player2.getWorld().equals((Object)player.getWorld())) {
-                    string = string.replaceAll("§e", "§7");
-                    player2.sendMessage(string.replaceAll("§f", "§7"));
+                    message = message.replaceAll("§e", "§7");
+					message = message.replaceAll("§f", "§7");
+                    player2.sendMessage(message);
+					kmlog("whole", message);
+					kmlog("chat",  message);
                     continue;
                 }
                 if (location.distanceSquared(player2.getLocation()) > d2) {
-                    string = string.replaceAll("§e", "§7");
-                    player2.sendMessage(string.replaceAll("§f", "§7"));
+                    message = message.replaceAll("§e", "§7");
+		   			message = message.replaceAll("§f", "§7");
+                    player2.sendMessage(message);
+					kmlog("whole", message);
+					kmlog("chat",  message);
                     continue;
                 }
                 linkedList.add(player2);
