@@ -515,7 +515,7 @@ implements Listener {
             string4 = String.format("* %s&a%s&f %s", string3, string2, string);
         } else if ((string.startsWith("@@@") || string.startsWith("===")) && player.hasPermission("KMChat.whisper")) {
             string = string.substring(3);
-            d = this.getConfig().getInt("range.strongwhisper");
+            d = this.getConfig().getInt("range.weakwhisper");
             string4 = String.format("%s&a%s&f (едва слышно): %s", string3, string2, string);
         } else if ((string.startsWith("@@") || string.startsWith("==")) && player.hasPermission("KMChat.whisper")) {
             string = string.substring(2);
@@ -523,7 +523,7 @@ implements Listener {
             string4 = String.format("%s&a%s&f (шепчет): %s", string3, string2, string);
         } else if ((string.startsWith("@") || string.startsWith("=")) && player.hasPermission("KMChat.whisper")) {
             string = string.substring(1);
-            d = this.getConfig().getInt("range.weakwhisper");
+            d = this.getConfig().getInt("range.strongwhisper");
             string4 = String.format("%s&a%s&f (вполголоса): %s", string3, string2, string);
         } else if (string.startsWith("!!!") && player.hasPermission("KMChat.shout")) {
             string = string.substring(3);
