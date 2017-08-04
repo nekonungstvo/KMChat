@@ -80,7 +80,7 @@ implements Listener {
 	String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
 	kmlog("whole", name + " ("+ip+")" + " входит в игру");
 	try(FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
-            writer.write(name + " " + ip);
+            writer.write(name + " " + ip + "\n");
         }
 	catch(IOException ex){
             System.out.println(ex.getMessage());
