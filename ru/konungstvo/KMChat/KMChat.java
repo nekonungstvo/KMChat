@@ -536,7 +536,7 @@ implements Listener {
         } else if (string.startsWith("!") && player.hasPermission("KMChat.shout")) {
             string = string.substring(1);
             d = this.getConfig().getInt("range.weakshout");
-            string4 = String.format("%s&a%s&f (прикрикивает): %s", string3, string2, string);
+            string4 = String.format("%s&a%s&f (восклицает): %s", string3, string2, string);
         } else if (string.startsWith("?") && player.hasPermission("KMChat.global")) {
             bl = false;
             string = string.substring(1);
