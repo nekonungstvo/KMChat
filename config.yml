@@ -1,4 +1,5 @@
 adminprefix: "&8[GM]"
+logsdir: "/home/narg/actualserver/logs/"
 range.default: 18
 range.dm: 18
 range.closedm: 9
