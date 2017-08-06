@@ -73,512 +73,337 @@ implements Listener {
 	    }
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
-        String name = playerJoinEvent.getPlayer().getName();
-        playerJoinEvent.setJoinMessage("§e" + name + "§f входит в игру");
-	String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
-	kmlog("whole", name + " ("+ip+")" + " входит в игру");
-	try(FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
-            writer.write(name + " " + ip + "\n");
-        }
-	catch(IOException ex){
-            System.out.println(ex.getMessage());
-        }
+    public String dF(String mes) {
+		String result = "&e бросает 4dF (";
+		int n = -1;
+		for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
+			if (mes.startsWith(entry.getValue())) {
+				n = entry.getKey();
+				break;
+			}
+		}
+	        if (n < 0) {
+			n = 2;
+			mes = "ПЛОХО";
+		}
+		int[] dices = {-1, 0, 1};
+		int dice = 0;
+	for (int i = 0; i < 4; ++i) {
+		int rnd = new Random().nextInt(3);
+		dice = dices[rnd];
+		if (dice < 0) {
+			n -= 1;
+			result += "-";
+		}
+		else if (dice > 0) {
+			n += 1;
+			result += "+";
+		}
+		else {
+			result += "=";
+		}
+		
+	}
+	result += ") от " + mes + ". Результат: " + nMap.get(n) + " ))&f"; 
+return result; 
+}
 
+@EventHandler
+public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
+String name = playerJoinEvent.getPlayer().getName();
+playerJoinEvent.setJoinMessage("§e" + name + "§f входит в игру");
+String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
+kmlog("whole", name + " ("+ip+")" + " входит в игру");
+try(FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
+    writer.write(name + " " + ip + "\n");
+}
+catch(IOException ex){
+    System.out.println(ex.getMessage());
+}
+
+}
+
+@EventHandler
+public void onPlayerLeave(PlayerQuitEvent playerQuitEvent) {
+String name = playerQuitEvent.getPlayer().getName();
+playerQuitEvent.setQuitMessage("§e" + name + "§f выходит из игры");
+	String ip = playerQuitEvent.getPlayer().getAddress().getHostName();
+kmlog("whole", name + " ("+ip+")" + " выходит из игры");
+}
+
+@EventHandler
+public void onChatTab(PlayerChatTabCompleteEvent playerChatTabCompleteEvent) {
+if (playerChatTabCompleteEvent.getChatMessage().startsWith("% ")) {
+    Collection<String> collection = playerChatTabCompleteEvent.getTabCompletions();
+    collection.clear();
+    if (playerChatTabCompleteEvent.getLastToken().startsWith("у")) {
+	collection.add("ужасно");
+	} else if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
+	    collection.add("превосходно");
+	} else if (playerChatTabCompleteEvent.getLastToken().startsWith("пл")) {
+	    collection.add("плохо");
+    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("по")) {
+	    collection.add("посредственно");
+	} else if (playerChatTabCompleteEvent.getLastToken().startsWith("п")) {
+	    collection.add("плохо");
+	    collection.add("посредственно");
+	    collection.add("превосходно");
+	} else if (playerChatTabCompleteEvent.getLastToken().startsWith("н")) {
+	collection.add("нормально");
+    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
+	collection.add("хорошо");
+    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("о")) {
+	collection.add("отлично");
+    } else {
+	collection.add("ужасно");
+	collection.add("плохо");
+	collection.add("посредственно");
+	collection.add("нормально");
+	collection.add("хорошо");
+	collection.add("отлично");
+	collection.add("превосходно");
     }
+}
+}
 
-    @EventHandler
-    public void onPlayerLeave(PlayerQuitEvent playerQuitEvent) {
-        String name = playerQuitEvent.getPlayer().getName();
-        playerQuitEvent.setQuitMessage("§e" + name + "§f выходит из игры");
-		String ip = playerQuitEvent.getPlayer().getAddress().getHostName();
-        kmlog("whole", name + " ("+ip+")" + " выходит из игры");
+@EventHandler
+public void onPlayerChat(AsyncPlayerChatEvent asyncPlayerChatEvent) {
+Player player = asyncPlayerChatEvent.getPlayer();
+boolean bl = true;
+String mes = asyncPlayerChatEvent.getMessage();
+String name = player.getName();
+double range = this.getConfig().getInt("range.default");
+
+String adminprefix = "";
+if (player.hasPermission("KMChat.prefix")) {
+    adminprefix = this.getConfig().getString("adminprefix");
+}
+String result = String.format("%s&a%s&f: %s", adminprefix, name, mes);
+
+if ((mes.startsWith("d") || mes.startsWith("к")) && player.hasPermission("KMChat.dice")) {
+    boolean bl2 = false;
+    int n = 6;
+    if (mes.startsWith("d4") || mes.startsWith("к4")) {
+	n = 4;
+    } else if (mes.startsWith("d6") || mes.startsWith("к6")) {
+	n = 6;
+    } else if (mes.startsWith("d8") || mes.startsWith("к8")) {
+	n = 8;
+    } else if (mes.startsWith("d10") || mes.startsWith("к10")) {
+	n = 10;
+    } else if (mes.startsWith("d12") || mes.startsWith("к12")) {
+	n = 12;
+    } else if (mes.startsWith("d14") || mes.startsWith("к14")) {
+	n = 14;
+    } else if (mes.startsWith("d20") || mes.startsWith("к20")) {
+	n = 20;
+    } else {
+	bl2 = true;
     }
-
-    @EventHandler
-    public void onChatTab(PlayerChatTabCompleteEvent playerChatTabCompleteEvent) {
-        if (playerChatTabCompleteEvent.getChatMessage().startsWith("% ")) {
-            Collection collection = playerChatTabCompleteEvent.getTabCompletions();
-            collection.clear();
-            if (playerChatTabCompleteEvent.getLastToken().startsWith("у")) {
-                collection.add("ужасно");
-            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("п")) {
-                if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
-                    collection.add("превосходно");
-                }
-                if (playerChatTabCompleteEvent.getLastToken().startsWith("пл")) {
-                    collection.add("плохо");
-                }
-                if (playerChatTabCompleteEvent.getLastToken().startsWith("по")) {
-                    collection.add("посредственно");
-                } else {
-                    collection.add("плохо");
-                    collection.add("посредственно");
-                    collection.add("превосходно");
-                }
-            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("н")) {
-                collection.add("нормально");
-            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
-                collection.add("хорошо");
-            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("о")) {
-                collection.add("отлично");
-            } else {
-                collection.add("ужасно");
-                collection.add("плохо");
-                collection.add("посредственно");
-                collection.add("нормально");
-                collection.add("хорошо");
-                collection.add("отлично");
-                collection.add("превосходно");
-            }
-        }
+    if (!bl2) {
+	Random random = new Random();
+	int n2 = random.nextInt();
+	n2 = Math.abs(n2);
+	n2 %= n;
+	result = "&e(( " + name + "&e бросает d" + n + ". Выпадает " + ++n2 + " ))&f";
     }
-
-    @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent asyncPlayerChatEvent) {
-        Player player = asyncPlayerChatEvent.getPlayer();
-        boolean bl = true;
-        String string = asyncPlayerChatEvent.getMessage();
-        String string2 = player.getName();
-        double d = this.getConfig().getInt("range.default");
-        String string3 = "";
-        if (player.hasPermission("KMChat.prefix")) {
-            string3 = this.getConfig().getString("adminprefix");
-        }
-        String string4 = String.format("%s&a%s&f: %s", string3, string2, string);
-        if ((string.startsWith("d") || string.startsWith("к")) && player.hasPermission("KMChat.dice")) {
-            boolean bl2 = false;
-            int n = 6;
-            if (string.startsWith("d4") || string.startsWith("к4")) {
-                n = 4;
-            } else if (string.startsWith("d6") || string.startsWith("к6")) {
-                n = 6;
-            } else if (string.startsWith("d8") || string.startsWith("к8")) {
-                n = 8;
-            } else if (string.startsWith("d10") || string.startsWith("к10")) {
-                n = 10;
-            } else if (string.startsWith("d12") || string.startsWith("к12")) {
-                n = 12;
-            } else if (string.startsWith("d14") || string.startsWith("к14")) {
-                n = 14;
-            } else if (string.startsWith("d20") || string.startsWith("к20")) {
-                n = 20;
-            } else {
-                bl2 = true;
-            }
-            if (!bl2) {
-                Random random = new Random();
-                int n2 = random.nextInt();
-                n2 = Math.abs(n2);
-                n2 %= n;
-                string4 = "&e(( " + string2 + "&e бросает d" + n + ". Выпадает " + ++n2 + " ))&f";
-            }
-        } else if (string.startsWith("% ")) {
-            int n = 2;
-            try {
-                string = string.substring(2);
-            }
-            catch (Exception exception) {
-                n = 666;
-                string4 = string;
-            }
-            if (string.startsWith("ужасно")) {
-                n = 1;
-            } else if (string.startsWith("плохо")) {
-                n = 2;
-            } else if (string.startsWith("посредственно")) {
-                n = 3;
-            } else if (string.startsWith("нормально")) {
-                n = 4;
-            } else if (string.startsWith("хорошо")) {
-                n = 5;
-            } else if (string.startsWith("отлично")) {
-                n = 6;
-            } else if (string.startsWith("превосходно")) {
-                n = 7;
-            } else if (string.startsWith("легендарно")) {
-                n = 8;
-            } else {
-                n = 2;
-                string = "ПЛОХО";
-            }
-            Random random = new Random();
-            String string5 = "";
-            int n3 = random.nextInt();
-            for (int i = 0; i < 4; ++i) {
-                n3 = random.nextInt();
-                n3 = Math.abs(n3);
-                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
-                n += n3;
-            }
-            String string6 = "";
-            string6 = this.nMap.get(n);
-            if (n != 666) {
-                string4 = "&e(( " + string2 + "&e бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
-            }
-        } else if (string.startsWith("===% ")) {
-            int n = 2;
-            try {
-                string = string.substring(5);
-            }
-            catch (Exception exception) {
-                n = 666;
-                string4 = string;
-            }
-            if (string.startsWith("ужасно")) {
-                n = 1;
-            } else if (string.startsWith("плохо")) {
-                n = 2;
-            } else if (string.startsWith("посредственно")) {
-                n = 3;
-            } else if (string.startsWith("нормально")) {
-                n = 4;
-            } else if (string.startsWith("хорошо")) {
-                n = 5;
-            } else if (string.startsWith("отлично")) {
-                n = 6;
-            } else if (string.startsWith("превосходно")) {
-                n = 7;
-            } else if (string.startsWith("легендарно")) {
-                n = 8;
-            } else {
-                n = 2;
-                string = "ПЛОХО";
-            }
-            Random random = new Random();
-            String string5 = "";
-            int n3 = random.nextInt();
-            for (int i = 0; i < 4; ++i) {
-                n3 = random.nextInt();
-                n3 = Math.abs(n3);
-                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
-                n += n3;
-            }
-            String string6 = "";
-            string6 = this.nMap.get(n);
-            if (n != 666) {
-                d = this.getConfig().getInt("range.weakwhisper");
-                string4 = "&e(( " + string2 + "&e едва слышно бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
-            }            
-        } else if (string.startsWith("==% ")) {
-            int n = 2;
-            try {
-                string = string.substring(4);
-            }
-            catch (Exception exception) {
-                n = 666;
-                string4 = string;
-            }
-            if (string.startsWith("ужасно")) {
-                n = 1;
-            } else if (string.startsWith("плохо")) {
-                n = 2;
-            } else if (string.startsWith("посредственно")) {
-                n = 3;
-            } else if (string.startsWith("нормально")) {
-                n = 4;
-            } else if (string.startsWith("хорошо")) {
-                n = 5;
-            } else if (string.startsWith("отлично")) {
-                n = 6;
-            } else if (string.startsWith("превосходно")) {
-                n = 7;
-            } else if (string.startsWith("легендарно")) {
-                n = 8;
-            } else {
-                n = 2;
-                string = "ПЛОХО";
-            }
-            Random random = new Random();
-            String string5 = "";
-            int n3 = random.nextInt();
-            for (int i = 0; i < 4; ++i) {
-                n3 = random.nextInt();
-                n3 = Math.abs(n3);
-                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
-                n += n3;
-            }
-            String string6 = "";
-            string6 = this.nMap.get(n);
-            if (n != 666) {
-                d = this.getConfig().getInt("range.whisper");
-                string4 = "&e(( " + string2 + "&e очень тихо бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
-            }      
-        } else if (string.startsWith("=% ")) {
-            int n = 2;
-            try {
-                string = string.substring(3);
-            }
-            catch (Exception exception) {
-                n = 666;
-                string4 = string;
-            }
-            if (string.startsWith("ужасно")) {
-                n = 1;
-            } else if (string.startsWith("плохо")) {
-                n = 2;
-            } else if (string.startsWith("посредственно")) {
-                n = 3;
-            } else if (string.startsWith("нормально")) {
-                n = 4;
-            } else if (string.startsWith("хорошо")) {
-                n = 5;
-            } else if (string.startsWith("отлично")) {
-                n = 6;
-            } else if (string.startsWith("превосходно")) {
-                n = 7;
-            } else if (string.startsWith("легендарно")) {
-                n = 8;
-            } else {
-                n = 2;
-                string = "ПЛОХО";
-            }
-            Random random = new Random();
-            String string5 = "";
-            int n3 = random.nextInt();
-            for (int i = 0; i < 4; ++i) {
-                n3 = random.nextInt();
-                n3 = Math.abs(n3);
-                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
-                n += n3;
-            }
-            String string6 = "";
-            string6 = this.nMap.get(n);
-            if (n != 666) {
-                d = this.getConfig().getInt("range.strongwhisper");
-                string4 = "&e(( " + string2 + "&e тихо бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
-            }      
-        } else if (string.startsWith("!!!% ")) {
-            int n = 2;
-            try {
-                string = string.substring(5);
-            }
-            catch (Exception exception) {
-                n = 666;
-                string4 = string;
-            }
-            if (string.startsWith("ужасно")) {
-                n = 1;
-            } else if (string.startsWith("плохо")) {
-                n = 2;
-            } else if (string.startsWith("посредственно")) {
-                n = 3;
-            } else if (string.startsWith("нормально")) {
-                n = 4;
-            } else if (string.startsWith("хорошо")) {
-                n = 5;
-            } else if (string.startsWith("отлично")) {
-                n = 6;
-            } else if (string.startsWith("превосходно")) {
-                n = 7;
-            } else if (string.startsWith("легендарно")) {
-                n = 8;
-            } else {
-                n = 2;
-                string = "ПЛОХО";
-            }
-            Random random = new Random();
-            String string5 = "";
-            int n3 = random.nextInt();
-            for (int i = 0; i < 4; ++i) {
-                n3 = random.nextInt();
-                n3 = Math.abs(n3);
-                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
-                n += n3;
-            }
-            String string6 = "";
-            string6 = this.nMap.get(n);
-            if (n != 666) {
-                d = this.getConfig().getInt("range.strongshout");
-                string4 = "&e(( " + string2 + "&e СВЕРХГРОМКО ОБРУШИВАЕТ 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
-            }      
-        } else if (string.startsWith("!!% ")) {
-            int n = 2;
-            try {
-                string = string.substring(4);
-            }
-            catch (Exception exception) {
-                n = 666;
-                string4 = string;
-            }
-            if (string.startsWith("ужасно")) {
-                n = 1;
-            } else if (string.startsWith("плохо")) {
-                n = 2;
-            } else if (string.startsWith("посредственно")) {
-                n = 3;
-            } else if (string.startsWith("нормально")) {
-                n = 4;
-            } else if (string.startsWith("хорошо")) {
-                n = 5;
-            } else if (string.startsWith("отлично")) {
-                n = 6;
-            } else if (string.startsWith("превосходно")) {
-                n = 7;
-            } else if (string.startsWith("легендарно")) {
-                n = 8;
-            } else {
-                n = 2;
-                string = "ПЛОХО";
-            }
-            Random random = new Random();
-            String string5 = "";
-            int n3 = random.nextInt();
-            for (int i = 0; i < 4; ++i) {
-                n3 = random.nextInt();
-                n3 = Math.abs(n3);
-                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
-                n += n3;
-            }
-            String string6 = "";
-            string6 = this.nMap.get(n);
-            if (n != 666) {
-                d = this.getConfig().getInt("range.shout");
-                string4 = "&e(( " + string2 + "&e очень громко бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
-            }      
-        } else if (string.startsWith("!% ")) {
-            int n = 2;
-            try {
-                string = string.substring(3);
-            }
-            catch (Exception exception) {
-                n = 666;
-                string4 = string;
-            }
-            if (string.startsWith("ужасно")) {
-                n = 1;
-            } else if (string.startsWith("плохо")) {
-                n = 2;
-            } else if (string.startsWith("посредственно")) {
-                n = 3;
-            } else if (string.startsWith("нормально")) {
-                n = 4;
-            } else if (string.startsWith("хорошо")) {
-                n = 5;
-            } else if (string.startsWith("отлично")) {
-                n = 6;
-            } else if (string.startsWith("превосходно")) {
-                n = 7;
-            } else if (string.startsWith("легендарно")) {
-                n = 8;
-            } else {
-                n = 2;
-                string = "ПЛОХО";
-            }
-            Random random = new Random();
-            String string5 = "";
-            int n3 = random.nextInt();
-            for (int i = 0; i < 4; ++i) {
-                n3 = random.nextInt();
-                n3 = Math.abs(n3);
-                string5 = (n3 = n3 % 3 - 1) < 0 ? string5 + "-" : (n3 > 0 ? string5 + "+" : string5 + "=");
-                n += n3;
-            }
-            String string6 = "";
-            string6 = this.nMap.get(n);
-            if (n != 666) {
-                d = this.getConfig().getInt("range.weakshout");
-                string4 = "&e(( " + string2 + "&e громко бросает 4dF (" + string5 + ") от " + string + ". Результат: " + string6 + " ))&f";
-            }                  
-        } else if ((string.startsWith("#") || string.startsWith("№")) && player.hasPermission("KMChat.dm")) {
-            string = string.substring(1);
-            d = this.getConfig().getInt("range.dm");
-            string4 = "&e***" + string + "***";
-        } else if ((string.startsWith("=#") || string.startsWith("=№")) && player.hasPermission("KMChat.dm")) {
-            string = string.substring(2);
-            d = this.getConfig().getInt("range.closedm");
-            string4 = "&e**" + string + "**";
-        } else if ((string.startsWith("==#") || string.startsWith("==№")) && player.hasPermission("KMChat.dm")) {
-            string = string.substring(3);
-            d = this.getConfig().getInt("range.closerdm");
-            string4 = "&e*" + string + "*";
-        } else if ((string.startsWith("===#") || string.startsWith("===№")) && player.hasPermission("KMChat.dm")) {
-            string = string.substring(4);
-            d = this.getConfig().getInt("range.closestdm");
-            string4 = "&e~" + string + "~";
-        } else if ((string.startsWith("!#") || string.startsWith("!№")) && player.hasPermission("KMChat.dm")) {
-            string = string.substring(2);
-            d = this.getConfig().getInt("range.fardm");
-            string4 = "&e****" + string + "****";
-        } else if ((string.startsWith("!!#") || string.startsWith("!!№")) && player.hasPermission("KMChat.dm")) {
-            string = string.substring(3);
-            d = this.getConfig().getInt("range.farerdm");
-            string4 = "&e*****" + string + "*****";
-        } else if ((string.startsWith("!!!#") || string.startsWith("!!!№")) && player.hasPermission("KMChat.dm")) {
-            string = string.substring(4);
-            d = this.getConfig().getInt("range.farestdm");
-            string4 = "&e******" + string + "******";
-        } else if (string.startsWith("*") && player.hasPermission("KMChat.me")) {
-            string = string.substring(1);
-            d = this.getConfig().getInt("range.me");
-            string4 = String.format("* %s&a%s&f %s", string3, string2, string);
-        } else if ((string.startsWith("@@@") || string.startsWith("===")) && player.hasPermission("KMChat.whisper")) {
-            string = string.substring(3);
-            d = this.getConfig().getInt("range.weakwhisper");
-            string4 = String.format("%s&a%s&f (едва слышно): %s", string3, string2, string);
-        } else if ((string.startsWith("@@") || string.startsWith("==")) && player.hasPermission("KMChat.whisper")) {
-            string = string.substring(2);
-            d = this.getConfig().getInt("range.whisper");
-            string4 = String.format("%s&a%s&f (шепчет): %s", string3, string2, string);
-        } else if ((string.startsWith("@") || string.startsWith("=")) && player.hasPermission("KMChat.whisper")) {
-            string = string.substring(1);
-            d = this.getConfig().getInt("range.strongwhisper");
-            string4 = String.format("%s&a%s&f (вполголоса): %s", string3, string2, string);
-        } else if (string.startsWith("!!!") && player.hasPermission("KMChat.shout")) {
-            string = string.substring(3);
-            d = this.getConfig().getInt("range.strongshout");
-            string4 = String.format("%s&a%s&f (орёт): %s", string3, string2, string);
-        } else if (string.startsWith("!!") && player.hasPermission("KMChat.shout")) {
-            string = string.substring(2);
-            d = this.getConfig().getInt("range.shout");
-            string4 = String.format("%s&a%s&f (кричит): %s", string3, string2, string);
-        } else if (string.startsWith("!") && player.hasPermission("KMChat.shout")) {
-            string = string.substring(1);
-            d = this.getConfig().getInt("range.weakshout");
-            string4 = String.format("%s&a%s&f (восклицает): %s", string3, string2, string);
-        } else if (string.startsWith("?") && player.hasPermission("KMChat.global")) {
-            bl = false;
-            string = string.substring(1);
-            string4 = String.format("%s&a%s&f: &b(( %s ))&f", string3, string2, string);
-        } else if (string.startsWith("_")) {
-            string = "((" + string.substring(1) + "))";
-        }
-        if (string.startsWith("((") && string.endsWith("))")) {
-            string4 = String.format("%s&a%s&f (OOC): &d%s&f", string3, string2, string);
-        }
-        string4 = string4.replaceAll("&([a-z0-9])", "§$1");
-        string4 = string4.replaceAll("%", "%%");
-        asyncPlayerChatEvent.setFormat(string4);
-        asyncPlayerChatEvent.setMessage(string);
-		kmlog("whole", string4);
-		kmlog("chat", string4);
-        if (bl) {
-            asyncPlayerChatEvent.getRecipients().clear();
-            asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, string4, d));
-        }
+} else if (mes.startsWith("% ")) {
+    int n = 2;
+    try {
+	mes = mes.substring(2);
     }
+    catch (Exception exception) {
+	n = 666;
+	result = mes;
+    }
+    if (n != 666) {
+	String dice = dF(mes);
+			result = "&e(( " + name + dice;
+    }
+} else if (mes.startsWith("===% ")) {
+    int n = 2;
+    try {
+	mes = mes.substring(5);
+    }
+    catch (Exception exception) {
+	n = 666;
+	result = mes;
+    }
+    if (n != 666) {
+	range = this.getConfig().getInt("range.weakwhisper");
+			String dice = dF(mes);
+			dice.replaceAll("бросает", "едва слышно бросает");
+	result = "&e(( " + name + dice;
+    }            
+} else if (mes.startsWith("==% ")) {
+    int n = 2;
+    try {
+	mes = mes.substring(4);
+    }
+    catch (Exception exception) {
+	n = 666;
+	result = mes;
+    }
+    if (n != 666) {
+	range = this.getConfig().getInt("range.whisper");
+			String dice = dF(mes);
+			dice.replaceAll("бросает", "очень тихо бросает");
+	result = "&e(( " + name + dice;
+    }      
+} else if (mes.startsWith("=% ")) {
+    int n = 2;
+    try {
+	mes = mes.substring(3);
+    }
+    catch (Exception exception) {
+	n = 666;
+	result = mes;
+    }
+    if (n != 666) {
+	range = this.getConfig().getInt("range.strongwhisper");
+			String dice = dF(mes);
+			dice.replaceAll("бросает", "тихо бросает");
+	result = "&e(( " + name + dice;
+    }      
+} else if (mes.startsWith("!!!% ")) {
+    int n = 2;
+    try {
+	mes = mes.substring(5);
+    }
+    catch (Exception exception) {
+	n = 666;
+	result = mes;
+    }
+    if (n != 666) {
+	range = this.getConfig().getInt("range.strongshout");
+			String dice = dF(mes);
+			dice.replaceAll("бросает", "СВЕРХГРОМКО ОБРУШИВАЕТ");
+	result = "&e(( " + name + dice;
+    }      
+} else if (mes.startsWith("!!% ")) {
+    int n = 2;
+    try {
+	mes = mes.substring(4);
+    }
+    catch (Exception exception) {
+	n = 666;
+	result = mes;
+    }
+    if (n != 666) {
+	range = this.getConfig().getInt("range.shout");
+			String dice = dF(mes);
+			dice.replaceAll("бросает", "очень громко бросает");
+	result = "&e(( " + name + dice;
+    }      
+} else if (mes.startsWith("!% ")) {
+    int n = 2;
+    try {
+	mes = mes.substring(3);
+    }
+    catch (Exception exception) {
+	n = 666;
+	result = mes;
+    }
+    if (n != 666) {
+	range = this.getConfig().getInt("range.weakshout");
+			String dice = dF(mes);
+			dice.replaceAll("бросает", "громко бросает");
+	result = "&e(( " + name + dice;
+    }                  
+} else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
+    mes = mes.substring(1);
+    range = this.getConfig().getInt("range.dm");
+    result = "&e***" + mes + "***";
+} else if ((mes.startsWith("=#") || mes.startsWith("=№")) && player.hasPermission("KMChat.dm")) {
+    mes = mes.substring(2);
+    range = this.getConfig().getInt("range.closedm");
+    result = "&e**" + mes + "**";
+} else if ((mes.startsWith("==#") || mes.startsWith("==№")) && player.hasPermission("KMChat.dm")) {
+    mes = mes.substring(3);
+    range = this.getConfig().getInt("range.closerdm");
+    result = "&e*" + mes + "*";
+} else if ((mes.startsWith("===#") || mes.startsWith("===№")) && player.hasPermission("KMChat.dm")) {
+    mes = mes.substring(4);
+    range = this.getConfig().getInt("range.closestdm");
+    result = "&e~" + mes + "~";
+} else if ((mes.startsWith("!#") || mes.startsWith("!№")) && player.hasPermission("KMChat.dm")) {
+    mes = mes.substring(2);
+    range = this.getConfig().getInt("range.fardm");
+    result = "&e****" + mes + "****";
+} else if ((mes.startsWith("!!#") || mes.startsWith("!!№")) && player.hasPermission("KMChat.dm")) {
+    mes = mes.substring(3);
+    range = this.getConfig().getInt("range.farerdm");
+    result = "&e*****" + mes + "*****";
+} else if ((mes.startsWith("!!!#") || mes.startsWith("!!!№")) && player.hasPermission("KMChat.dm")) {
+    mes = mes.substring(4);
+    range = this.getConfig().getInt("range.farestdm");
+    result = "&e******" + mes + "******";
+} else if (mes.startsWith("*") && player.hasPermission("KMChat.me")) {
+    mes = mes.substring(1);
+    range = this.getConfig().getInt("range.me");
+    result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
+} else if ((mes.startsWith("@@@") || mes.startsWith("===")) && player.hasPermission("KMChat.whisper")) {
+    mes = mes.substring(3);
+    range = this.getConfig().getInt("range.weakwhisper");
+    result = String.format("%s&a%s&f (едва слышно): %s", adminprefix, name, mes);
+} else if ((mes.startsWith("@@") || mes.startsWith("==")) && player.hasPermission("KMChat.whisper")) {
+    mes = mes.substring(2);
+    range = this.getConfig().getInt("range.whisper");
+    result = String.format("%s&a%s&f (шепчет): %s", adminprefix, name, mes);
+} else if ((mes.startsWith("@") || mes.startsWith("=")) && player.hasPermission("KMChat.whisper")) {
+    mes = mes.substring(1);
+    range = this.getConfig().getInt("range.strongwhisper");
+    result = String.format("%s&a%s&f (вполголоса): %s", adminprefix, name, mes);
+} else if (mes.startsWith("!!!") && player.hasPermission("KMChat.shout")) {
+    mes = mes.substring(3);
+    range = this.getConfig().getInt("range.strongshout");
+    result = String.format("%s&a%s&f (орёт): %s", adminprefix, name, mes);
+} else if (mes.startsWith("!!") && player.hasPermission("KMChat.shout")) {
+    mes = mes.substring(2);
+    range = this.getConfig().getInt("range.shout");
+    result = String.format("%s&a%s&f (кричит): %s", adminprefix, name, mes);
+} else if (mes.startsWith("!") && player.hasPermission("KMChat.shout")) {
+    mes = mes.substring(1);
+    range = this.getConfig().getInt("range.weakshout");
+    result = String.format("%s&a%s&f (восклицает): %s", adminprefix, name, mes);
+} else if (mes.startsWith("?") && player.hasPermission("KMChat.global")) {
+    bl = false;
+    mes = mes.substring(1);
+    result = String.format("%s&a%s&f: &b(( %s ))&f", adminprefix, name, mes);
+} else if (mes.startsWith("_")) {
+    mes = "((" + mes.substring(1) + "))";
+}
+if (mes.startsWith("((") && mes.endsWith("))")) {
+    result = String.format("%s&a%s&f (OOC): &d%s&f", adminprefix, name, mes);
+}
+result = result.replaceAll("&([a-z0-9])", "§$1");
+result = result.replaceAll("%", "%%");
+asyncPlayerChatEvent.setFormat(result);
+asyncPlayerChatEvent.setMessage(mes);
+	kmlog("whole", result);
+	kmlog("chat", result);
+if (bl) {
+    asyncPlayerChatEvent.getRecipients().clear();
+    asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
+}
+}
 
-    protected List<Player> getLocalRecipients(Player player, String message, double d) {
-        Location location = player.getLocation();
-        LinkedList<Player> linkedList = new LinkedList<Player>();
-        double d2 = Math.pow(d, 2.0);
-        for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
-            if (player2.hasPermission("KMChat.admin")) {
-                if (!player2.getWorld().equals((Object)player.getWorld())) {
-                    message = message.replaceAll("§e", "§7");
-					message = message.replaceAll("§f", "§7");
-                    player2.sendMessage(message);
-					kmlog("whole", message);
-					kmlog("chat",  message);
-                    continue;
-                }
-                if (location.distanceSquared(player2.getLocation()) > d2) {
-                    message = message.replaceAll("§e", "§7");
-		   			message = message.replaceAll("§f", "§7");
-                    player2.sendMessage(message);
-					kmlog("whole", message);
-					kmlog("chat",  message);
+protected List<Player> getLocalRecipients(Player player, String mes, double d) {
+Location location = player.getLocation();
+LinkedList<Player> linkedList = new LinkedList<Player>();
+double d2 = Math.pow(d, 2.0);
+for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
+    if (player2.hasPermission("KMChat.admin")) {
+	if (!player2.getWorld().equals((Object)player.getWorld())) {
+	    mes = mes.replaceAll("§e", "§7");
+				mes = mes.replaceAll("§f", "§7");
+	    player2.sendMessage(mes);
+	    continue;
+	}
+	if (location.distanceSquared(player2.getLocation()) > d2) {
+                    mes = mes.replaceAll("§e", "§7");
+		   			mes = mes.replaceAll("§f", "§7");
+                    player2.sendMessage(mes);
                     continue;
                 }
                 linkedList.add(player2);
