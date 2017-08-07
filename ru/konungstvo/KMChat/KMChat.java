@@ -75,7 +75,7 @@ implements Listener {
     }
 
     public String dF(String mes) {
-		String result = "&e бросает 4dF (";
+		String result = "(";
 		int n = -1;
 		for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
 			if (mes.startsWith(entry.getValue())) {
@@ -104,7 +104,7 @@ implements Listener {
 				result += "=";
 			}
 		}
-		result += ") от " + mes + ". Результат: " + nMap.get(n) + " ))&f"; 
+		result += String.format(") от %s. Результат: %s", mes, nMap.get(n)); 
 		return result; 
 	}	
 
@@ -132,7 +132,14 @@ implements Listener {
 
 	@EventHandler
 	public void onChatTab(PlayerChatTabCompleteEvent playerChatTabCompleteEvent) {
-		if (playerChatTabCompleteEvent.getChatMessage().startsWith("% ")) {
+		String mes = playerChatTabCompleteEvent.getChatMessage();
+		if (mes.startsWith("% ") ||
+			mes.startsWith("=% ") ||
+			mes.startsWith("!% ") ||
+			mes.startsWith("==% ") ||
+			mes.startsWith("!!% ") ||
+			mes.startsWith("===% ") ||
+			mes.startsWith("!!!% ") ) {
 	    	Collection<String> collection = playerChatTabCompleteEvent.getTabCompletions();
 		    collection.clear();
     		if (playerChatTabCompleteEvent.getLastToken().startsWith("у")) {
@@ -207,10 +214,14 @@ implements Listener {
 			result = "&e(( " + name + "&e бросает d" + n + ". Выпадает " + ++n2 + " ))&f";
 	    }
 
-		} else if (mes.startsWith("% ")) {
+		} else if (mes.startsWith("%")) {
 	    	int n = 2;
 	    	try {
-				mes = mes.substring(2);
+				if (mes.startsWith("% ")) {
+					mes = mes.substring(2);
+				} else {
+					mes = mes.substring(1);
+				}
 		    }
 	    	catch (Exception exception) {
 				n = 666;
@@ -218,13 +229,17 @@ implements Listener {
     		}
 	    	if (n != 666) {
 				String dice = dF(mes);
-				result = "&e(( " + name + dice;
+				result = String.format("&e(( %s бросает 4dF %s ))&f", name, dice);
 		    }
 
-		} else if (mes.startsWith("===% ")) {
+		} else if (mes.startsWith("===%")) {
 		    int n = 2;
 		    try {
-				mes = mes.substring(5);
+				if (mes.startsWith("===% ")) {
+					mes = mes.substring(5);
+				} else {
+					mes = mes.substring(4);
+				}
 		    }	
     		catch (Exception exception) {
 				n = 666;
@@ -233,14 +248,17 @@ implements Listener {
     		if (n != 666) {
 				range = this.getConfig().getInt("range.weakwhisper");
 				String dice = dF(mes);
-				dice = dice.replaceAll("бросает", "едва слышно бросает");
-				result = "&e(( " + name + dice;
+				result = String.format("&e((%s едва слышно бросает 4dF%s ))&f", name, dice);
 		    }            
 
-		} else if (mes.startsWith("==% ")) {
+		} else if (mes.startsWith("==%")) {
 		    int n = 2;
 		    try {
-				mes = mes.substring(4);
+				if (mes.startsWith("==% ")) {
+					mes = mes.substring(4); 
+				} else {
+					mes = mes.substring(3);
+				}
 		    }
 		    catch (Exception exception) {
 				n = 666;
@@ -249,14 +267,17 @@ implements Listener {
 		    if (n != 666) {
 				range = this.getConfig().getInt("range.whisper");
 				String dice = dF(mes);
-				dice = dice.replaceAll("бросает", "очень тихо бросает");
-				result = "&e(( " + name + dice;
+				result = String.format("&e(( %s очень тихо бросает 4dF %s ))&f", name, dice);
 		    }      
 
-		} else if (mes.startsWith("=% ")) {
+		} else if (mes.startsWith("=%")) {
 		    int n = 2;
 		    try {
-				mes = mes.substring(3);
+				if (mes.startsWith("=% ")) {
+					mes = mes.substring(3);
+				} else {
+					mes = mes.substring(2);
+				}
 		    }
 		    catch (Exception exception) {
 				n = 666;
@@ -265,14 +286,17 @@ implements Listener {
 		    if (n != 666) {
 				range = this.getConfig().getInt("range.strongwhisper");
 				String dice = dF(mes);
-				dice = dice.replaceAll("бросает", "тихо бросает");
-				result = "&e(( " + name + dice;
+				result = String.format("&e(( %s тихо бросает 4dF %s ))&f", name, dice);
 		    }      
 	
-		} else if (mes.startsWith("!!!% ")) {
+		} else if (mes.startsWith("!!!%")) {
 		    int n = 2;
 		    try {
-				mes = mes.substring(5);
+				if (mes.startsWith("!!!% ")) {
+					mes = mes.substring(5);
+				} else {
+					mes = mes.substring(4);
+				}
 		    }
 		    catch (Exception exception) {
 				n = 666;
@@ -281,14 +305,17 @@ implements Listener {
 		    if (n != 666) {
 				range = this.getConfig().getInt("range.strongshout");
 				String dice = dF(mes);
-				dice = dice.replaceAll("бросает", "СВЕРХГРОМКО ОБРУШИВАЕТ");
-				result = "&e(( " + name + dice;
+				result = String.format("&e(( %s СВЕРХГРОМКО ОБРУШИВАЕТ 4dF %s ))&f", name, dice);
 		    }      
 		
-		} else if (mes.startsWith("!!% ")) {
+		} else if (mes.startsWith("!!%")) {
 		    int n = 2;
 		    try {
-				mes = mes.substring(4);
+				if (mes.startsWith("!!% ")) {
+					mes = mes.substring(4);
+				} else {
+				mes = mes.substring(3);
+				}
 		    }
 		    catch (Exception exception) {
 				n = 666;
@@ -297,14 +324,17 @@ implements Listener {
 		    if (n != 666) {
 				range = this.getConfig().getInt("range.shout");
 				String dice = dF(mes);
-				dice = dice.replaceAll("бросает", "очень громко бросает");
-				result = "&e(( " + name + dice;
+				result = String.format("&e(( %s очень громко бросает 4dF %s ))&f", name, dice);
 		    }      
 			
-		} else if (mes.startsWith("!% ")) {
+		} else if (mes.startsWith("!%")) {
 		    int n = 2;
 		    try {
-				mes = mes.substring(3);
+				if (mes.startsWith("!% ")) {
+					mes = mes.substring(3);
+				} else {
+					mes = mes.substring(2);
+				}
 		    }
 		    catch (Exception exception) {
 				n = 666;
@@ -313,8 +343,7 @@ implements Listener {
 		    if (n != 666) {
 				range = this.getConfig().getInt("range.weakshout");
 				String dice = dF(mes);
-				dice = dice.replaceAll("бросает", "громко бросает");
-				result = "&e(( " + name + dice;
+				result = String.format("&e(( %s громко бросает 4dF %s ))&f", name, dice);
 		    }       	           
 		
 		} else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
