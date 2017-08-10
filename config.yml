@@ -1,5 +1,5 @@
 adminprefix: "&8[GM]"
-logsdir: "../logs/"
+logsdir: "logs/"
 range.default: 18
 range.dm: 18
 range.closedm: 9
