@@ -59,7 +59,7 @@ implements Listener {
         this.log.info(String.format("%s is enabled!", this.getDescription().getFullName()));
     }
 
-    public void onDisable() {
+    public void onDisable() {	
         this.log.info(String.format("%s is disabled!", this.getDescription().getFullName()));
     }
 
@@ -109,7 +109,7 @@ implements Listener {
     }	
 
     public String dnum(String mes) {
-	int[] poss = {4, 6, 8, 10, 12, 14};
+	int[] poss = {4, 6, 8, 10, 12, 14, 20};
         int n = -1;
         for (int i = 0; i < poss.length; ++i) {
 	    int compare = poss[i];
@@ -169,6 +169,7 @@ implements Listener {
     public void onChatTab(PlayerChatTabCompleteEvent playerChatTabCompleteEvent) {
     	String mes = playerChatTabCompleteEvent.getChatMessage();
     	if (mes.startsWith("% ") ||
+	    mes.startsWith(")% ") ||
             mes.startsWith("=% ") ||
 	    mes.startsWith("!% ") ||
 	    mes.startsWith("==% ") ||
@@ -211,7 +212,8 @@ implements Listener {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent asyncPlayerChatEvent) {
 	Player player = asyncPlayerChatEvent.getPlayer();
-	boolean bl = true;
+	boolean local = true;
+	boolean forgm = false;
 	String mes = asyncPlayerChatEvent.getMessage();
 	String name = player.getName();
 	double range = this.getConfig().getInt("range.default");
@@ -222,22 +224,81 @@ implements Listener {
 	}
 	String result = String.format("%s&a%s&f: %s", adminprefix, name, mes);
 	
-	if ((mes.startsWith("d") || mes.startsWith("к")) && player.hasPermission("KMChat.dice")) {
-	    mes = mes.substring(1);
-	    String dice = dnum(mes);
+	    
+
+	if ((mes.startsWith(")d") || mes.startsWith(")к")) && player.hasPermission("kmchat.dice")) {
+	    String helpmes = mes.substring(2);
+	    String dice = dnum(helpmes);
+	    forgm = true;
+	    if (dice != null) {
+		result = String.format("&a%s &f(to GM) &eбросает %s &f", name, dice);
+	    }
+
+	} else if ((mes.startsWith("===d") || mes.startsWith("===к")) && player.hasPermission("kmchat.dice")) {
+	    String helpmes = mes.substring(4);
+	    String dice = dnum(helpmes);
+	    if (dice != null) {
+		result = String.format("&e(( %s едва слышно бросает %s ))&f", name, dice);
+		range = this.getConfig().getInt("range.weakwhisper");
+	    }
+	} else if ((mes.startsWith("==d") || mes.startsWith("==к")) && player.hasPermission("kmchat.dice")) {
+	    String helpmes = mes.substring(3);
+	    String dice = dnum(helpmes);
+	    if (dice != null) {
+		result = String.format("&e(( %s очень тихо бросает %s ))&f", name, dice);
+		range = this.getConfig().getInt("range.wisper");
+	    }
+
+	} else if ((mes.startsWith("=d") || mes.startsWith("=к")) && player.hasPermission("kmchat.dice")) {
+	    String helpmes = mes.substring(2);
+	    String dice = dnum(helpmes);
+	    if (dice != null) {
+		result = String.format("&e(( %s тихо бросает %s ))&f", name, dice);
+		range = this.getConfig().getInt("range.strongwisper");
+	    }
+
+	} else if ((mes.startsWith("!d") || mes.startsWith("!к")) && player.hasPermission("kmchat.dice")) {
+	    String helpmes = mes.substring(2);
+	    String dice = dnum(helpmes);
+	    if (dice != null) {
+		result = String.format("&e(( %s громко бросает %s ))&f", name, dice);
+		range = this.getConfig().getInt("range.weakshout");
+	    }
+
+	} else if ((mes.startsWith("!!d") || mes.startsWith("!!к")) && player.hasPermission("kmchat.dice")) {
+	    String helpmes = mes.substring(3);
+	    String dice = dnum(helpmes);
+	    if (dice != null) {
+		result = String.format("&e(( %s очень громко бросает %s ))&f", name, dice);
+		range = this.getConfig().getInt("range.shout");
+	    }
+	
+	} else if ((mes.startsWith("!!!d") || mes.startsWith("!!!к")) && player.hasPermission("kmchat.dice")) {
+	    String helpmes = mes.substring(4);
+	    String dice = dnum(helpmes);
+	    if (dice != null) {
+		result = String.format("&e(( %s СВЕРХГРОМКО ОБРУШИВАЕТ %s ))&f", name, dice);
+		range = this.getConfig().getInt("range.strongshout");
+	    }
+
+	} else if ((mes.startsWith("d") || mes.startsWith("к")) && player.hasPermission("kmchat.dice")) {
+	    String helpmes = mes.substring(1);
+	    String dice = dnum(helpmes);
 	    if (dice != null) {
 		result = String.format("&e(( %s &e бросает %s ))&f", name, dice);
 	    }
 
-        } else if (mes.startsWith("%")) {
+	} else if (mes.startsWith(")%")) {
 	    int n = 2;
-            if (mes.startsWith("% ")) {
-	    	mes = mes.substring(2);
+	    forgm = true;
+            if (mes.startsWith(")% ")) {
+	    	mes = mes.substring(3);
 	    } else {
-		mes = mes.substring(1);
+		mes = mes.substring(2);
 	    }
 	    String dice = dF(mes);
-	    result = String.format("&e(( %s бросает 4dF %s ))&f", name, dice);
+	    result = String.format("&a%s &f(to GM) &eбросает 4dF %s &f", name, dice);
+
 
 	} else if (mes.startsWith("===%")) {
 	    int n = 2;
@@ -376,25 +437,46 @@ implements Listener {
 	    result = String.format("%s&a%s&f (восклицает): %s", adminprefix, name, mes);
 		
 	} else if (mes.startsWith("^") && player.hasPermission("KMChat.global")) {
-	    bl = false;
+	    local = true;
 	    mes = mes.substring(1);
 	    result = String.format("%s&a%s&f: &b(( %s ))&f", adminprefix, name, mes);
 		
 	} else if (mes.startsWith("_")) {
 	    mes = "(( " + mes.substring(1) + " ))";
+	
+	} else if (mes.startsWith(")")) {
+	    if (mes.startsWith(") ")) {
+		mes = mes.substring(2);
+	    }
+	    mes = mes.substring(1);
+	    result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
+	    forgm = true;
 	}
-		
+
 	if (mes.startsWith("((") && mes.endsWith("))")) {
 	    result = String.format("%s&a%s&f (OOC): &d%s&f", adminprefix, name, mes);
 	}
-	
+
+
 	result = result.replaceAll("&([a-z0-9])", "§$1");
 	result = result.replaceAll("%", "%%");
 	asyncPlayerChatEvent.setFormat(result);
 	asyncPlayerChatEvent.setMessage(mes);
 	kmlog("whole", result);
 	kmlog("chat", result);
-	if (bl) {
+
+	if (forgm) {
+	    asyncPlayerChatEvent.getRecipients().clear();
+	    LinkedList<Player> recips = new LinkedList();
+	    recips.add(player);
+            for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
+                if (player2.hasPermission("KMChat.admin")) {
+		    recips.add(player2);
+		}
+	    }
+	    asyncPlayerChatEvent.getRecipients().addAll(recips);
+
+	} else if (local) {
 	    asyncPlayerChatEvent.getRecipients().clear();
 	    asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
 	}
