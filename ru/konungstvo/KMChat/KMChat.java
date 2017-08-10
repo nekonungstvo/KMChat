@@ -288,6 +288,17 @@ implements Listener {
 		result = String.format("&e(( %s &e бросает %s ))&f", name, dice);
 	    }
 
+
+	} else if (mes.startsWith("%")) {
+	    int n = 2;
+            if (mes.startsWith("% ")) {
+	    	mes = mes.substring(2);
+	    } else {
+		mes = mes.substring(1);
+	    }
+	    String dice = dF(mes);
+	    result = String.format("&e(( %s бросает 4dF %s ))&f", name, dice);
+	
 	} else if (mes.startsWith("-%")) {
 	    int n = 2;
 	    forgm = true;
@@ -298,7 +309,6 @@ implements Listener {
 	    }
 	    String dice = dF(mes);
 	    result = String.format("&a%s &f(to GM) &eбросает 4dF %s &f", name, dice);
-
 
 	} else if (mes.startsWith("===%")) {
 	    int n = 2;
