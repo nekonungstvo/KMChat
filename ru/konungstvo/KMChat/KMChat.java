@@ -246,7 +246,7 @@ implements Listener {
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
 		result = String.format("&e(( %s очень тихо бросает %s ))&f", name, dice);
-		range = this.getConfig().getInt("range.wisper");
+		range = this.getConfig().getInt("range.whisper");
 	    }
 
 	} else if ((mes.startsWith("=d") || mes.startsWith("=к")) && player.hasPermission("kmchat.dice")) {
@@ -254,7 +254,7 @@ implements Listener {
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
 		result = String.format("&e(( %s тихо бросает %s ))&f", name, dice);
-		range = this.getConfig().getInt("range.strongwisper");
+		range = this.getConfig().getInt("range.strongwhisper");
 	    }
 
 	} else if ((mes.startsWith("!d") || mes.startsWith("!к")) && player.hasPermission("kmchat.dice")) {
