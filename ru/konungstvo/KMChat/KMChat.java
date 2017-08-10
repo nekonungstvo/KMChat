@@ -226,7 +226,7 @@ implements Listener {
 	
 	    
 
-	if ((mes.startsWith(")d") || mes.startsWith(")к")) && player.hasPermission("kmchat.dice")) {
+	if ((mes.startsWith("-d") || mes.startsWith("-к")) && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(2);
 	    String dice = dnum(helpmes);
 	    forgm = true;
@@ -288,10 +288,10 @@ implements Listener {
 		result = String.format("&e(( %s &e бросает %s ))&f", name, dice);
 	    }
 
-	} else if (mes.startsWith(")%")) {
+	} else if (mes.startsWith("-%")) {
 	    int n = 2;
 	    forgm = true;
-            if (mes.startsWith(")% ")) {
+            if (mes.startsWith("-% ")) {
 	    	mes = mes.substring(3);
 	    } else {
 		mes = mes.substring(2);
@@ -444,8 +444,8 @@ implements Listener {
 	} else if (mes.startsWith("_")) {
 	    mes = "(( " + mes.substring(1) + " ))";
 	
-	} else if (mes.startsWith(")")) {
-	    if (mes.startsWith(") ")) {
+	} else if (mes.startsWith("-")) {
+	    if (mes.startsWith("- ")) {
 		mes = mes.substring(2);
 	    }
 	    mes = mes.substring(1);
