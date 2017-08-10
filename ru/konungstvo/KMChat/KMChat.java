@@ -33,7 +33,7 @@ extends JavaPlugin
 implements Listener {
     private Logger log = Logger.getLogger("Minecraft");
     private Map<Integer, String> nMap = new Hashtable<Integer, String>();
-    private String path = "/srv/logs/";
+    private String path = "logs/";
 
     public void onEnable() {
         this.getConfig().options().copyDefaults(true);
@@ -107,6 +107,41 @@ implements Listener {
 	result += String.format(") от %s. Результат: %s", mes, nMap.get(n)); 
 	return result; 
     }	
+
+    public String dnum(String mes) {
+	int[] poss = {4, 6, 8, 10, 12, 14};
+        int n = -1;
+        for (int i = 0; i < poss.length; ++i) {
+	    int compare = poss[i];
+	    if (mes.startsWith(Integer.toString(compare))) {
+		n = poss[i];
+		if (mes.startsWith("100")) {
+		    n = 100;
+		    mes = mes.substring(3);
+		}
+		else {
+		    mes = mes.substring(Integer.toString(compare).length());
+		}
+	    break;
+	    }
+	}
+	String hlp = "";
+	if (!mes.isEmpty()) {
+	    if (mes.startsWith(" ")) {
+		mes = mes.substring(1);
+	    }
+            hlp = " (" + mes + ")";
+	}
+
+	if (n > 0) {
+	    int dice = new Random().nextInt(n);
+
+        this.log.info(mes);
+	    return String.format("d%s%s. Выпадает %s", n, hlp, ++dice);
+	} else {
+	    return null;
+	}
+    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
@@ -186,259 +221,184 @@ implements Listener {
 	    adminprefix = this.getConfig().getString("adminprefix");
 	}
 	String result = String.format("%s&a%s&f: %s", adminprefix, name, mes);
-	if ((mes.startsWith("d") || mes.startsWith("к")) && player.hasPermission("KMChat.dice")) {
-	    boolean bl2 = false;
-	    int n = 6;
-	    if (mes.startsWith("d4") || mes.startsWith("к4")) {
-		n = 4;
-	    } else if (mes.startsWith("d6") || mes.startsWith("к6")) {
-		n = 6;
-	    } else if (mes.startsWith("d8") || mes.startsWith("к8")) {
-		n = 8;
-	    } else if (mes.startsWith("d10") || mes.startsWith("к10")) {
-		n = 10;
-	    } else if (mes.startsWith("d12") || mes.startsWith("к12")) {
-		n = 12;
-	    } else if (mes.startsWith("d14") || mes.startsWith("к14")) {
-		n = 14;
-	    } else if (mes.startsWith("d20") || mes.startsWith("к20")) {
-		n = 20;
-	    } else {
-		bl2 = true;
-	    }
-	    if (!bl2) {
-		Random random = new Random();
-		int n2 = random.nextInt();
-		n2 = Math.abs(n2);
-		n2 %= n;
-		result = "&e(( " + name + "&e бросает d" + n + ". Выпадает " + ++n2 + " ))&f";
-	    }
-
-	    } else if (mes.startsWith("%")) {
-	    	int n = 2;
-	    	try {
-		    if (mes.startsWith("% ")) {
-			mes = mes.substring(2);
-		    } else {
-			mes = mes.substring(1);
-		    }
-		}
-	    	catch (Exception exception) {
-		    n = 666;
-		    result = mes;
-    		}
-	    	if (n != 666) {
-		    String dice = dF(mes);
-		    result = String.format("&e(( %s бросает 4dF %s ))&f", name, dice);
-		}
-
-		} else if (mes.startsWith("===%")) {
-		    int n = 2;
-		    try {
-			if (mes.startsWith("===% ")) {
-			    mes = mes.substring(5);
-			} else {
-			    mes = mes.substring(4);
-			}
-		    }	
-		    catch (Exception exception) {
-			n = 666;
-			result = mes;
-		    }
-		    if (n != 666) {
-			range = this.getConfig().getInt("range.weakwhisper");
-			String dice = dF(mes);
-			result = String.format("&e((%s едва слышно бросает 4dF%s ))&f", name, dice);
-		    }            
-
-		} else if (mes.startsWith("==%")) {
-		    int n = 2;
-		    try {
-			if (mes.startsWith("==% ")) {
-			    mes = mes.substring(4); 
-			} else {
-			    mes = mes.substring(3);
-			}
-		    }
-		    catch (Exception exception) {
-			n = 666;
-			result = mes;
-		    }
-		    if (n != 666) {
-			range = this.getConfig().getInt("range.whisper");
-			String dice = dF(mes);
-			result = String.format("&e(( %s очень тихо бросает 4dF %s ))&f", name, dice);
-		    }      
-
-		} else if (mes.startsWith("=%")) {
-		    int n = 2;
-		    try {
-			if (mes.startsWith("=% ")) {
-			    mes = mes.substring(3);
-			} else {
-			    mes = mes.substring(2);
-			}
-		    }
-		    catch (Exception exception) {
-			n = 666;
-			result = mes;
-		    }
-		    if (n != 666) {
-			range = this.getConfig().getInt("range.strongwhisper");
-			String dice = dF(mes);
-			result = String.format("&e(( %s тихо бросает 4dF %s ))&f", name, dice);
-		    }      
 	
-		} else if (mes.startsWith("!!!%")) {
-		    int n = 2;
-		    try {
-			if (mes.startsWith("!!!% ")) {
-			    mes = mes.substring(5);
-			} else {
-			    mes = mes.substring(4);
-			}
-		    }
-		    catch (Exception exception) {
-			n = 666;
-			result = mes;
-		    }
-		    if (n != 666) {
-			range = this.getConfig().getInt("range.strongshout");
-			String dice = dF(mes);
-			result = String.format("&e(( %s СВЕРХГРОМКО ОБРУШИВАЕТ 4dF %s ))&f", name, dice);
-		    }     
+	if ((mes.startsWith("d") || mes.startsWith("к")) && player.hasPermission("KMChat.dice")) {
+	    mes = mes.substring(1);
+	    String dice = dnum(mes);
+	    if (dice != null) {
+		result = String.format("&e(( %s &e бросает %s ))&f", name, dice);
+	    }
+
+        } else if (mes.startsWith("%")) {
+	    int n = 2;
+            if (mes.startsWith("% ")) {
+	    	mes = mes.substring(2);
+	    } else {
+		mes = mes.substring(1);
+	    }
+	    String dice = dF(mes);
+	    result = String.format("&e(( %s бросает 4dF %s ))&f", name, dice);
+
+	} else if (mes.startsWith("===%")) {
+	    int n = 2;
+	    if (mes.startsWith("===% ")) {
+	        mes = mes.substring(5);
+	    } else {
+	        mes = mes.substring(4);
+	    }
+	    range = this.getConfig().getInt("range.weakwhisper");
+	    String dice = dF(mes);
+	    result = String.format("&e((%s едва слышно бросает 4dF %s ))&f", name, dice);            
+
+	} else if (mes.startsWith("==%")) {
+	    int n = 2;
+	    if (mes.startsWith("==% ")) {
+	        mes = mes.substring(4); 
+	    } else {
+		mes = mes.substring(3);
+	    }
+	    range = this.getConfig().getInt("range.whisper");
+	    String dice = dF(mes);
+	    result = String.format("&e(( %s очень тихо бросает 4dF %s ))&f", name, dice);
+
+	} else if (mes.startsWith("=%")) {
+	    int n = 2;
+	    if (mes.startsWith("=% ")) {
+	        mes = mes.substring(3);
+	    } else {
+	        mes = mes.substring(2);
+	    }
+	    range = this.getConfig().getInt("range.strongwhisper");
+	    String dice = dF(mes);
+	    result = String.format("&e(( %s тихо бросает 4dF %s ))&f", name, dice);
+	
+	} else if (mes.startsWith("!!!%")) {
+	    int n = 2;
+	    if (mes.startsWith("!!!% ")) {
+	        mes = mes.substring(5);
+	    } else {
+		mes = mes.substring(4);
+	    }
+	    range = this.getConfig().getInt("range.strongshout");
+	    String dice = dF(mes);
+	    result = String.format("&e(( %s СВЕРХГРОМКО ОБРУШИВАЕТ 4dF %s ))&f", name, dice);
+	
+	} else if (mes.startsWith("!!%")) {
+	    int n = 2;
+	    if (mes.startsWith("!!% ")) {
+	       mes = mes.substring(4);
+	    } else {
+	        mes = mes.substring(3);
+	    }
+	    range = this.getConfig().getInt("range.shout");
+	    String dice = dF(mes);
+	    result = String.format("&e(( %s очень громко бросает 4dF %s ))&f", name, dice);
+
+	} else if (mes.startsWith("!%")) {
+	    int n = 2;
+	    if (mes.startsWith("!% ")) {
+	        mes = mes.substring(3);
+	    } else {
+	        mes = mes.substring(2);
+	    }
+	    range = this.getConfig().getInt("range.weakshout");
+	    String dice = dF(mes);
+	    result = String.format("&e(( %s громко бросает 4dF %s ))&f", name, dice);
 		
-		} else if (mes.startsWith("!!%")) {
-		    int n = 2;
-		    try {
-			if (mes.startsWith("!!% ")) {
-			    mes = mes.substring(4);
-			} else {
-			    mes = mes.substring(3);
-			}
-		    }
-		    catch (Exception exception) {
-			n = 666;
-			result = mes;
-		    }
-		    if (n != 666) {
-			range = this.getConfig().getInt("range.shout");
-			String dice = dF(mes);
-			result = String.format("&e(( %s очень громко бросает 4dF %s ))&f", name, dice);
-		    }     
-			
-		} else if (mes.startsWith("!%")) {
-		    int n = 2;
-		    try {
-			if (mes.startsWith("!% ")) {
-			    mes = mes.substring(3);
-			} else {
-			    mes = mes.substring(2);
-			}
-		    }
-		    catch (Exception exception) {
-			n = 666;
-			result = mes;
-		    }
-		    if (n != 666) {
-			range = this.getConfig().getInt("range.weakshout");
-			String dice = dF(mes);
-			result = String.format("&e(( %s громко бросает 4dF %s ))&f", name, dice);
-		    }       	           
+	} else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
+	    mes = mes.substring(1);
+	    range = this.getConfig().getInt("range.dm");
+	    result = "&e***" + mes + "***";
 		
-		} else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
-		    mes = mes.substring(1);
-		    range = this.getConfig().getInt("range.dm");
-		    result = "&e***" + mes + "***";
+	} else if ((mes.startsWith("=#") || mes.startsWith("=№")) && player.hasPermission("KMChat.dm")) {
+	    mes = mes.substring(2);
+	    range = this.getConfig().getInt("range.closedm");
+	    result = "&e**" + mes + "**";
 		
-		} else if ((mes.startsWith("=#") || mes.startsWith("=№")) && player.hasPermission("KMChat.dm")) {
-		    mes = mes.substring(2);
-		    range = this.getConfig().getInt("range.closedm");
-		    result = "&e**" + mes + "**";
+	} else if ((mes.startsWith("==#") || mes.startsWith("==№")) && player.hasPermission("KMChat.dm")) {
+	    mes = mes.substring(3);
+	    range = this.getConfig().getInt("range.closerdm");
+	    result = "&e*" + mes + "*";
+	
+	} else if ((mes.startsWith("===#") || mes.startsWith("===№")) && player.hasPermission("KMChat.dm")) {
+	    mes = mes.substring(4);
+	    range = this.getConfig().getInt("range.closestdm");
+	    result = "&e~" + mes + "~";
 		
-		} else if ((mes.startsWith("==#") || mes.startsWith("==№")) && player.hasPermission("KMChat.dm")) {
-		    mes = mes.substring(3);
-		    range = this.getConfig().getInt("range.closerdm");
-		    result = "&e*" + mes + "*";
+	} else if ((mes.startsWith("!#") || mes.startsWith("!№")) && player.hasPermission("KMChat.dm")) {
+	    mes = mes.substring(2);
+	    range = this.getConfig().getInt("range.fardm");
+	    result = "&e****" + mes + "****";
 		
-		} else if ((mes.startsWith("===#") || mes.startsWith("===№")) && player.hasPermission("KMChat.dm")) {
-		    mes = mes.substring(4);
-		    range = this.getConfig().getInt("range.closestdm");
-		    result = "&e~" + mes + "~";
+	} else if ((mes.startsWith("!!#") || mes.startsWith("!!№")) && player.hasPermission("KMChat.dm")) {
+	    mes = mes.substring(3);
+	    range = this.getConfig().getInt("range.farerdm");
+	    result = "&e*****" + mes + "*****";
 		
-		} else if ((mes.startsWith("!#") || mes.startsWith("!№")) && player.hasPermission("KMChat.dm")) {
-		    mes = mes.substring(2);
-		    range = this.getConfig().getInt("range.fardm");
-		    result = "&e****" + mes + "****";
+	} else if ((mes.startsWith("!!!#") || mes.startsWith("!!!№")) && player.hasPermission("KMChat.dm")) {
+	    mes = mes.substring(4);
+	    range = this.getConfig().getInt("range.farestdm");
+	    result = "&e******" + mes + "******";
+	
+	} else if (mes.startsWith("*") && player.hasPermission("KMChat.me")) {
+	    mes = mes.substring(1);
+	    range = this.getConfig().getInt("range.me");
+	    result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
 		
-		} else if ((mes.startsWith("!!#") || mes.startsWith("!!№")) && player.hasPermission("KMChat.dm")) {
-		    mes = mes.substring(3);
-		    range = this.getConfig().getInt("range.farerdm");
-		    result = "&e*****" + mes + "*****";
+	} else if ((mes.startsWith("@@@") || mes.startsWith("===")) && player.hasPermission("KMChat.whisper")) {
+	    mes = mes.substring(3);
+	    range = this.getConfig().getInt("range.weakwhisper");
+	    result = String.format("%s&a%s&f (едва слышно): %s", adminprefix, name, mes);
 		
-		} else if ((mes.startsWith("!!!#") || mes.startsWith("!!!№")) && player.hasPermission("KMChat.dm")) {
-		    mes = mes.substring(4);
-		    range = this.getConfig().getInt("range.farestdm");
-		    result = "&e******" + mes + "******";
+	} else if ((mes.startsWith("@@") || mes.startsWith("==")) && player.hasPermission("KMChat.whisper")) {
+	    mes = mes.substring(2);
+	    range = this.getConfig().getInt("range.whisper");
+	    result = String.format("%s&a%s&f (шепчет): %s", adminprefix, name, mes);
 		
-		} else if (mes.startsWith("*") && player.hasPermission("KMChat.me")) {
-		    mes = mes.substring(1);
-		    range = this.getConfig().getInt("range.me");
-		    result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
+	} else if ((mes.startsWith("@") || mes.startsWith("=")) && player.hasPermission("KMChat.whisper")) {
+	    mes = mes.substring(1);
+	    range = this.getConfig().getInt("range.strongwhisper");
+	    result = String.format("%s&a%s&f (вполголоса): %s", adminprefix, name, mes);
 		
-		} else if ((mes.startsWith("@@@") || mes.startsWith("===")) && player.hasPermission("KMChat.whisper")) {
-		    mes = mes.substring(3);
-		    range = this.getConfig().getInt("range.weakwhisper");
-		    result = String.format("%s&a%s&f (едва слышно): %s", adminprefix, name, mes);
+	} else if (mes.startsWith("!!!") && player.hasPermission("KMChat.shout")) {
+	    mes = mes.substring(3);
+	    range = this.getConfig().getInt("range.strongshout");
+	    result = String.format("%s&a%s&f (орёт): %s", adminprefix, name, mes);
 		
-		} else if ((mes.startsWith("@@") || mes.startsWith("==")) && player.hasPermission("KMChat.whisper")) {
-		    mes = mes.substring(2);
-		    range = this.getConfig().getInt("range.whisper");
-		    result = String.format("%s&a%s&f (шепчет): %s", adminprefix, name, mes);
+	} else if (mes.startsWith("!!") && player.hasPermission("KMChat.shout")) {
+	    mes = mes.substring(2);
+	    range = this.getConfig().getInt("range.shout");
+	    result = String.format("%s&a%s&f (кричит): %s", adminprefix, name, mes);
 		
-		} else if ((mes.startsWith("@") || mes.startsWith("=")) && player.hasPermission("KMChat.whisper")) {
-		    mes = mes.substring(1);
-		    range = this.getConfig().getInt("range.strongwhisper");
-		    result = String.format("%s&a%s&f (вполголоса): %s", adminprefix, name, mes);
+	} else if (mes.startsWith("!") && player.hasPermission("KMChat.shout")) {
+	    mes = mes.substring(1);
+	    range = this.getConfig().getInt("range.weakshout");
+	    result = String.format("%s&a%s&f (восклицает): %s", adminprefix, name, mes);
 		
-		} else if (mes.startsWith("!!!") && player.hasPermission("KMChat.shout")) {
-		    mes = mes.substring(3);
-		    range = this.getConfig().getInt("range.strongshout");
-		    result = String.format("%s&a%s&f (орёт): %s", adminprefix, name, mes);
+	} else if (mes.startsWith("^") && player.hasPermission("KMChat.global")) {
+	    bl = false;
+	    mes = mes.substring(1);
+	    result = String.format("%s&a%s&f: &b(( %s ))&f", adminprefix, name, mes);
 		
-		} else if (mes.startsWith("!!") && player.hasPermission("KMChat.shout")) {
-		    mes = mes.substring(2);
-		    range = this.getConfig().getInt("range.shout");
-		    result = String.format("%s&a%s&f (кричит): %s", adminprefix, name, mes);
-		
-		} else if (mes.startsWith("!") && player.hasPermission("KMChat.shout")) {
-		    mes = mes.substring(1);
-		    range = this.getConfig().getInt("range.weakshout");
-		    result = String.format("%s&a%s&f (восклицает): %s", adminprefix, name, mes);
-		
-		} else if (mes.startsWith("^") && player.hasPermission("KMChat.global")) {
-		    bl = false;
-		    mes = mes.substring(1);
-		    result = String.format("%s&a%s&f: &b(( %s ))&f", adminprefix, name, mes);
-		
-		} else if (mes.startsWith("_")) {
-		    mes = "((" + mes.substring(1) + "))";
-		}
-		
-		if (mes.startsWith("((") && mes.endsWith("))")) {
-		    result = String.format("%s&a%s&f (OOC): &d%s&f", adminprefix, name, mes);
-		}
-		result = result.replaceAll("&([a-z0-9])", "§$1");
-		result = result.replaceAll("%", "%%");
-		asyncPlayerChatEvent.setFormat(result);
-		asyncPlayerChatEvent.setMessage(mes);
-		kmlog("whole", result);
-		kmlog("chat", result);
-		if (bl) {
-		    asyncPlayerChatEvent.getRecipients().clear();
-		    asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
-		}
+	} else if (mes.startsWith("_")) {
+	    mes = "(( " + mes.substring(1) + " ))";
 	}
+		
+	if (mes.startsWith("((") && mes.endsWith("))")) {
+	    result = String.format("%s&a%s&f (OOC): &d%s&f", adminprefix, name, mes);
+	}
+	
+	result = result.replaceAll("&([a-z0-9])", "§$1");
+	result = result.replaceAll("%", "%%");
+	asyncPlayerChatEvent.setFormat(result);
+	asyncPlayerChatEvent.setMessage(mes);
+	kmlog("whole", result);
+	kmlog("chat", result);
+	if (bl) {
+	    asyncPlayerChatEvent.getRecipients().clear();
+	    asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
+	}
+    }
 
     protected List<Player> getLocalRecipients(Player player, String mes, double d) {
 	Location location = player.getLocation();
