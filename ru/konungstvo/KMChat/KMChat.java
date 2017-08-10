@@ -27,6 +27,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 
 public class KMChat
 extends JavaPlugin
@@ -169,7 +171,7 @@ implements Listener {
     public void onChatTab(PlayerChatTabCompleteEvent playerChatTabCompleteEvent) {
     	String mes = playerChatTabCompleteEvent.getChatMessage();
     	if (mes.startsWith("% ") ||
-	    mes.startsWith(")% ") ||
+	    mes.startsWith("-% ") ||
             mes.startsWith("=% ") ||
 	    mes.startsWith("!% ") ||
 	    mes.startsWith("==% ") ||
@@ -208,6 +210,62 @@ implements Listener {
 	    }	
 	}
     }	
+
+    public boolean onCommand(CommandSender commandSender, Command command, String string, String[] args) {
+	if (command.getName().equalsIgnoreCase("me")) {
+                commandSender.sendMessage("§4/me отключено, используйте *§f");
+                return true;
+
+	} else if (command.getName().equalsIgnoreCase("msg")) {
+	    if (!(commandSender instanceof Player)) {
+	        commandSender.sendMessage("§4You must be a player!§f");
+                return false;
+            }
+            Player sender = (Player)commandSender;
+            if (args.length == 0) {
+		sender.sendMessage("§8...и чего сказать хотел?§f");
+                return true;
+            }
+
+	    Player recip = sender.getServer().getPlayer(args[0]);
+	    if (recip == null) {
+		sender.sendMessage("§4Нет такого игрока!§f");
+		return true;
+	    }
+	    
+            if (!sender.hasPermission("KMCore.tell")) {
+		sender.sendMessage("§4Недостаточно прав.§f");
+		return true;
+            }
+
+
+            String senderName = sender.getName();
+	    String recipName = recip.getName();
+            args[0] = "&8[&a"+ senderName + "&8->&a" + recipName + "&8]:&f";
+	    String message = "";
+            for (String arg : args) {
+		message = message + " " + arg;
+            }
+	    
+	    message = message.replaceAll("&([a-z0-9])", "§$1");
+            sender.sendMessage(message);
+            recip.sendMessage(message);
+	    kmlog("whole", message);
+	    kmlog("chat", message);
+            for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+	        if (player.hasPermission("KMChat.admin")) {
+		    if (player != sender && player != recip) {
+			player.sendMessage(message);
+		    }
+		}
+	    }
+	    return true;
+	}
+	return true;
+	
+    }
+
+
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent asyncPlayerChatEvent) {
@@ -468,8 +526,8 @@ implements Listener {
 	}
 
 
-	result = result.replaceAll("&([a-z0-9])", "§$1");
 	result = result.replaceAll("%", "%%");
+	result = result.replaceAll("&([a-z0-9])", "§$1");
 	asyncPlayerChatEvent.setFormat(result);
 	asyncPlayerChatEvent.setMessage(mes);
 	kmlog("whole", result);
