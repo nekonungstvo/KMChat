@@ -1,0 +1,11 @@
+apply plugin: "java"
+
+
+version = "0.5"
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+
+dependencies {
+	compile files('libs/craftbukkit-1.7.10-R0.1-20140808.005431-8.jar')
+}
