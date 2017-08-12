@@ -151,6 +151,7 @@ implements Listener {
 	playerJoinEvent.setJoinMessage("§e" + name + "§f входит в игру");
 	String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
 	kmlog("whole", name + " ("+ip+")" + " входит в игру");
+	kmlog("chat", name + " ("+ip+")" + " входит в игру");
 	try(FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
 	    writer.write(name + " " + ip + "\n");
 	}
@@ -165,6 +166,7 @@ implements Listener {
     	playerQuitEvent.setQuitMessage("§e" + name + "§f выходит из игры");
 	String ip = playerQuitEvent.getPlayer().getAddress().getHostName();
 	kmlog("whole", name + " ("+ip+")" + " выходит из игры");
+	kmlog("chat", name + " ("+ip+")" + " выходит из игры");
     }
 
     @EventHandler
