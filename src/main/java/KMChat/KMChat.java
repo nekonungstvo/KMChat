@@ -515,8 +515,9 @@ implements Listener {
 	} else if (mes.startsWith("-")) {
 	    if (mes.startsWith("- ")) {
 		mes = mes.substring(2);
+	    } else {
+		mes = mes.substring(1);
 	    }
-	    mes = mes.substring(1);
 	    result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
 	    forgm = true;
 	}
