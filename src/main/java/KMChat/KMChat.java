@@ -286,7 +286,7 @@ implements Listener {
 	
 	    
 
-	if ((mes.startsWith("-d") || mes.startsWith("-к")) && player.hasPermission("kmchat.dice")) {
+	if ((mes.startsWith("-d") && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(2);
 	    String dice = dnum(helpmes);
 	    forgm = true;
@@ -294,14 +294,14 @@ implements Listener {
 		result = String.format("&a%s &f(to GM) &eбросает %s &f", name, dice);
 	    }
 
-	} else if ((mes.startsWith("===d") || mes.startsWith("===к")) && player.hasPermission("kmchat.dice")) {
+	} else if ((mes.startsWith("===d") && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(4);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
 		result = String.format("&e(( %s едва слышно бросает %s ))&f", name, dice);
 		range = this.getConfig().getInt("range.weakwhisper");
 	    }
-	} else if ((mes.startsWith("==d") || mes.startsWith("==к")) && player.hasPermission("kmchat.dice")) {
+	} else if ((mes.startsWith("==d") && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(3);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -309,7 +309,7 @@ implements Listener {
 		range = this.getConfig().getInt("range.whisper");
 	    }
 
-	} else if ((mes.startsWith("=d") || mes.startsWith("=к")) && player.hasPermission("kmchat.dice")) {
+	} else if ((mes.startsWith("=d") && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(2);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -317,7 +317,7 @@ implements Listener {
 		range = this.getConfig().getInt("range.strongwhisper");
 	    }
 
-	} else if ((mes.startsWith("!d") || mes.startsWith("!к")) && player.hasPermission("kmchat.dice")) {
+	} else if ((mes.startsWith("!d") && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(2);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -325,7 +325,7 @@ implements Listener {
 		range = this.getConfig().getInt("range.weakshout");
 	    }
 
-	} else if ((mes.startsWith("!!d") || mes.startsWith("!!к")) && player.hasPermission("kmchat.dice")) {
+	} else if ((mes.startsWith("!!d") && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(3);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -333,7 +333,7 @@ implements Listener {
 		range = this.getConfig().getInt("range.shout");
 	    }
 	
-	} else if ((mes.startsWith("!!!d") || mes.startsWith("!!!к")) && player.hasPermission("kmchat.dice")) {
+	} else if ((mes.startsWith("!!!d")  && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(4);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -341,7 +341,7 @@ implements Listener {
 		range = this.getConfig().getInt("range.strongshout");
 	    }
 
-	} else if ((mes.startsWith("d") || mes.startsWith("к")) && player.hasPermission("kmchat.dice")) {
+	} else if ((mes.startsWith("d") && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(1);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
