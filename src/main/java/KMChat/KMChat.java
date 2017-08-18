@@ -223,45 +223,12 @@ implements Listener {
 	        commandSender.sendMessage("§4You must be a player!§f");
                 return false;
             }
-            Player sender = (Player)commandSender;
-            if (args.length == 0) {
-		sender.sendMessage("§8...и чего сказать хотел?§f");
-                return true;
-            }
-
-	    Player recip = sender.getServer().getPlayer(args[0]);
-	    if (recip == null) {
-		sender.sendMessage("§4Нет такого игрока!§f");
-		return true;
-	    }
 	    
-            if (!sender.hasPermission("KMCore.tell")) {
-		sender.sendMessage("§4Недостаточно прав.§f");
+            if (!commandSender.hasPermission("KMCore.tell")) {
+		commandSender.sendMessage("§4Недостаточно прав.§f");
 		return true;
             }
-
-
-            String senderName = sender.getName();
-	    String recipName = recip.getName();
-            args[0] = "&8[&a"+ senderName + "&8->&a" + recipName + "&8]:&f";
-	    String message = "";
-            for (String arg : args) {
-		message = message + " " + arg;
-            }
-	    
-	    message = message.replaceAll("&([a-z0-9])", "§$1");
-            sender.sendMessage(message);
-            recip.sendMessage(message);
-	    kmlog("whole", message);
-	    kmlog("chat", message);
-            for (Player player: Bukkit.getServer().getOnlinePlayers()) {
-	        if (player.hasPermission("KMChat.admin")) {
-		    if (player != sender && player != recip) {
-			player.sendMessage(message);
-		    }
-		}
-	    }
-	    return true;
+	    commandSender.sendMessage("§4Используйте :msg ник сообщение§f");
 	}
 	return true;
 	
@@ -274,6 +241,7 @@ implements Listener {
 	Player player = asyncPlayerChatEvent.getPlayer();
 	boolean local = true;
 	boolean forgm = false;
+	boolean norec = false; //no recipients at all
 	String mes = asyncPlayerChatEvent.getMessage();
 	String name = player.getName();
 	double range = this.getConfig().getInt("range.default");
@@ -522,7 +490,50 @@ implements Listener {
 	    }
 	    result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
 	    forgm = true;
+	} else if (mes.startsWith(":msg")) {
+	    boolean further = false;
+            if (!player.hasPermission("KMCore.tell")) {
+		player.sendMessage("§4Недостаточно прав.§f");
+            } else {
+	    norec = true;
+	    try {
+		mes = mes.substring(5);
+	    }
+	    catch (Exception exception) {
+		player.sendMessage("§4Что-то пошло не так. Следите за пробелами.§f");
+	    }
+
+	    Player recipient = null;
+	    for(Player rec : Bukkit.getServer().getOnlinePlayers()){
+		if (mes.startsWith(rec.getName() + " ")) {
+		    recipient = rec;
+		    further = true;
+		}
+	    }
+	    if (recipient == null) {
+		player.sendMessage("§4Нет такого игрока!§f");
+
+	    }
+	    
+	    if (further) {
+	    String message = "§8[§a"+ player.getName() + "§8->§a" + recipient.getName() + "§8]:§f";
+	    mes = mes.substring(recipient.getName().length());
+	    message += mes;
+            for (Player admin: Bukkit.getServer().getOnlinePlayers()) {
+	        if (admin.hasPermission("KMChat.admin")) {
+		    if (admin != player && admin != recipient) {
+			admin.sendMessage(message);
+		    }
+		}
+	    }
+	    player.sendMessage(message);
+	    recipient.sendMessage(message);
+	    kmlog("whole", message);
+	    kmlog("chat", message);
+	    }
+	    }
 	}
+
 
 	if (mes.startsWith("((") && mes.endsWith("))")) {
 	    result = String.format("%s&a%s&f (OOC): &d%s&f", adminprefix, name, mes);
@@ -536,7 +547,9 @@ implements Listener {
 	kmlog("whole", result);
 	kmlog("chat", result);
 
-	if (forgm) {
+	if (norec) {
+	    asyncPlayerChatEvent.getRecipients().clear();
+	} else if (forgm) {
 	    asyncPlayerChatEvent.getRecipients().clear();
 	    LinkedList<Player> recips = new LinkedList();
 	    recips.add(player);
