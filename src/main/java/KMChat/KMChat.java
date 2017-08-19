@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.Date;
 import java.io.*;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -29,18 +30,43 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.scheduler.BukkitScheduler;
+
+import sx.blah.discord.api.ClientBuilder;
+import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.ReadyEvent;
+import sx.blah.discord.handle.obj.*;
+import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.RateLimitException;
+
 
 public class KMChat
 extends JavaPlugin
 implements Listener {
+    private static String TOKEN;
+    private static String CHID;
+    private static IDiscordClient client;
+    private static IChannel ingameChannel;
     private Logger log = Logger.getLogger("Minecraft");
     private Map<Integer, String> nMap = new Hashtable<Integer, String>();
     private String path = "logs/";
-
     public void onEnable() {
+
         this.getConfig().options().copyDefaults(true);
-	this.saveConfig();
-	path = this.getConfig().getString("logsdir");
+        this.saveConfig();
+        path = this.getConfig().getString("logsdir");
+
+        TOKEN = this.getConfig().getString("bottoken");
+        CHID = this.getConfig().getString("channelid");
+        
+        System.out.println("Logging bot in...");
+        client = new ClientBuilder().withToken(TOKEN).build();
+        client.getDispatcher().registerListener(this);
+        client.login();
+        
         this.getServer().getPluginManager().registerEvents((Listener)this, (Plugin)this);
         this.nMap.put(-3, "так ужасно, что хуже уже некуда");
         this.nMap.put(-2, "ужасно---");
@@ -62,9 +88,82 @@ implements Listener {
     }
 
     public void onDisable() {	
+        ingameChannel.sendMessage("**Server is going offline!**");
         this.log.info(String.format("%s is disabled!", this.getDescription().getFullName()));
     }
+    
+    @EventSubscriber
+    public void onReady(ReadyEvent event) {
+        System.out.println("Bot is now ready!");
+		ingameChannel = client.getChannelByID(CHID);
+		ingameChannel.sendMessage("**Server is going online!**");
+    }
+    
+    
+    @EventSubscriber
+    public void onMessage(MessageReceivedEvent event) throws RateLimitException, DiscordException, MissingPermissionsException {
+	IMessage message = event.getMessage();
+	IUser user = message.getAuthor();
+	if (user.isBot()) return;
+	
+	IChannel channel = message.getChannel();
+	if (channel != ingameChannel) return;
 
+	IGuild guild = message.getGuild();
+	String[] split = message.getContent().split(" ");
+	if (message.getContent().startsWith("!")) {
+	    if (message.getContent().startsWith("!d")) {
+		String dice = dnum(message.getContent().substring(2));
+		ingameChannel.sendMessage(user.mention() + " бросает " + dice);
+		return;
+
+	    } else if (message.getContent().startsWith("!% ")) {
+		String dice = dF(message.getContent().substring(3));
+		ingameChannel.sendMessage(user.mention() + " бросает " + dice);
+		return;
+	    
+	    } else if (message.getContent().startsWith("!online") || message.getContent().startsWith("!онлайн")) {
+		String online = "Текущий онлайн (%s): ";
+		int i = 0;
+		Player[] players = Bukkit.getServer().getOnlinePlayers();
+		for (Player player: players) {
+		    i++;
+		    if (player.hasPermission("KMChat.admin"))
+			online += "**" + player.getName() + "**";
+		    else
+			online += player.getName();
+		    if (i == players.length)
+			online += ".";
+		    else 
+			online += ", ";
+		}
+		if (i == 0)
+		    ingameChannel.sendMessage("Никого онлайн!");
+		else
+		    ingameChannel.sendMessage(String.format(online, i));
+		return;
+	    
+	    } else if (message.getContent().startsWith("!exec ")) {
+		String mes = "";
+		try { mes = message.getContent().substring(6); }
+		catch (Exception e) { return; }
+		BukkitScheduler scheduler = getServer().getScheduler();
+		if (
+		scheduler.scheduleSyncDelayedTask(this, new Runnable() {    
+		    @Override
+		    public void run() {
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), message.getContent().substring(6));    
+		    }
+		}, 1L) == -1)
+		    ingameChannel.sendMessage("_Что-то пошло не так, команда не была выполнена!_");
+	    }
+	} else {
+	    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+		player.sendMessage("<§2"+user.getName()+"§f> "+message);
+	    }
+	}
+    }
+   
     public void kmlog(String where, String what) {
 	try(FileWriter writer = new FileWriter(path + where + "/" + where + "_current.log", true)) {
 	    Date date = new Date();
@@ -150,8 +249,10 @@ implements Listener {
 	String name = playerJoinEvent.getPlayer().getName();
 	playerJoinEvent.setJoinMessage("§e" + name + "§f входит в игру");
 	String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
-	kmlog("whole", name + " ("+ip+")" + " входит в игру");
-	kmlog("chat", name + " ("+ip+")" + " входит в игру");
+	String message =  name + " ("+ip+")" + " входит в игру";
+	kmlog("whole", message);
+	kmlog("chat",  message);
+	ingameChannel.sendMessage(message.replaceAll(name, "__"+name+"__"));
 	try(FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
 	    writer.write(name + " " + ip + "\n");
 	}
@@ -162,11 +263,14 @@ implements Listener {
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent playerQuitEvent) {
-    	String name = playerQuitEvent.getPlayer().getName();
+	Player player = playerQuitEvent.getPlayer(); 
+    	String name = player.getName();
     	playerQuitEvent.setQuitMessage("§e" + name + "§f выходит из игры");
-	String ip = playerQuitEvent.getPlayer().getAddress().getHostName();
-	kmlog("whole", name + " ("+ip+")" + " выходит из игры");
-	kmlog("chat", name + " ("+ip+")" + " выходит из игры");
+	String ip = player.getAddress().getHostName();
+	String message = name + " ("+ip+")" + " выходит из игры";
+	kmlog("whole", message);
+	kmlog("chat", message);
+	ingameChannel.sendMessage(message.replaceAll(name, "__"+name+"__"));
     }
 
     @EventHandler
@@ -217,20 +321,57 @@ implements Listener {
 	if (command.getName().equalsIgnoreCase("me")) {
                 commandSender.sendMessage("§4/me отключено, используйте *§f");
                 return true;
-
 	} else if (command.getName().equalsIgnoreCase("msg")) {
 	    if (!(commandSender instanceof Player)) {
 	        commandSender.sendMessage("§4You must be a player!§f");
                 return false;
             }
+            Player sender = (Player)commandSender;
+            if (args.length == 0) {
+		sender.sendMessage("§8...и чего сказать хотел?§f");
+                return true;
+            }
+
+	    Player recip = sender.getServer().getPlayer(args[0]);
+	    if (recip == null) {
+		sender.sendMessage("§4Нет такого игрока!§f");
+		return true;
+	    }
 	    
-            if (!commandSender.hasPermission("KMCore.tell")) {
-		commandSender.sendMessage("§4Недостаточно прав.§f");
+            if (!sender.hasPermission("KMCore.tell")) {
+		sender.sendMessage("§4Недостаточно прав.§f");
 		return true;
             }
-	    commandSender.sendMessage("§4Используйте :msg ник сообщение§f");
+
+
+            String senderName = sender.getName();
+	    String recipName = recip.getName();
+            args[0] = "&8[&a"+ senderName + "&8->&a" + recipName + "&8]:&f";
+	    String message = "";
+            for (String arg : args) {
+		message = message + " " + arg;
+            }
+	    
+	    message = message.replaceAll("&([a-z0-9])", "§$1");
+
+            sender.sendMessage(message);
+            recip.sendMessage(message);
+	    kmlog("whole", message);
+	    kmlog("chat", message);
+
+	    String mes2discord = message.replaceAll("§([a-z0-9])","");
+	    ingameChannel.sendMessage(mes2discord);
+
+            for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+	        if (player.hasPermission("KMChat.admin")) {
+		    if (player != sender && player != recip) {
+			player.sendMessage(message);
+		    }
+		}
+	    }
+	    return true;
 	}
-	return true;
+    return true;
 	
     }
 
@@ -318,6 +459,7 @@ implements Listener {
 
 
 	} else if (mes.startsWith("%")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">**: "+mes);
 	    int n = 2;
             if (mes.startsWith("% ")) {
 	    	mes = mes.substring(2);
@@ -490,7 +632,8 @@ implements Listener {
 	    }
 	    result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
 	    forgm = true;
-	} else if (mes.startsWith(":msg")) {
+    }
+	/*} else if (mes.startsWith(":msg")) {
 	    boolean further = false;
             if (!player.hasPermission("KMCore.tell")) {
 		player.sendMessage("§4Недостаточно прав.§f");
@@ -530,10 +673,11 @@ implements Listener {
 	    recipient.sendMessage(message);
 	    kmlog("whole", message);
 	    kmlog("chat", message);
+	    ingameChannel.sendMessage(message);
 	    }
 	    }
 	}
-
+*/
 
 	if (mes.startsWith("((") && mes.endsWith("))")) {
 	    result = String.format("%s&a%s&f (OOC): &d%s&f", adminprefix, name, mes);
@@ -546,6 +690,9 @@ implements Listener {
 	asyncPlayerChatEvent.setMessage(mes);
 	kmlog("whole", result);
 	kmlog("chat", result);
+	String res2discord = result.replaceAll("§([a-z0-9])", "");
+	res2discord = res2discord.replace(player.getName(), "**"+player.getName()+"**");
+	ingameChannel.sendMessage(res2discord);
 
 	if (norec) {
 	    asyncPlayerChatEvent.getRecipients().clear();

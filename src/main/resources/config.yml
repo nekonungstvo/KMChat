@@ -1,5 +1,7 @@
 adminprefix: "&8[GM]"
 logsdir: "logs/"
+bottoken: "Mjk5MDY0NjU5NjgyNTI1MTg0.DHm6Dg.TdVl5mRm8HriDzVId2nbTHIiQVU"
+channelid: "298771227445559298"
 range.default: 18
 range.dm: 18
 range.closedm: 9

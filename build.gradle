@@ -5,7 +5,27 @@ version = "0.5"
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
+repositories {
+  jcenter() //This prevents issues with transitive dependencies
+  maven {
+    url  "https://jitpack.io"
+  }
+}
+
+configurations {
+    shade
+    compile.extendsFrom shade
+}
 
 dependencies {
 	compile files('libs/craftbukkit-1.7.10-R0.1-20140808.005431-8.jar')
+	shade files('libs/Discord4j-2.8.4-shaded.jar')
+}
+
+jar {
+    configurations.shade.each { dep ->
+        from(project.zipTree(dep)){
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
 }
