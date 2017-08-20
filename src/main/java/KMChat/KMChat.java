@@ -562,41 +562,49 @@ implements Listener {
 	    result = String.format("&e(( %s громко бросает 4dF %s ))&f", name, dice);
 		
 	} else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    mes = mes.substring(1);
 	    range = this.getConfig().getInt("range.dm");
 	    result = "&e***" + mes + "***";
 		
 	} else if ((mes.startsWith("=#") || mes.startsWith("=№")) && player.hasPermission("KMChat.dm")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    mes = mes.substring(2);
 	    range = this.getConfig().getInt("range.closedm");
 	    result = "&e**" + mes + "**";
 		
 	} else if ((mes.startsWith("==#") || mes.startsWith("==№")) && player.hasPermission("KMChat.dm")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    mes = mes.substring(3);
 	    range = this.getConfig().getInt("range.closerdm");
 	    result = "&e*" + mes + "*";
 	
 	} else if ((mes.startsWith("===#") || mes.startsWith("===№")) && player.hasPermission("KMChat.dm")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    mes = mes.substring(4);
 	    range = this.getConfig().getInt("range.closestdm");
 	    result = "&e~" + mes + "~";
 		
 	} else if ((mes.startsWith("!#") || mes.startsWith("!№")) && player.hasPermission("KMChat.dm")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    mes = mes.substring(2);
 	    range = this.getConfig().getInt("range.fardm");
 	    result = "&e****" + mes + "****";
 		
 	} else if ((mes.startsWith("!!#") || mes.startsWith("!!№")) && player.hasPermission("KMChat.dm")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    mes = mes.substring(3);
 	    range = this.getConfig().getInt("range.farerdm");
 	    result = "&e*****" + mes + "*****";
 		
 	} else if ((mes.startsWith("!!!#") || mes.startsWith("!!!№")) && player.hasPermission("KMChat.dm")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    mes = mes.substring(4);
 	    range = this.getConfig().getInt("range.farestdm");
 	    result = "&e******" + mes + "******";
 	
 	} else if (mes.startsWith("*") && player.hasPermission("KMChat.me")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    mes = mes.substring(1);
 	    range = this.getConfig().getInt("range.me");
 	    result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
