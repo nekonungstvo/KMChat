@@ -135,15 +135,25 @@ implements Listener {
 		String mes = message.getContent().substring(5);
 		Player[] players = Bukkit.getServer().getOnlinePlayers();
 		boolean found = false;
+		Player recip = null;
 		for (Player player : players) {
 		    if (mes.startsWith(player.getName())) {
 			player.sendMessage("<§2"+user.getName()+"§f->§a"+player.getName()+"§f>"+mes.replace(player.getName(), ""));
 			ingameChannel.sendMessage("<"+user.getName()+"->"+mes.replace(player.getName(), player.getName()+">"));
+			recip = player;
 			found = true;
 		    }
 		}
 		if (!found) {
 		    ingameChannel.sendMessage("Нет такого игрока!");
+		} else {
+		    for (Player admin: Bukkit.getServer().getOnlinePlayers()) {
+		       if (admin.hasPermission("KMChat.admin")) {
+			    if (admin != recip) {
+			        admin.sendMessage("<§2"+user.getName()+"§f->§a"+recip.getName()+"§f>"+mes.replace(recip.getName(), ""));
+			    }
+			}
+		    }
 		}
 		return;
 
