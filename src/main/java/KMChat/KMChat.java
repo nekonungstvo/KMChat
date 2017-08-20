@@ -396,6 +396,7 @@ implements Listener {
 	    
 
 	if (mes.startsWith("-d") && player.hasPermission("kmchat.dice")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    String helpmes = mes.substring(2);
 	    String dice = dnum(helpmes);
 	    forgm = true;
@@ -404,6 +405,7 @@ implements Listener {
 	    }
 
 	} else if (mes.startsWith("===d") && player.hasPermission("kmchat.dice")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    String helpmes = mes.substring(4);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -411,6 +413,7 @@ implements Listener {
 		range = this.getConfig().getInt("range.weakwhisper");
 	    }
 	} else if (mes.startsWith("==d") && player.hasPermission("kmchat.dice")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    String helpmes = mes.substring(3);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -419,6 +422,7 @@ implements Listener {
 	    }
 
 	} else if (mes.startsWith("=d") && player.hasPermission("kmchat.dice")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    String helpmes = mes.substring(2);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -427,6 +431,7 @@ implements Listener {
 	    }
 
 	} else if (mes.startsWith("!d") && player.hasPermission("kmchat.dice")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    String helpmes = mes.substring(2);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -435,6 +440,7 @@ implements Listener {
 	    }
 
 	} else if (mes.startsWith("!!d") && player.hasPermission("kmchat.dice")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    String helpmes = mes.substring(3);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -443,6 +449,7 @@ implements Listener {
 	    }
 	
 	} else if (mes.startsWith("!!!d")  && player.hasPermission("kmchat.dice")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    String helpmes = mes.substring(4);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -451,6 +458,7 @@ implements Listener {
 	    }
 
 	} else if (mes.startsWith("d") && player.hasPermission("kmchat.dice")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    String helpmes = mes.substring(1);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
@@ -459,7 +467,7 @@ implements Listener {
 
 
 	} else if (mes.startsWith("%")) {
-	    ingameChannel.sendMessage("**<"+player.getName()+">**: "+mes);
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    int n = 2;
             if (mes.startsWith("% ")) {
 	    	mes = mes.substring(2);
@@ -470,6 +478,7 @@ implements Listener {
 	    result = String.format("&e(( %s бросает 4dF %s ))&f", name, dice);
 	
 	} else if (mes.startsWith("-%")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    int n = 2;
 	    forgm = true;
             if (mes.startsWith("-% ")) {
@@ -481,6 +490,7 @@ implements Listener {
 	    result = String.format("&a%s &f(to GM) &eбросает 4dF %s &f", name, dice);
 
 	} else if (mes.startsWith("===%")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    int n = 2;
 	    if (mes.startsWith("===% ")) {
 	        mes = mes.substring(5);
@@ -492,6 +502,7 @@ implements Listener {
 	    result = String.format("&e((%s едва слышно бросает 4dF %s ))&f", name, dice);            
 
 	} else if (mes.startsWith("==%")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    int n = 2;
 	    if (mes.startsWith("==% ")) {
 	        mes = mes.substring(4); 
@@ -503,6 +514,7 @@ implements Listener {
 	    result = String.format("&e(( %s очень тихо бросает 4dF %s ))&f", name, dice);
 
 	} else if (mes.startsWith("=%")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    int n = 2;
 	    if (mes.startsWith("=% ")) {
 	        mes = mes.substring(3);
@@ -514,6 +526,7 @@ implements Listener {
 	    result = String.format("&e(( %s тихо бросает 4dF %s ))&f", name, dice);
 	
 	} else if (mes.startsWith("!!!%")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    int n = 2;
 	    if (mes.startsWith("!!!% ")) {
 	        mes = mes.substring(5);
@@ -525,6 +538,7 @@ implements Listener {
 	    result = String.format("&e(( %s СВЕРХГРОМКО ОБРУШИВАЕТ 4dF %s ))&f", name, dice);
 	
 	} else if (mes.startsWith("!!%")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    int n = 2;
 	    if (mes.startsWith("!!% ")) {
 	       mes = mes.substring(4);
@@ -536,6 +550,7 @@ implements Listener {
 	    result = String.format("&e(( %s очень громко бросает 4dF %s ))&f", name, dice);
 
 	} else if (mes.startsWith("!%")) {
+	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    int n = 2;
 	    if (mes.startsWith("!% ")) {
 	        mes = mes.substring(3);
