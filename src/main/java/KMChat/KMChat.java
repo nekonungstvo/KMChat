@@ -111,8 +111,17 @@ implements Listener {
 
 	IGuild guild = message.getGuild();
 	String[] split = message.getContent().split(" ");
+
+	if ( message.getContent().startsWith(":msg") || message.getContent().startsWith("/msg") ) {
+	    ingameChannel.sendMessage("Пользуйтесь !msg {player} {message}");
+	    return;
+	}
+
 	if (message.getContent().startsWith("!")) {
-	    if (message.getContent().startsWith("!d")) {
+	    if (message.getContent().startsWith("!help")) {
+		ingameChannel.sendMessage("Все команды начинаются с символа !\n!exec command — выполнить команду в игре;\n!online либо !онлайн — показать текущий онлайн;\n!msg {ник} {сообщение} — написать игроку в лс\n!d{число} — дайс (виден только в дискорде);\n!% значение — фуджедайс (виден только в дискорде);\n!help — вывести эту справку.");
+		return;
+	    } else if (message.getContent().startsWith("!d")) {
 		String dice = dnum(message.getContent().substring(2));
 		ingameChannel.sendMessage(user.mention() + " бросает " + dice);
 		return;
@@ -122,6 +131,22 @@ implements Listener {
 		ingameChannel.sendMessage(user.mention() + " бросает " + dice);
 		return;
 	    
+	    } else if (message.getContent().startsWith("!msg ")) {
+		String mes = message.getContent().substring(5);
+		Player[] players = Bukkit.getServer().getOnlinePlayers();
+		boolean found = false;
+		for (Player player : players) {
+		    if (mes.startsWith(player.getName())) {
+			player.sendMessage("<§2"+user.getName()+"§f->§a"+player.getName()+"§f>"+mes.replace(player.getName(), ""));
+			ingameChannel.sendMessage("<"+user.getName()+"->"+mes.replace(player.getName(), player.getName()+">"));
+			found = true;
+		    }
+		}
+		if (!found) {
+		    ingameChannel.sendMessage("Нет такого игрока!");
+		}
+		return;
+
 	    } else if (message.getContent().startsWith("!online") || message.getContent().startsWith("!онлайн")) {
 		String online = "Текущий онлайн (%s): ";
 		int i = 0;
@@ -144,6 +169,10 @@ implements Listener {
 		return;
 	    
 	    } else if (message.getContent().startsWith("!exec ")) {
+		if (message.getContent().startsWith("!exec msg")) {
+		    ingameChannel.sendMessage("Так не получится. Пользуйтесь !msg {player} {message}");
+		    return;
+		}
 		String mes = "";
 		try { mes = message.getContent().substring(6); }
 		catch (Exception e) { return; }
@@ -322,10 +351,12 @@ implements Listener {
                 commandSender.sendMessage("§4/me отключено, используйте *§f");
                 return true;
 	} else if (command.getName().equalsIgnoreCase("msg")) {
+	    
 	    if (!(commandSender instanceof Player)) {
 	        commandSender.sendMessage("§4You must be a player!§f");
                 return false;
             }
+	    
             Player sender = (Player)commandSender;
             if (args.length == 0) {
 		sender.sendMessage("§8...и чего сказать хотел?§f");
@@ -635,6 +666,10 @@ implements Listener {
 	    result = String.format("%s&a%s&f (кричит): %s", adminprefix, name, mes);
 		
 	} else if (mes.startsWith("!") && player.hasPermission("KMChat.shout")) {
+	    if (mes.startsWith("!msg")) {
+		player.sendMessage("§4Используйте /msg!");
+		norec = true;
+	    }
 	    mes = mes.substring(1);
 	    range = this.getConfig().getInt("range.weakshout");
 	    result = String.format("%s&a%s&f (восклицает): %s", adminprefix, name, mes);
@@ -655,9 +690,17 @@ implements Listener {
 	    }
 	    result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
 	    forgm = true;
-    }
-	/*} else if (mes.startsWith(":msg")) {
-	    boolean further = false;
+    
+	} else if (mes.startsWith(":msg") || mes.startsWith("!msg")) {
+            if (!player.hasPermission("KMCore.tell")) {
+                player.sendMessage("§4Недостаточно прав.§f");
+            } else {
+		player.sendMessage("§4Используйте /msg!");
+		norec = true;
+	    }
+	}
+
+	    /*boolean further = false;
             if (!player.hasPermission("KMCore.tell")) {
 		player.sendMessage("§4Недостаточно прав.§f");
             } else {
