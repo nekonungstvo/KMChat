@@ -811,9 +811,10 @@ implements Listener {
 	String res2discord = result.replaceAll("§([a-z0-9])", "");
 	res2discord = res2discord.replace(player.getName(), "**"+player.getName()+"**");
 	
-	final String rawsnd = raw2dis;
-	RequestBuffer.request(() -> ingameChannel.sendMessage(rawsnd));
-
+	if (raw2dis != null) {
+	    final String rawsnd = raw2dis;
+	    RequestBuffer.request(() -> ingameChannel.sendMessage(rawsnd));
+	}
 	final String snd = res2discord;
 	RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
 	if (norec) {
