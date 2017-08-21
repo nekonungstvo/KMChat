@@ -645,7 +645,6 @@ implements Listener {
 	    result = "&e******" + mes + "******";
 	
 	} else if (mes.startsWith("*") && player.hasPermission("KMChat.me")) {
-	    ingameChannel.sendMessage("**<"+player.getName()+">** "+mes);
 	    mes = mes.substring(1);
 	    range = this.getConfig().getInt("range.me");
 	    result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
