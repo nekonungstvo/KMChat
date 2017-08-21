@@ -128,6 +128,10 @@ implements Listener {
 
 	    } else if (message.getContent().startsWith("!% ")) {
 		String dice = dF(message.getContent().substring(3));
+		if (dice == null) {
+		    ingameChannel.sendMessage("Для броска дайса пропишите: \"% значение\".");	
+		    return;
+		}
 		ingameChannel.sendMessage(user.mention() + " бросает " + dice);
 		return;
 	    
@@ -224,8 +228,7 @@ implements Listener {
 	    }
 	}
         if (n < 0) {
-	    n = 2;
-	    mes = "ПЛОХО";
+	    return null;
 	}
 	int[] dices = {-1, 0, 1};
 	int dice = 0;
@@ -516,6 +519,10 @@ implements Listener {
 		mes = mes.substring(1);
 	    }
 	    String dice = dF(mes);
+	    if (dice == null) {
+		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
+		norec = true;
+	    }
 	    result = String.format("&e(( %s бросает 4dF %s ))&f", name, dice);
 	
 	} else if (mes.startsWith("-%")) {
@@ -528,6 +535,10 @@ implements Listener {
 		mes = mes.substring(2);
 	    }
 	    String dice = dF(mes);
+	    if (dice == null) {
+		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
+		norec = true;
+	    }
 	    result = String.format("&a%s &f(to GM) &eбросает 4dF %s &f", name, dice);
 
 	} else if (mes.startsWith("===%")) {
@@ -540,6 +551,10 @@ implements Listener {
 	    }
 	    range = this.getConfig().getInt("range.weakwhisper");
 	    String dice = dF(mes);
+	    if (dice == null) {
+		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
+		norec = true;
+	    }
 	    result = String.format("&e((%s едва слышно бросает 4dF %s ))&f", name, dice);            
 
 	} else if (mes.startsWith("==%")) {
@@ -552,6 +567,10 @@ implements Listener {
 	    }
 	    range = this.getConfig().getInt("range.whisper");
 	    String dice = dF(mes);
+	    if (dice == null) {
+		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
+		norec = true;
+	    }
 	    result = String.format("&e(( %s очень тихо бросает 4dF %s ))&f", name, dice);
 
 	} else if (mes.startsWith("=%")) {
@@ -564,6 +583,10 @@ implements Listener {
 	    }
 	    range = this.getConfig().getInt("range.strongwhisper");
 	    String dice = dF(mes);
+	    if (dice == null) {
+		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
+		norec = true;
+	    }
 	    result = String.format("&e(( %s тихо бросает 4dF %s ))&f", name, dice);
 	
 	} else if (mes.startsWith("!!!%")) {
@@ -576,6 +599,10 @@ implements Listener {
 	    }
 	    range = this.getConfig().getInt("range.strongshout");
 	    String dice = dF(mes);
+	    if (dice == null) {
+		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
+		norec = true;
+	    }
 	    result = String.format("&e(( %s СВЕРХГРОМКО ОБРУШИВАЕТ 4dF %s ))&f", name, dice);
 	
 	} else if (mes.startsWith("!!%")) {
@@ -588,6 +615,10 @@ implements Listener {
 	    }
 	    range = this.getConfig().getInt("range.shout");
 	    String dice = dF(mes);
+	    if (dice == null) {
+		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
+		norec = true;
+	    }
 	    result = String.format("&e(( %s очень громко бросает 4dF %s ))&f", name, dice);
 
 	} else if (mes.startsWith("!%")) {
@@ -600,6 +631,10 @@ implements Listener {
 	    }
 	    range = this.getConfig().getInt("range.weakshout");
 	    String dice = dF(mes);
+	    if (dice == null) {
+		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
+		norec = true;
+	    }
 	    result = String.format("&e(( %s громко бросает 4dF %s ))&f", name, dice);
 		
 	} else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
