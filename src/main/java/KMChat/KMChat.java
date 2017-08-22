@@ -51,7 +51,7 @@ implements Listener {
     private static IDiscordClient client;
     private static IChannel ingameChannel;
     private Logger log = Logger.getLogger("Minecraft");
-        private String path = "logs/";
+    private String path = "logs/";
     private Map<Integer, String> nMap = new Hashtable<Integer, String>();
     private Range[] allRanges = new Range[6];
 
@@ -187,7 +187,7 @@ implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent asyncPlayerChatEvent) {
-	Long beg = System.nanoTime();
+	//Long beg = System.nanoTime();
 	Player player = asyncPlayerChatEvent.getPlayer();
 	int rangePosition = 6; // if no range specified, lands on the last element of array with descriptions
 	boolean local = true; 
@@ -384,7 +384,7 @@ implements Listener {
 	    asyncPlayerChatEvent.getRecipients().clear();
 	    asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
 	}
-	System.out.println("range: " + range);
+	//System.out.println("range: " + range);
 	//Long end = System.nanoTime();
 	//System.out.println("speed:" + (end-beg));
     }
