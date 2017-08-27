@@ -304,7 +304,7 @@ implements Listener {
 	    mes = mes.substring(1);
 	    result = "&e" +vars[rangePosition] + mes + vars[rangePosition];
 		
-	} else if (mes.startsWith("*") && player.hasPermission("KMChat.me")) {
+	} else if (mes.startsWith("*") && player.hasPermission("KMChat.me") && setRange == null) {
 	    mes = mes.substring(1);
 	    range = this.getConfig().getInt("range.me");
 	    result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
