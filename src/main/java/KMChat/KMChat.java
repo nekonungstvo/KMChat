@@ -9,6 +9,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.Date;
+import java.util.regex.Matcher;  
+import java.util.regex.Pattern;
 import java.io.*;
 
 import org.bukkit.Bukkit;
@@ -221,14 +223,16 @@ implements Listener {
 	
 	String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
 
-	if (mes.startsWith("-d") && player.hasPermission("kmchat.dice")) {
-	    sendraw = true;
+	Pattern p = Pattern.compile("-d(4|6|8|10|12|14|20|100).*"); 
+	Matcher m = p.matcher(mes);  
+	if (mes.startsWith("-d") && m.matches() && player.hasPermission("kmchat.dice")) {
 	    String helpmes = mes.substring(2);
 	    String dice = dnum(helpmes);
-	    forgm = true;
 	    if (dice != null) {
+		sendraw = true;
+		forgm = true;
 		result = String.format("&a%s &f(to GM) &eбросает %s &f", name, dice);
-	    }	
+	    }
 
 	} else if (mes.startsWith("d") && player.hasPermission("kmchat.dice")) {
 	    sendraw = true;
