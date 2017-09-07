@@ -107,7 +107,7 @@ implements Listener {
     }
 
     public void onDisable() {	
-        ingameChannel.sendMessage("**Server is going offline!**");
+	RequestBuffer.request(() -> ingameChannel.sendMessage("**Server is going offline!**"));
         this.log.info(String.format("%s is disabled!", this.getDescription().getFullName()));
     }
    
@@ -138,7 +138,7 @@ implements Listener {
 	String message = name + " ("+ip+")" + " выходит из игры";
 	kmlog("whole", message);
 	kmlog("chat", message);
-	ingameChannel.sendMessage(message.replaceAll(name, "__"+name+"__"));
+	RequestBuffer.request(() -> ingameChannel.sendMessage(message.replaceAll(name, "__"+name+"__")));
     }
 
     @EventHandler
@@ -570,8 +570,8 @@ implements Listener {
     @EventSubscriber
     public void onReady(ReadyEvent event) {
         System.out.println("Bot is now ready!");
-		ingameChannel = client.getChannelByID(CHID);
-		ingameChannel.sendMessage("**Server is going online!**");
+	ingameChannel = client.getChannelByID(CHID);
+	RequestBuffer.request(() -> ingameChannel.sendMessage("**Server is going online!**"));
     }
     
     
@@ -676,7 +676,9 @@ implements Listener {
 	    }
 	}
 	final String snd = res;
-	RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+	if (snd != null) {
+	    RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+	}
     }
     //---}}} IngameBot
     
