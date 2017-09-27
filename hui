@@ -1,0 +1,78 @@
+
+> Task :compileJava
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:131: error: cannot find symbol
+        try(FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
+            ^
+  symbol:   class FileWriter
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:131: error: cannot find symbol
+        try(FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
+                                    ^
+  symbol:   class FileWriter
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:134: error: cannot find symbol
+        catch(IOException ex){
+              ^
+  symbol:   class IOException
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:437: error: cannot find symbol
+        try(FileWriter writer = new FileWriter(path + where + "/" + where + "_current.log", true)) {
+            ^
+  symbol:   class FileWriter
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:437: error: cannot find symbol
+        try(FileWriter writer = new FileWriter(path + where + "/" + where + "_current.log", true)) {
+                                    ^
+  symbol:   class FileWriter
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:442: error: cannot find symbol
+        catch(IOException ex){
+              ^
+  symbol:   class IOException
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:449: error: cannot find symbol
+        Path path = Paths.get(DATA_PATH, nick + ".skills");
+        ^
+  symbol:   class Path
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:450: error: cannot find symbol
+        Charset charset = Charset.forName("UTF-8");
+        ^
+  symbol:   class Charset
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:450: error: cannot find symbol
+        Charset charset = Charset.forName("UTF-8");
+                          ^
+  symbol:   variable Charset
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:458: error: cannot find symbol
+            List<String> lines = Files.readAllLines(path, charset);
+                                 ^
+  symbol:   variable Files
+  location: class KMChat
+/home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java:486: error: cannot find symbol
+        } catch (IOException e) {
+                 ^
+  symbol:   class IOException
+  location: class KMChat
+Note: /home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /home/volpe/java_sandbox/KMChat/src/main/java/KMChat/KMChat.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+11 errors
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 0s
+1 actionable task: 1 executed
+
