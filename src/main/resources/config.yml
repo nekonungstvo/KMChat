@@ -3,6 +3,7 @@ logsdir: "logs/"
 bottoken: "HERE GOES BOT TOKEN"
 channelid: "HERE GOES CHANNEL ID"
 datastorage: "HERE GOES DATA STORAGE"
+whoUseAutoGM: []
 range.default: 18
 range.dm: 18
 range.closedm: 9

@@ -59,6 +59,8 @@ implements Listener {
     private Map<Integer, String> nMap = new Hashtable<Integer, String>();
     private Range[] allRanges = new Range[6];
     private String[] skillset;
+    private List<String> whoUseAutoGM;
+    private boolean wasrestarted = false;
     public void onEnable() {
 
         this.getConfig().options().copyDefaults(true);
@@ -66,10 +68,11 @@ implements Listener {
         
         path = this.getConfig().getString("logsdir");
         TOKEN = this.getConfig().getString("bottoken");
-        CHID = this.getConfig().getString("channelid");
+        CHID = this.getConfig().getString("channelid"); 
         DATA_PATH = this.getConfig().getString("datastorage");
-         
-	System.out.println("Logging bot in...");
+        whoUseAutoGM = this.getConfig().getStringList("whoUseAutoGM");
+	
+        System.out.println("Logging bot in...");
         client = new ClientBuilder().withToken(TOKEN).build();
         client.getDispatcher().registerListener(this);
         client.login();
@@ -190,8 +193,19 @@ implements Listener {
 	    }
 	}
 	
-	String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
+        for (String nick : whoUseAutoGM) {
+            if (player.getName().equals(nick)) {
+                if (!mes.startsWith(":")) {
+                    mes = "-" + mes;
+                    forgm = true;
+                } else {
+                    mes = mes.substring(1);
+                }
+            break;
+            } 
+        }
 
+	String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
 	Pattern p = Pattern.compile("-d(4|6|8|10|12|14|20|100).*"); 
 	Matcher m = p.matcher(mes);  
 	if (mes.startsWith("-d") && m.matches() && player.hasPermission("kmchat.dice")) {
@@ -318,7 +332,7 @@ implements Listener {
 		}
 	    
 
-	    result = String.format("%s&a%s&f (%sOOC): &d%s&f", adminprefix, name, str ,mes);
+	    result = String.format("%s&a%s&f (%sOOC): &d%s&f", adminprefix, name, str, mes);
 	}
 
 
@@ -349,7 +363,14 @@ implements Listener {
 	    recips.add(player);
             for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
                 if (player2.hasPermission("KMChat.admin")) {
-		    recips.add(player2);
+                    if (player.getLocation().distanceSquared(player2.getLocation()) > range*range) {
+                        result = result.replaceAll("§e", "§7");
+                        result = result.replaceAll("§f", "§7");
+                        result = result.replaceAll("§6", "§7");
+                        player2.sendMessage(result);
+                    } else {
+		        recips.add(player2);
+                    }
 		}
 	    }
 	    asyncPlayerChatEvent.getRecipients().addAll(recips);
@@ -640,17 +661,71 @@ implements Listener {
     
     //{{{--- Commands 
        public boolean onCommand(CommandSender commandSender, Command command, String string, String[] args) {
+            Player sender = (Player)commandSender;
 	if (command.getName().equalsIgnoreCase("me")) {
                 commandSender.sendMessage("§4/me отключено, используйте *§f");
+                return true;    
+
+        } else if (command.getName().equalsIgnoreCase("alwaysgm")) {
+            if (!(commandSender instanceof Player)) {
+                commandSender.sendMessage("§4You must be a player!§f");
+                return false;
+            }
+        if (!sender.hasPermission("KMChat.gm")) {
+                sender.sendMessage("§4Недостаточно прав.§f");
                 return true;
+        }
+        if (args.length == 0) {
+                if (whoUseAutoGM.contains(sender.getName())) {
+                    sender.sendMessage("§7Автоматический ГМ-чат §aвключён!§f");
+                } else {
+                    sender.sendMessage("§7Автоматический ГМ-чат §4выключен!§f");
+                }
+            return true;
+        }
+        if (args[0].equals("help")) {
+                sender.sendMessage("§6Usage:\n§f/alwaysgm - check condition\n/alwaysgm on - turn on\n/alwaysgm off - turn off\n:message - regular chat (if alwaysgm is on)");
+        } else if (args[0].equals("on")) {
+                    if (!whoUseAutoGM.contains(sender.getName())) {
+                        whoUseAutoGM.add(sender.getName());
+                        this.getConfig().set("whoUseAutoGM", whoUseAutoGM);
+                        this.saveConfig();
+                    }
+                    sender.sendMessage("§7Автоматический ГМ-чат теперь §aвключён!§f"); 
+        } else if (args[0].equals("off")) {
+                    if (whoUseAutoGM.contains("player"))        
+                    if (whoUseAutoGM.contains(sender.getName())) {
+                        whoUseAutoGM.remove(sender.getName());
+                        this.getConfig().set("whoUseAutoGM", whoUseAutoGM);
+                        this.saveConfig();
+                    }   
+                    sender.sendMessage("§7Автоматический ГМ-чат теперь §4выключен!§f");
+        }
+
+        } else if (command.getName().equalsIgnoreCase("ingamerestart")) {
+                if (!sender.hasPermission("KMCore.gm")) {
+                    sender.sendMessage("§4Недостаточно прав.§f");
+                    return false;
+            }
+            try {
+                client.logout();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+                wasrestarted = true;
+            try {
+              client.login();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            sender.sendMessage("§8Ingame bot was reloaded!§f");
+            return true;
 	} else if (command.getName().equalsIgnoreCase("msg")) {
-	    
 	    if (!(commandSender instanceof Player)) {
 	        commandSender.sendMessage("§4You must be a player!§f");
                 return false;
             }
 	    
-            Player sender = (Player)commandSender;
             if (args.length == 0) {
 		sender.sendMessage("§8...и чего сказать хотел?§f");
                 return true;
@@ -705,7 +780,12 @@ implements Listener {
     public void onReady(ReadyEvent event) {
         System.out.println("Bot is now ready!");
 	ingameChannel = client.getChannelByID(CHID);
-	RequestBuffer.request(() -> ingameChannel.sendMessage("**Server is going online!**"));
+        String mes = "**Server is going online!**";
+        if (wasrestarted) {
+            mes = "**I was reloaded!**";
+        }
+        final String snd = mes;
+	RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
     }
     
     
@@ -827,7 +907,8 @@ implements Listener {
 	    mes.startsWith("==% ") ||
 	    mes.startsWith("!!% ") ||
 	    mes.startsWith("===% ") ||
-	    mes.startsWith("!!!% ") ) {
+	    mes.startsWith("!!!% ") ||
+	    mes.startsWith(":% ") ) {
 
 	    Collection<String> collection = playerChatTabCompleteEvent.getTabCompletions();
 	    collection.clear();
@@ -883,8 +964,13 @@ implements Listener {
                 collection.add("физическая сила");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("с")) {
                 collection.add("скрытность");
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("хи")) {
+                collection.add("хирургия");
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("хо")) {
+                collection.add("хорошо");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
                 collection.add("хирургия");
+                collection.add("хорошо");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
 		collection.add("превосходно");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пла")) {
@@ -905,8 +991,6 @@ implements Listener {
                 collection.add("первая помощь");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("н")) {
 		collection.add("нормально");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
-		collection.add("хорошо");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("о")) {
 		collection.add("отлично");
 	    } else {
