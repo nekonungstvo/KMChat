@@ -170,6 +170,19 @@ implements Listener {
 
 	String mes = asyncPlayerChatEvent.getMessage();
 	String raw = mes;
+        System.out.println(mes);
+        for (String nick : whoUseAutoGM) {
+            if (player.getName().equals(nick)) {
+                if (!mes.startsWith(":")) {
+                    mes = "-" + mes;
+                    forgm = true;
+                } else {
+                    mes = mes.substring(1);
+                }
+            break;
+            } 
+        }
+        System.out.println(mes);
 	String name = player.getName();
 	Range setRange = null;
 	double range = this.getConfig().getInt("range.default");
@@ -193,17 +206,6 @@ implements Listener {
 	    }
 	}
 	
-        for (String nick : whoUseAutoGM) {
-            if (player.getName().equals(nick)) {
-                if (!mes.startsWith(":")) {
-                    mes = "-" + mes;
-                    forgm = true;
-                } else {
-                    mes = mes.substring(1);
-                }
-            break;
-            } 
-        }
 
 	String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
 	Pattern p = Pattern.compile("-d(4|6|8|10|12|14|20|100).*"); 
@@ -693,7 +695,6 @@ implements Listener {
                     }
                     sender.sendMessage("§7Автоматический ГМ-чат теперь §aвключён!§f"); 
         } else if (args[0].equals("off")) {
-                    if (whoUseAutoGM.contains("player"))        
                     if (whoUseAutoGM.contains(sender.getName())) {
                         whoUseAutoGM.remove(sender.getName());
                         this.getConfig().set("whoUseAutoGM", whoUseAutoGM);
