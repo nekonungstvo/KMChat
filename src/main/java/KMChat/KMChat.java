@@ -170,7 +170,6 @@ implements Listener {
 
 	String mes = asyncPlayerChatEvent.getMessage();
 	String raw = mes;
-        System.out.println(mes);
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
                 if (!mes.startsWith(":")) {
@@ -366,9 +365,7 @@ implements Listener {
             for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
                 if (player2.hasPermission("KMChat.admin")) {
                     if (player.getLocation().distanceSquared(player2.getLocation()) > range*range) {
-                        result = result.replaceAll("§e", "§7");
                         result = result.replaceAll("§f", "§7");
-                        result = result.replaceAll("§6", "§7");
                         player2.sendMessage(result);
                     } else {
 		        recips.add(player2);
