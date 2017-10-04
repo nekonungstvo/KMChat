@@ -170,17 +170,6 @@ implements Listener {
 
 	String mes = asyncPlayerChatEvent.getMessage();
 	String raw = mes;
-        for (String nick : whoUseAutoGM) {
-            if (player.getName().equals(nick)) {
-                if (!mes.startsWith(":")) {
-                    mes = "-" + mes;
-                    forgm = true;
-                } else {
-                    mes = mes.substring(1);
-                }
-            break;
-            } 
-        }
         System.out.println(mes);
 	String name = player.getName();
 	Range setRange = null;
@@ -191,6 +180,14 @@ implements Listener {
 	    adminprefix = this.getConfig().getString("adminprefix");
 	}
 	    
+        for (String nick : whoUseAutoGM) {
+            if (player.getName().equals(nick)) {
+                if (mes.startsWith(":")) {
+                    mes = mes.substring(1);
+                }
+            break;
+            } 
+        }
 	String describeRange = "";
 	int i = -1;
 	for (Range ran : allRanges) {
@@ -206,6 +203,19 @@ implements Listener {
 	}
 	
 
+        for (String nick : whoUseAutoGM) {
+            if (player.getName().equals(nick)) {
+                if (mes.startsWith(":")) {
+                    mes = mes.substring(1);
+                } else if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№")) {
+                    break;
+                } else {
+                    mes = "-" + mes;
+                    forgm = true;
+                }
+            break;
+            } 
+        }
 	String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
 	Pattern p = Pattern.compile("-d(4|6|8|10|12|14|20|100).*"); 
 	Matcher m = p.matcher(mes);  
@@ -911,8 +921,7 @@ implements Listener {
 	    Collection<String> collection = playerChatTabCompleteEvent.getTabCompletions();
 	    collection.clear();
 
-	    if (playerChatTabCompleteEvent.getLastToken().startsWith("у")) {
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("уж")) {
+	    if (playerChatTabCompleteEvent.getLastToken().startsWith("уж")) {
 		collection.add("ужасно");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ук")) {
                 collection.add("уклонение");
@@ -969,6 +978,8 @@ implements Listener {
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
                 collection.add("хирургия");
                 collection.add("хорошо");
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("первая помощь")) {
+		collection.add("первая помощь");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
 		collection.add("превосходно");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пла")) {
