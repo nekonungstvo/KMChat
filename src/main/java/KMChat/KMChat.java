@@ -179,11 +179,12 @@ implements Listener {
 	if (player.hasPermission("KMChat.prefix")) {
 	    adminprefix = this.getConfig().getString("adminprefix");
 	}
-	    
+	boolean strippedColon = false;
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
                 if (mes.startsWith(":")) {
                     mes = mes.substring(1);
+                    strippedColon = true;
                 }
             break;
             } 
@@ -202,12 +203,11 @@ implements Listener {
 	    }
 	}
 	
-
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
                 if (mes.startsWith(":")) {
                     mes = mes.substring(1);
-                } else if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№")) {
+                } else if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || strippedColon) {
                     break;
                 } else {
                     mes = "-" + mes;
@@ -341,9 +341,15 @@ implements Listener {
 		    str = "едва слышно в ";
 		    }
 		}
-	    
-
 	    result = String.format("%s&a%s&f (%sOOC): &d%s&f", adminprefix, name, str, mes);
+            if (result.matches(".*\\(\\(\\S.*")) {
+                result = result.replace("((", "(( ");
+            }
+            if (result.matches(".*\\S\\)\\).*")) {
+                System.out.println(result);
+                result = result.replace("))", " ))");
+            }
+
 	}
 
 
