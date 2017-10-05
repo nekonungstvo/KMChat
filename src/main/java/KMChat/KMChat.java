@@ -170,7 +170,6 @@ implements Listener {
 
 	String mes = asyncPlayerChatEvent.getMessage();
 	String raw = mes;
-        System.out.println(mes);
 	String name = player.getName();
 	Range setRange = null;
 	double range = this.getConfig().getInt("range.default");
@@ -205,9 +204,7 @@ implements Listener {
 	
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
-                if (mes.startsWith(":")) {
-                    mes = mes.substring(1);
-                } else if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || strippedColon) {
+                if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || strippedColon) {
                     break;
                 } else {
                     mes = "-" + mes;
@@ -240,9 +237,10 @@ implements Listener {
 	    String helpmes = mes.substring(1);
 	    String dice = dnum(helpmes);
 	    if (dice != null) {
-		result = String.format("&e(( %s &e%s %s ))&f", name, vars[rangePosition], dice);
-	    } else
-		result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
+		result = String.format("&e(( &a%s &e%s %s ))&f", name, vars[rangePosition], dice);
+	    } else {
+		result = String.format("&a%s&f%s: %s", name, describeRange, mes);
+            }
 
 	} else if (mes.startsWith("%")) {
 	    sendraw = true;
@@ -264,7 +262,7 @@ implements Listener {
 		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
 		norec = true;
 	    } else
-		result = String.format("&e(( %s %s 4dF %s ))&f", name, vars[rangePosition], dice);
+		result = String.format("&e(( &a%s&e %s 4dF %s ))&f", name, vars[rangePosition], dice);
 	
 	} else if (mes.startsWith("-%")) {
 	    sendraw = true;
@@ -346,7 +344,6 @@ implements Listener {
                 result = result.replace("((", "(( ");
             }
             if (result.matches(".*\\S\\)\\).*")) {
-                System.out.println(result);
                 result = result.replace("))", " ))");
             }
 
@@ -444,14 +441,25 @@ implements Listener {
 
     protected String getSkill(String desc, String nick) {
 	//we need to have a file "Playernick.skills" with skills listed as following: "skill:level"
-	Path path = Paths.get(DATA_PATH, nick + ".skills");
-	Charset charset = Charset.forName("UTF-8");
 	Pattern skillpat = Pattern.compile("(.*):");
 	Pattern levelpat = Pattern.compile(":(.*)");
-
+        boolean changedNick = false;
 	String skill = null;
 	String level = null;
 
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            if (desc.startsWith(player.getName())) {
+                if (getServer().getPlayer(nick).hasPermission("KMChat.gm")) {
+                    nick = player.getName();
+                    desc = desc.substring(nick.length() + 1);
+                    changedNick = true;
+                    break;
+                }
+            }
+        }
+
+	Path path = Paths.get(DATA_PATH, nick + ".skills");
+	Charset charset = Charset.forName("UTF-8");
         try {
 	    List<String> lines = Files.readAllLines(path, charset);
 
@@ -492,7 +500,12 @@ implements Listener {
 //                        System.out.println("skill is " + skill + ", level is " + level);
             if (skill == null)
                 return null;
-	    String result = desc.replaceFirst(skill, level + " ["+skill+"] (");
+            String result = "";
+            if (changedNick) {
+	        result = desc.replaceFirst(skill, level + " ["+nick+" "+skill+"] (");
+            } else {
+	        result = desc.replaceFirst(skill, level + " ["+skill+"] (");
+            }
 	    //let's make the output pretty!
 	    //System.out.println(result);
 	    //System.out.println(desc);
@@ -925,7 +938,9 @@ implements Listener {
 	    mes.startsWith(":% ") ) {
 
 	    Collection<String> collection = playerChatTabCompleteEvent.getTabCompletions();
-	    collection.clear();
+	    if (!playerChatTabCompleteEvent.getPlayer().hasPermission("KMChat.gm")) {
+                collection.clear();
+            }
 
 	    if (playerChatTabCompleteEvent.getLastToken().startsWith("уж")) {
 		collection.add("ужасно");
@@ -984,7 +999,7 @@ implements Listener {
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
                 collection.add("хирургия");
                 collection.add("хорошо");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("первая помощь")) {
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пе")) {
 		collection.add("первая помощь");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
 		collection.add("превосходно");
