@@ -696,7 +696,7 @@ implements Listener {
     }
 
     public int getNumFromDice(String dice) {
-        Pattern skillPat =  Pattern.compile("Результат:(§.)? ((абсолютно ублюдски|ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно|божественно)[+-]{0,3})");
+        Pattern skillPat =  Pattern.compile("Результат:(§8)? ((абсолютно ублюдски|ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно|божественно)[+-]{0,3})");
         Matcher skillMat = skillPat.matcher(dice);
         skillMat.find();
         String found = skillMat.group(2);
@@ -718,11 +718,10 @@ implements Listener {
         String initial = mat1.group(1);
         String desc = mat1.group(2);
         String newroll = simpledF(initial, desc);
-        String logged = "### " + dice + " ---> " + newroll;
-        logged = logged.replaceAll("§.", "");
-        kmlog("chat", logged);
-        kmlog("whole", logged);
-        final String snd = logged;
+        System.out.println("### " + dice + " ---> " + newroll);
+        kmlog("chat", newroll);
+        kmlog("whole", newroll);
+        final String snd = newroll;
         RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
 
         return newroll;
@@ -837,7 +836,7 @@ implements Listener {
                 n = 12;
         }
 
-        return "(" + result + ") от " + level + desc + ". Результат:§o " + nMap.get(n) + "§e";
+        return "(" + result + ") от " + level + desc + ". Результат:§8 " + nMap.get(n) + "§e";
     }
 
 
@@ -860,7 +859,7 @@ implements Listener {
             }
             Player sender = (Player)commandSender;
             if (args.length == 0 || args[0].equals("help")) {
-                commandSender.sendMessage("§e----------- §fHelp: react §e--------------------§8\nReact usage:\nYou can specify the name of the list after «/react». You can also add/edit/remove multiple reactions per time. {arg} is for optional arguments\n§6/react add %nick% {level} {mod}:§f add reactions\n§6/react edit %nick% {level} {mod}:§f edit reactions\n§6/react remove %nick%:§f remove reactions\n§6/react end:§а delete the list\n§6/react go:§f launch reactions, !go and =go also possible\n§6/react list:§f see all lists\n§6/react show:§f show the list§f");
+                commandSender.sendMessage("§4help message will be here!§f");
                 return true;
             }
             String name = null;
@@ -1026,10 +1025,9 @@ implements Listener {
                         List<Player> recips = getLocalRecipients(sender, out, range);
                         for (Player pl : recips) {
                             pl.sendMessage(out);
-                            out.replaceAll("§.", "");
                             kmlog("chat", out);
                             kmlog("whole", out);
-                            final String snd = out.replaceAll("§.", "");
+                            final String snd = out;
                             RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
                         }
                     }
@@ -1037,7 +1035,6 @@ implements Listener {
                 List<Player> recips = getLocalRecipients(sender, reactNameOut, range);
                 for (Player pl : recips) {
                     pl.sendMessage(reactNameOut);
-                    reactNameOut = reactNameOut.replace("§.", "");
                     kmlog("chat", reactNameOut);
                     kmlog("whole", reactNameOut);
                     final String snd = reactNameOut;

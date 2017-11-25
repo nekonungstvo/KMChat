@@ -22,6 +22,10 @@ commands:
       description: Nothing
       usage: /<command>
       permission-message: You don't have <permission>
+   react:      
+      description: Nothing
+      usage: /<command>
+      permission-message: You don't have <permission>
 permissions:
     KMChat.tell:
         description: Allow to tell
