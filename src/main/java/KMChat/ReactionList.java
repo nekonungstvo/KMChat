@@ -179,13 +179,17 @@ public class ReactionList {
     }
 
     public boolean remove(String[] args) {
+        List<Reaction> todelete = new ArrayList<Reaction>();
 	for (String a : args) {
 	    for (Reaction r : rlist) {
 		if (r.getPlayer().equals(a)) {
-		    rlist.remove(r);
-		}
+		    todelete.add(r);
+                }
 	    }
 	}
+        for (Reaction r : todelete) {
+            rlist.remove(r);
+        }
 	return true;
     }
 

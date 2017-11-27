@@ -1067,8 +1067,8 @@ implements Listener {
                 Pattern ininPat = Pattern.compile("Результат:§?.?\\s(.*)");
                 int whatever = modNicks.length-1;
                 for (String str : reactName) {
-                    String space = ":";
-                    reactNameOut += str + space + modNicks[whatever--] + " ";
+                    String space = "-";
+                    reactNameOut += str + space + modNicks[whatever--] + " " + "|" + " " ;
                 }
                 
                // for (int j = 0; j < players.length; j++) {
