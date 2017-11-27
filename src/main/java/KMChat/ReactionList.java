@@ -74,7 +74,6 @@ public class ReactionList {
     //    System.out.println("!!");
   //      System.out.println(nick +  " " + initial);
         this.turns = this.turns.replaceFirst(nick, (nick+"\\-"+initial));
-        System.out.println(this.turns);
     }
 
     public String[] getPlayers() {
@@ -99,7 +98,6 @@ public class ReactionList {
         try {
 	    List<String> lines = Files.readAllLines(path, charset);
 	    for (String line : lines) {
-                System.out.println(line + " --- " + skill);
 		if (line.startsWith(skill)) {
 		    Matcher levelmat = levelpat.matcher(line);
 		    while (levelmat.find()) {

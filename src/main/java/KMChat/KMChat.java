@@ -725,17 +725,13 @@ implements Listener {
         Matcher nickMat = nickPat.matcher(dice);
         nickMat.find();
         String old = nickMat.group(4);
-        System.out.println("old = " + old);
         String repl = nickMat.group(3) + "\\$" + nickMat.group(4);
         String nick = nickMat.group(3);
         if (!desc.contains("$")) {
-            System.out.println(nick + repl);
             newroll = newroll.replaceFirst(nick, repl);
-            System.out.println(newroll);
         }
         list.addInfo(nickMat.group(3) + ": " + nickMat.group(4));
         String logged = "### " + dice + " ---> " + newroll;
-        System.out.println(logged);
         logged = logged.replaceAll("§.", "");
         kmlog("chat", logged);
         kmlog("whole", logged);
@@ -1015,9 +1011,8 @@ implements Listener {
                 if (mat.matches()) {
                     String describeRange = "";
                     int i = -1;
-                    int range = this.getConfig().getInt("default");
+                    double range = this.getConfig().getInt("range.default");
                     int rangePosition = 6;
-                    
     	            for (Range ran : allRanges) {
 	                ++i;
 	                if (ran.matches(mat.group(1)) && commandSender.hasPermission(ran.getPermission())) {
@@ -1075,7 +1070,6 @@ implements Listener {
                //     reactNameOut = reactNameOut.replace(players[j], players[j] + levels[j]);
                // }
                 list.setTurns(reactNameOut);
-                System.out.println(reactNameOut);
                 reactNameOut = list.getTurns();
 
                  String[] vars = { "едва слышно бросает",
@@ -1123,7 +1117,6 @@ implements Listener {
             if (comm.endsWith("turns")) {
                     String out = list.getTurns();
                     //String out = "§8" + list.getInfo() + list.getTurns();
-                    System.out.println(out);
                     int range = this.getConfig().getInt("default");
 
                 Pattern pat2 = Pattern.compile("(.*)turns");
