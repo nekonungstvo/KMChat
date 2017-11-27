@@ -1116,7 +1116,6 @@ implements Listener {
             }
             }
             if (comm.endsWith("turns")) {
-                System.out.println("!!!");
                     String out = list.getTurns();
                     //String out = "§8" + list.getInfo() + list.getTurns();
                     int range = this.getConfig().getInt("range.default");
