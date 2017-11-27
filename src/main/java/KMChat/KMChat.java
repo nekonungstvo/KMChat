@@ -1114,10 +1114,12 @@ implements Listener {
              catch (Exception e){
                 commandSender.sendMessage("§4" + e.getMessage() + "§f");
             }
+            }
             if (comm.endsWith("turns")) {
+                System.out.println("!!!");
                     String out = list.getTurns();
                     //String out = "§8" + list.getInfo() + list.getTurns();
-                    int range = this.getConfig().getInt("default");
+                    int range = this.getConfig().getInt("range.default");
 
                 Pattern pat2 = Pattern.compile("(.*)turns");
                 Matcher mat2 = pat2.matcher(comm);
@@ -1142,7 +1144,8 @@ implements Listener {
                         
                     return true;
                 }
-                }
+                
+                
         //AutoGM-chat
             
             } else if (command.getName().equalsIgnoreCase("alwaysgm")) {
