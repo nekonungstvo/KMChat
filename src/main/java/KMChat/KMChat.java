@@ -380,7 +380,10 @@ implements Listener {
 	    recips.add(player);
             for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
                 if (player2.hasPermission("KMChat.admin")) {
-                    if (player.getLocation().distanceSquared(player2.getLocation()) > range*range) {
+                    if (!player2.getWorld().equals((Object)player.getWorld())) {
+                        result = result.replaceAll("§f", "§7");
+                        player2.sendMessage(result);
+                    } else if ( player.getLocation().distanceSquared(player2.getLocation()) > range*range) {
                         result = result.replaceAll("§f", "§7");
                         player2.sendMessage(result);
                     } else {
@@ -706,19 +709,33 @@ implements Listener {
                 n = entry.getKey();
                 break;
             }
-        }
+      }
         return n;
 
     }
 
-    public  String reroll(String dice) {
-        Pattern pat1 = Pattern.compile("от (абсолютно ублюдски|ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно|божественно)(.*)\\. Результат");
+    public  String reroll(String dice, ReactionList list) {
+        Pattern pat1 = Pattern.compile("от (абсолютно ублюдски|ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно|божественно)(.*)\\.\\sРезультат");
         Matcher mat1 = pat1.matcher(dice);
         mat1.find();
         String initial = mat1.group(1);
         String desc = mat1.group(2);
         String newroll = simpledF(initial, desc);
+        Pattern nickPat = Pattern.compile("от (ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно)\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+.*\\sРезультат:§?.?\\s(.*)");
+        Matcher nickMat = nickPat.matcher(dice);
+        nickMat.find();
+        String old = nickMat.group(4);
+        System.out.println("old = " + old);
+        String repl = nickMat.group(3) + "\\$" + nickMat.group(4);
+        String nick = nickMat.group(3);
+        if (!desc.contains("$")) {
+            System.out.println(nick + repl);
+            newroll = newroll.replaceFirst(nick, repl);
+            System.out.println(newroll);
+        }
+        list.addInfo(nickMat.group(3) + ": " + nickMat.group(4));
         String logged = "### " + dice + " ---> " + newroll;
+        System.out.println(logged);
         logged = logged.replaceAll("§.", "");
         kmlog("chat", logged);
         kmlog("whole", logged);
@@ -729,7 +746,7 @@ implements Listener {
     }
 
 
-    public  boolean findReroll(String[] dices, int beg) {
+    public  boolean findReroll(String[] dices, int beg, ReactionList list) {
         List <String> repeats = new ArrayList<String>();
         String first = "";
         int begin = beg+1;
@@ -755,20 +772,20 @@ implements Listener {
         }
         if (begin < 0) return false;
         for (String dice : repeats) {
-            String r = reroll(dice);
+            String r = reroll(dice, list);
             rerolled.add(r);
 //            System.out.println(r);
         }
         String[] rerolledStrArr = rerolled.toArray(new String[rerolled.size()]);
         bubbleSort(rerolledStrArr);
-        findReroll(rerolledStrArr, -2);
+        findReroll(rerolledStrArr, -2, list);
         int j = 0;
         if (begin < 0) return false;
         for (int i = begin; i <= end; i++) {
             //System.out.println("--> " + begin + " <---");
             dices[i] = rerolledStrArr[j++];
         }
-        findReroll(dices, end);
+        findReroll(dices, end, list);
     //    System.out.println();
         return false;
     }
@@ -837,7 +854,7 @@ implements Listener {
                 n = 12;
         }
 
-        return "(" + result + ") от " + level + desc + ". Результат:§o " + nMap.get(n) + "§e";
+        return "(" + result + ") от " + level + desc + ". Результат:§o " + nMap.get(n);
     }
 
 
@@ -859,6 +876,10 @@ implements Listener {
                 return false;
             }
             Player sender = (Player)commandSender;
+            if (!sender.hasPermission("KMChat.gm")) {
+                sender.sendMessage("§4Недостаточно прав.§f");
+                return true;
+        }
             if (args.length == 0 || args[0].equals("help")) {
                 commandSender.sendMessage("§e----------- §fHelp: react §e--------------------§8\nReact usage:\nYou can specify the name of the list after «/react». You can also add/edit/remove multiple reactions per time. {arg} is for optional arguments\n§6/react add %nick% {level} {mod}:§f add reactions\n§6/react edit %nick% {level} {mod}:§f edit reactions\n§6/react remove %nick%:§f remove reactions\n§6/react end:§а delete the list\n§6/react go:§f launch reactions, !go and =go also possible\n§6/react list:§f see all lists\n§6/react show:§f show the list§f");
                 return true;
@@ -872,6 +893,7 @@ implements Listener {
                 args[1].equals("edit") ||
                 args[1].equals("end") ||
                 args[1].equals("show") ||
+                args[1].endsWith("turns") ||
                 args[1].equals("list") ||
                 args[1].equals("check") ||
                 args[1].endsWith("go") )
@@ -893,6 +915,7 @@ implements Listener {
                 args[0].equals("edit") ||
                 args[0].equals("end") ||
                 args[0].equals("check") ||
+                args[0].endsWith("turns") ||
                 args[0].equals("show") ||
                 args[0].equals("list") ||
                 args[0].endsWith("go") )
@@ -912,13 +935,16 @@ implements Listener {
             String owner = commandSender.getName();
             if (sprReactionList != null) {
                 for (ReactionList ls : sprReactionList) {
-                    if (ls.getName().equals(name)) {
+                    if (ls.getListName().equals(name)) {
                         list = ls;
                         break;
                     }
                 }
             }
+
+
                 if (comm.equals("add") && list == null) {
+                    try {
                     if (cutArgs[0] == null) {
                         commandSender.sendMessage("§4Нельзя добавить пустую реакцию!§f");
                         return true;
@@ -926,13 +952,18 @@ implements Listener {
                         ReactionList newList = new ReactionList(name, cutArgs);
                         sprReactionList.add(newList);
                         list = newList;
-                    commandSender.sendMessage("§7Имена добавлены в новосозданный список " + name + "!§f");
+                    commandSender.sendMessage("§7Имена добавлены в новосозданный список!§f\n" + list.show());
                     return true;
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        commandSender.sendMessage("§4" + e.getMessage() + "§f");
+                        return false;
+                    }
                 }
                 if (comm.equals("list")) {
                     String out = "";
                     for (ReactionList rlist : sprReactionList){
-                        out += rlist.getName() + " ";
+                        out += rlist.getListName() + " ";
                     }
                     commandSender.sendMessage("§7Списки: §6" + out + "§f");
                     return true;
@@ -942,13 +973,18 @@ implements Listener {
                     return true;
                 }
                 if (comm.equals("add")) {
+                    try {
                     if (cutArgs[0] == null) {
                         commandSender.sendMessage("§4Нельзя добавить пустую реакцию!§f");
                         return true;
                     }
                     list.add(cutArgs);
-                    commandSender.sendMessage("§7Имена добавлены в список " + name + "!§f");
+                    commandSender.sendMessage("§7Имена добавлены в список " + name + "!§f\n" + list.show());
                     return true;
+                    } catch (Exception e){
+                        commandSender.sendMessage("§4" + e.getMessage() + "§f");
+                        return false;
+                    }
                 }
                 if (comm.equals("remove")) {
                     list.remove(cutArgs);
@@ -971,6 +1007,9 @@ implements Listener {
                             commandSender.sendMessage(out);
                             return true;
                 }
+                if (comm.endsWith("go")) {
+                    try {
+                list.clearInfo();
                 Pattern pat = Pattern.compile("(.*)go");
                 Matcher mat = pat.matcher(comm);
                 if (mat.matches()) {
@@ -990,16 +1029,32 @@ implements Listener {
 
                 String[] rawdices = list.getDices();
                 String[] dices = new String[rawdices.length];
+                String[] players = list.getPlayers();
+                String[] levels = list.getLevels();
+                Pattern resPat = Pattern.compile("Результат:\\s(.*)");
+                Pattern nickPat = Pattern.compile("(ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно)\\+{0,4}\\-{0,4}\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+");
                 for (int j = 0; j < rawdices.length; j++) {
-                    dices[j] = dF(rawdices[j], owner);
+                    dices[j] = dF(rawdices[j], players[j]);
                 }
+                
                 bubbleSort(dices);
-                findReroll(dices, -2);
-                System.out.println("dices:");
-                for (int j = 0; j < dices.length; j++)
-                System.out.print(dices[j]);
+                findReroll(dices, -2, list);
 
-                Pattern nickPat = Pattern.compile("(ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно)\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+");
+                Pattern oldPat = Pattern.compile("\\$(.*?)(\\s|\\))");
+                String[] modNicks = new String[dices.length];
+                for (int j = 0; j < dices.length; j++) {
+                    Matcher oldMat = oldPat.matcher(dices[j]);
+                    if (oldMat.find()) {
+                        modNicks[j] = oldMat.group(1);
+                        dices[j] = dices[j].replaceFirst("\\$.*?\\s", " ");
+                        dices[j] = dices[j].replaceFirst("Результат:§o\\s(.*)", ("Результат: "+modNicks[j]));
+                    } else {
+                    Matcher resMat = resPat.matcher(dices[j]);
+                    resMat.find();
+                    String res = resMat.group(1);
+                    modNicks[j] = res;
+                }
+                }   
                 String[] reactName = new String[dices.length];
                 int h = 0;
                 for (int j = dices.length-1; j >= 0; j--) {
@@ -1007,11 +1062,21 @@ implements Listener {
                     matName.find();
                     reactName[h++] = matName.group(3);
                 }
-                String reactNameOut = "§6Очередь: §a";
-                for (String str : reactName) {
-                    reactNameOut += str + " ";
-                }
 
+                String reactNameOut = "§6Очередь: §a";
+                Pattern ininPat = Pattern.compile("Результат:§?.?\\s(.*)");
+                int whatever = modNicks.length-1;
+                for (String str : reactName) {
+                    char space = '-';
+                    reactNameOut += str + space + modNicks[whatever--] + " " + ":" + " ";
+                }
+                
+               // for (int j = 0; j < players.length; j++) {
+               //     reactNameOut = reactNameOut.replace(players[j], players[j] + levels[j]);
+               // }
+                list.setTurns(reactNameOut);
+                System.out.println(reactNameOut);
+                reactNameOut = list.getTurns();
 
                  String[] vars = { "едва слышно бросает",
                     "очень тихо бросает",
@@ -1021,6 +1086,8 @@ implements Listener {
                     "громко бросает",
                     "бросает" };
 
+
+                String noDelayMsg = "";
                 for (int j = dices.length-1; j >= 0; j--) {
                         String out = String.format("§e(( §a%s §e%s %s ))§f", commandSender.getName(), vars[rangePosition], dices[j]);
                         List<Player> recips = getLocalRecipients(sender, out, range);
@@ -1029,22 +1096,60 @@ implements Listener {
                             out.replaceAll("§.", "");
                             kmlog("chat", out);
                             kmlog("whole", out);
-                            final String snd = out.replaceAll("§.", "");
-                            RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+                            noDelayMsg += out + '\n';
                         }
                     }
 
+                final String snd = noDelayMsg.replaceAll("§.", "");
+                RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+                
                 List<Player> recips = getLocalRecipients(sender, reactNameOut, range);
                 for (Player pl : recips) {
                     pl.sendMessage(reactNameOut);
+                    list.setTurns(reactNameOut);
                     reactNameOut = reactNameOut.replace("§.", "");
                     kmlog("chat", reactNameOut);
                     kmlog("whole", reactNameOut);
-                    final String snd = reactNameOut;
-                    RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+                    final String snd2 = list.getTurns();
+                    RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
+                    
+            }  
+            return true;
+                } 
+        }   
+             catch (Exception e){
+                commandSender.sendMessage("§4" + e.getMessage() + "§f");
+            }
+            if (comm.endsWith("turns")) {
+                    String out = list.getTurns();
+                    //String out = "§8" + list.getInfo() + list.getTurns();
+                    System.out.println(out);
+                    int range = this.getConfig().getInt("default");
+
+                Pattern pat2 = Pattern.compile("(.*)turns");
+                Matcher mat2 = pat2.matcher(comm);
+                if (mat2.matches()) {
+                    for (Range ran : allRanges) {
+                        if (ran.matches(mat2.group(1)) && commandSender.hasPermission(ran.getPermission())) {
+                            range = this.getConfig().getInt(ran.getRange());
+                            break;
+                        }
+                    }
+                }
+
+                    List<Player> recips = getLocalRecipients(sender, out, range);
+                        for (Player pl : recips) {
+                            pl.sendMessage(out);
+           //                 out.replaceAll("§.", "");
+                            kmlog("chat", out);
+                            kmlog("whole", out);
+        //                    final String snd = out.replaceAll("§.", "");
+         //                   RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+                        }
+                        
                     return true;
                 }
-            }    
+                }
         //AutoGM-chat
             
             } else if (command.getName().equalsIgnoreCase("alwaysgm")) {
@@ -1152,7 +1257,9 @@ implements Listener {
 		}
 	    }
 	    return true;
-	}
+
+}
+
     return true;
 	
     }
