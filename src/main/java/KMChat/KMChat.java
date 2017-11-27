@@ -881,7 +881,7 @@ implements Listener {
                 return true;
         }
             if (args.length == 0 || args[0].equals("help")) {
-                commandSender.sendMessage("§e----------- §fHelp: react §e--------------------§8\nReact usage:\nYou can specify the name of the list after «/react». You can also add/edit/remove multiple reactions per time. {arg} is for optional arguments\n§6/react add %nick% {level} {mod}:§f add reactions\n§6/react edit %nick% {level} {mod}:§f edit reactions\n§6/react remove %nick%:§f remove reactions\n§6/react end:§а delete the list\n§6/react go:§f launch reactions, !go and =go also possible\n§6/react list:§f see all lists\n§6/react show:§f show the list§f");
+                commandSender.sendMessage("§e----------- §fHelp: react §e--------------------§8\nReact usage:\nYou can specify the name of the list after «/react». You can also add/edit/remove multiple reactions per time. {arg} is for optional arguments\n§6/react add %nick% {level} {mod}:§f add reactions\n§6/react edit %nick% {level} {mod}:§f edit reactions\n§6/react remove %nick%:§f remove reactions\n§6/react end:§а delete the list\n§6/react go:§f launch reactions, !go and =go also possible\n§6/react turns: show current queue\n§6/react list:§f see all lists\n§6/react show:§f show the list§f");
                 return true;
             }
             String name = null;
@@ -1067,8 +1067,8 @@ implements Listener {
                 Pattern ininPat = Pattern.compile("Результат:§?.?\\s(.*)");
                 int whatever = modNicks.length-1;
                 for (String str : reactName) {
-                    char space = '-';
-                    reactNameOut += str + space + modNicks[whatever--] + " " + ":" + " ";
+                    String space = ":";
+                    reactNameOut += str + space + modNicks[whatever--] + " ";
                 }
                 
                // for (int j = 0; j < players.length; j++) {
