@@ -1,6 +1,6 @@
 name: KMChat
 main: KMChat.KMChat
-version: 0.7
+version: 0.7.1.4
 commands:
    me:
       description: Nothing

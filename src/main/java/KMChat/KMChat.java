@@ -40,7 +40,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.*;
 import sx.blah.discord.util.DiscordException;
@@ -52,7 +52,7 @@ public class KMChat
 extends JavaPlugin
 implements Listener {
     private static String TOKEN;
-    private static String CHID;
+    private static long CHID;
     private static String DATA_PATH;
     private static IDiscordClient client;
     private static IChannel ingameChannel;
@@ -71,7 +71,7 @@ implements Listener {
         
         path = this.getConfig().getString("logsdir");
         TOKEN = this.getConfig().getString("bottoken");
-        CHID = this.getConfig().getString("channelid"); 
+        CHID = this.getConfig().getLong("channelid"); 
         DATA_PATH = this.getConfig().getString("datastorage");
         whoUseAutoGM = this.getConfig().getStringList("whoUseAutoGM");
 	

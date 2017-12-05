@@ -1,7 +1,7 @@
 apply plugin: "java"
 
 
-version = "0.7.1.3"
+version = "0.7.1.4"
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
@@ -19,7 +19,7 @@ configurations {
 
 dependencies {
 	compile files('libs/craftbukkit-1.7.10-R0.1-20140808.005431-8.jar')
-	shade files('libs/Discord4j-2.8.4-shaded.jar')
+	shade files('libs/Discord4j-2.9.2-shaded.jar')
 }
 
 jar {
