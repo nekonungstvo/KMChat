@@ -446,11 +446,19 @@ implements Listener {
     }
 
     public void send2discord(String message) {
-        if (message.length() > 2000) {
+        if (message.length() > 2000 && message.length() < 4000) {
+            final String snd1 = message.substring(0,2000);
+            RequestBuffer.request(() -> ingameChannel.sendMessage(snd1));
+            final String snd2 = message.substring(2000);
+            RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
+        } else if (message.length() > 4000) {
             final String snd1 = message.substring(0,2000);
             RequestBuffer.request(() -> ingameChannel.sendMessage(snd1));
             final String snd2 = message.substring(2000,4000);
             RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
+            final String snd3 = message.substring(4000);
+            RequestBuffer.request(() -> ingameChannel.sendMessage(snd3));
+        
         } else {
             final String snd = message;
             RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
@@ -770,7 +778,8 @@ implements Listener {
                        (i < dices.length-1 &&
                        (getNumFromDice(dices[i]) == getNumFromDice(dices[i+1]))))
                        ) {
-                if (dices[i].contains("§") && dices[i+1].contains("§") || !dices[i].contains("§") && !dices[i+1].contains("§")) {
+                //if (dices[i].contains("§") && dices[i+1].contains("§") || !dices[i].contains("§") && !dices[i+1].contains("§")) {
+                if (!dices[i].contains("§") || !dices[i+1].contains("§")) {
                     begin = i;
                     first = dices[i];
                     repeats.add(dices[i]);
