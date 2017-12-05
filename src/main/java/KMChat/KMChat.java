@@ -445,6 +445,19 @@ implements Listener {
 	}
     }
 
+    public void send2discord(String message) {
+        if (message.length() > 2000) {
+            final String snd1 = message.substring(0,2000);
+            RequestBuffer.request(() -> ingameChannel.sendMessage(snd1));
+            final String snd2 = message.substring(2000,4000);
+            RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
+        } else {
+            final String snd = message;
+            RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+        }
+        
+    }
+
     public String getSkill(String desc, String nick) {
 	//we need to have a file "Playernick.skills" with skills listed as following: "skill:level"
 	Pattern skillpat = Pattern.compile("(.*):");
@@ -735,9 +748,7 @@ implements Listener {
         logged = logged.replaceAll("§.", "");
         kmlog("chat", logged);
         kmlog("whole", logged);
-        final String snd = logged;
-        RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
-
+	send2discord(logged);
         return newroll;
     }
 
@@ -745,13 +756,13 @@ implements Listener {
     public  boolean findReroll(String[] dices, int beg, ReactionList list) {
         List <String> repeats = new ArrayList<String>();
         String first = "";
-        int begin = beg+1;
+        int begin = beg; //this is used to ignore previously rerolled dice
         if (begin >= dices.length) return false;
   //      System.out.println("started with: " + begin);
 //        if (begin > 0) System.out.println("...which is " + dices[begin]);
-        int end = -2;
+        int end = -1;
         List<String> rerolled = new ArrayList<String>();
-        for (int i = 0; i < dices.length ; i++) {
+        for (int i = begin+1; i < dices.length ; i++) {
             if ( !first.equals("") && (getNumFromDice(dices[i]) == getNumFromDice(first))) {
                 repeats.add(dices[i]);
                 end = i;
@@ -774,7 +785,7 @@ implements Listener {
         }
         String[] rerolledStrArr = rerolled.toArray(new String[rerolled.size()]);
         bubbleSort(rerolledStrArr);
-        findReroll(rerolledStrArr, -2, list);
+        findReroll(rerolledStrArr, -1, list);
         int j = 0;
         if (begin < 0) return false;
         for (int i = begin; i <= end; i++) {
@@ -1033,7 +1044,7 @@ implements Listener {
                 }
                 
                 bubbleSort(dices);
-                findReroll(dices, -2, list);
+                findReroll(dices, -1, list);
 
                 Pattern oldPat = Pattern.compile("\\$(.*?)(\\s|\\))");
                 String[] modNicks = new String[dices.length];
@@ -1094,9 +1105,7 @@ implements Listener {
                         }
                     }
 
-                final String snd = noDelayMsg.replaceAll("§.", "");
-                RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
-                
+                send2discord(noDelayMsg); 
                 List<Player> recips = getLocalRecipients(sender, reactNameOut, range);
                 for (Player pl : recips) {
                     pl.sendMessage(reactNameOut);
