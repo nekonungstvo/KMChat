@@ -648,9 +648,10 @@ implements Listener {
 
 	int[] dices = {-1, 0, 1};
 	int dice = 0;
+        Random rnd = new Random();
 	for (int i = 0; i < 4; ++i) {
-	    int rnd = new Random().nextInt(3);
-	    dice = dices[rnd];
+	    int rndInt = rnd.nextInt(3);
+	    dice = dices[rndInt];
 	    if (dice < 0) {
 		n -= 1;
 		result += "-";
@@ -742,6 +743,8 @@ implements Listener {
         String initial = mat1.group(1);
         String desc = mat1.group(2);
         String newroll = simpledF(initial, desc);
+        String newrollSave = newroll;
+        newroll = dice.substring(0,6) + newroll.substring(6);
         Pattern nickPat = Pattern.compile("от (ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно)\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+.*\\sРезультат:§?.?\\s(.*)");
         Matcher nickMat = nickPat.matcher(dice);
         nickMat.find();
@@ -750,9 +753,10 @@ implements Listener {
         String nick = nickMat.group(3);
         if (!desc.contains("$")) {
             newroll = newroll.replaceFirst(nick, repl);
+            newrollSave = newrollSave.replaceFirst(nick, repl);
         }
         list.addInfo(nickMat.group(3) + ": " + nickMat.group(4));
-        String logged = "### " + dice + " ---> " + newroll;
+        String logged = "### " + dice + " ---> " + newrollSave;
         logged = logged.replaceAll("§.", "");
         kmlog("chat", logged);
         kmlog("whole", logged);
@@ -760,8 +764,18 @@ implements Listener {
         return newroll;
     }
 
-
     public  boolean findReroll(String[] dices, int beg, ReactionList list) {
+        return findReroll(dices, beg, list, false);
+    }
+
+    public  boolean findReroll(String[] dices, int beg, ReactionList list, boolean isItRerolled) {
+        if (isItRerolled) System.out.println("IT IS REROLLED!");
+        System.out.println("HERE IS WHAT WE GET:\nbeg = " + beg + ", dices:");
+        if (beg == dices.length) return true;
+        int irrelevantCounter = 0;
+        for (String str : dices) {
+            System.out.println(irrelevantCounter++ + str);
+        }
         List <String> repeats = new ArrayList<String>();
         String first = "";
         int begin = beg; //this is used to ignore previously rerolled dice
@@ -779,11 +793,11 @@ implements Listener {
                        (getNumFromDice(dices[i]) == getNumFromDice(dices[i+1]))))
                        ) {
                 //if (dices[i].contains("§") && dices[i+1].contains("§") || !dices[i].contains("§") && !dices[i+1].contains("§")) {
-                if (!dices[i].contains("§") || !dices[i+1].contains("§")) {
+//                if (!dices[i].contains("§") || !dices[i+1].contains("§")) {
                     begin = i;
                     first = dices[i];
                     repeats.add(dices[i]);
-                }
+  //              }
             }
         }
         if (begin < 0) return false;
@@ -794,13 +808,16 @@ implements Listener {
         }
         String[] rerolledStrArr = rerolled.toArray(new String[rerolled.size()]);
         bubbleSort(rerolledStrArr);
-        findReroll(rerolledStrArr, -1, list);
+        findReroll(rerolledStrArr, -1, list, true);
         int j = 0;
         if (begin < 0) return false;
         for (int i = begin; i <= end; i++) {
             //System.out.println("--> " + begin + " <---");
             dices[i] = rerolledStrArr[j++];
         }
+        //if (isItRerolled) return false;
+        System.out.println("CONTINUE FINDING REROLLS WITH END = " + end);
+        if (end > 0)
         findReroll(dices, end, list);
     //    System.out.println();
         return false;
@@ -1107,11 +1124,11 @@ implements Listener {
                         List<Player> recips = getLocalRecipients(sender, out, range);
                         for (Player pl : recips) {
                             pl.sendMessage(out);
+                        }
                             out.replaceAll("§.", "");
                             kmlog("chat", out);
                             kmlog("whole", out);
                             noDelayMsg += out + '\n';
-                        }
                     }
 
                 send2discord(noDelayMsg); 
@@ -1528,6 +1545,8 @@ implements Listener {
                 collection.add("первая помощь");
                 collection.add("зашивание ран");
                 collection.add("хирургия");
+                collection.add("передвижение");
+                collection.add("рукопашный бой");
 	    }	
 	}
     }	
