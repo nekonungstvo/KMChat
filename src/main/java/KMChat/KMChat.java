@@ -769,13 +769,13 @@ implements Listener {
     }
 
     public  boolean findReroll(String[] dices, int beg, ReactionList list, boolean isItRerolled) {
-        if (isItRerolled) System.out.println("IT IS REROLLED!");
-        System.out.println("HERE IS WHAT WE GET:\nbeg = " + beg + ", dices:");
+        //if (isItRerolled) System.out.println("IT IS REROLLED!");
+        //System.out.println("HERE IS WHAT WE GET:\nbeg = " + beg + ", dices:");
         if (beg == dices.length) return true;
-        int irrelevantCounter = 0;
-        for (String str : dices) {
-            System.out.println(irrelevantCounter++ + str);
-        }
+        //int irrelevantCounter = 0;
+        //for (String str : dices) {
+        //    System.out.println(irrelevantCounter++ + str);
+        //}
         List <String> repeats = new ArrayList<String>();
         String first = "";
         int begin = beg; //this is used to ignore previously rerolled dice
@@ -816,7 +816,7 @@ implements Listener {
             dices[i] = rerolledStrArr[j++];
         }
         //if (isItRerolled) return false;
-        System.out.println("CONTINUE FINDING REROLLS WITH END = " + end);
+        //System.out.println("CONTINUE FINDING REROLLS WITH END = " + end);
         if (end > 0)
         findReroll(dices, end, list);
     //    System.out.println();
@@ -1477,7 +1477,12 @@ implements Listener {
                 collection.add("диагностика");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("з")) {
                 collection.add("зашивание ран");
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ре")) {
+                collection.add("реакция");
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ру")) {
+                collection.add("рукопашный бой");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("р")) {
+                collection.add("рукопашный бой");
                 collection.add("реакция");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("к")) {
                 collection.add("кулачный бой");
@@ -1492,8 +1497,16 @@ implements Listener {
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
                 collection.add("хирургия");
                 collection.add("хорошо");
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("перв")) {
+		collection.add("первая помощь");
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пере")) {
+		collection.add("передвижение");
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пер")) {
+		collection.add("первая помощь");
+		collection.add("передвижение");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пе")) {
 		collection.add("первая помощь");
+		collection.add("передвижение");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
 		collection.add("превосходно");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пла")) {
@@ -1512,6 +1525,7 @@ implements Listener {
                 collection.add("парирование");
                 collection.add("плавание");
                 collection.add("первая помощь");
+		collection.add("передвижение");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("н")) {
 		collection.add("нормально");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("о")) {
