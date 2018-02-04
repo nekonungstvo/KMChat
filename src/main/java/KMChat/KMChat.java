@@ -113,12 +113,13 @@ implements Listener {
         this.nMap.put(9, "легендарно+");
         this.nMap.put(10, "легендарно++");
         this.nMap.put(11, "легендарно+++");	
-        //this.nMap.put(12, "ТАК ЛЕГЕНДАРНО, ЧТО ПОПАДЁТ ВО ВСЕ КНИГИ РЕКОРДОВ");
-        this.nMap.put(12, "божественно");
+//      this.nMap.put(12, "ТАК ЛЕГЕНДАРНО, ЧТО ПОПАДЁТ ВО ВСЕ КНИГИ РЕКОРДОВ");
+//      this.nMap.put(12, "божественно");
+        this.nMap.put(12, "КАК АЛЛАХ");
 
 	skillset = new String [] {"реакция", "владение оружием", "кулачный бой", "борьба", "парирование", "уклонение", "блокирование",
 		                    "бег", "плавание", "акробатика", "физическая сила", "выносливость", "устойчивость к болезням", "внимательность",
-				    "скрытность", "выживание", "диагностика", "первая помощь", "зашивание ран", "хирургия"};
+				    "скрытность", "выживание", "диагностика", "первая помощь", "зашивание ран", "хирургия", "сила", "передвижение", "врачевание"};
 
         this.log.info(String.format("%s is enabled!", this.getDescription().getFullName()));
     }
@@ -207,7 +208,7 @@ implements Listener {
 	
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
-                if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || strippedColon) {
+                if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
                     break;
                 } else {
                     mes = "-" + mes;
@@ -473,6 +474,7 @@ implements Listener {
         boolean changedNick = false;
 	String skill = null;
 	String level = null;
+        String oldskill = null;
 
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             if (desc.startsWith(player.getName())) {
@@ -508,8 +510,9 @@ implements Listener {
 	    if (skill == null) {
 	        for (String sk : skillset) {
 	            if (desc.toLowerCase().startsWith(sk)) {
+                        oldskill = desc.substring(0, sk.length());
 		        skill = sk;
-	    //System.out.println("skill is " + skill + ", level is " + level);
+	    System.out.println("skill is " + skill + ", level is " + level);
                         break;
 		    } else {
                         level = null;
@@ -521,17 +524,21 @@ implements Listener {
 	    System.out.println(e);
 	    level = null;
 	}
+            
+            System.out.println("SKILL: " + skill);
 	    if (level == null) {
 		level = ":ПЛОХО";
             }
-//                        System.out.println("skill is " + skill + ", level is " + level);
+            System.out.println("!! skill is " + skill + ", level is " + level + ", oldskill = " + oldskill);
             if (skill == null)
                 return null;
             String result = "";
+            oldskill = desc.substring(0, skill.length());
+            if (oldskill == null) oldskill = skill;
             if (changedNick) {
-	        result = desc.replaceFirst(skill, level + " ["+nick+" "+skill+"] (");
+	        result = desc.replaceFirst(oldskill, level + " ["+nick+" "+skill+"] (");
             } else {
-	        result = desc.replaceFirst(skill, level + " ["+skill+"] (");
+	        result = desc.replaceFirst(oldskill, level + " ["+skill+"] (");
             }
 	    //let's make the output pretty!
 	    //System.out.println(result);
@@ -556,7 +563,7 @@ implements Listener {
 
     public boolean containsSkillValue(String message) {
         for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
-            if (message.startsWith(entry.getValue())) {
+            if (message.toLowerCase().startsWith(entry.getValue())) {
                 return true;
             }
         }
@@ -596,7 +603,7 @@ implements Listener {
 		weusedskill = true;
                 }
 	    }
-	
+        System.out.println("SKILL = " + mes);	
 	String level = "";
 	String comment = "";
 	try {
@@ -623,10 +630,10 @@ implements Listener {
 
 	if (n == 666) {
 	    return null;
-        } else if (n < 1) {
-		n = 1;
-	} else if (n > 8) {
-		n = 8;
+//        } else if (n < 1) {
+//		n = 1;
+//	} else if (n > 8) {
+//		n = 8;
 	}
 
 	int oldn = n;
@@ -897,8 +904,17 @@ implements Listener {
     
     //{{{--- Commands 
        public boolean onCommand(CommandSender commandSender, Command command, String string, String[] args) {
+	if (command.getName().equalsIgnoreCase("butcher")) {
+            if (!(commandSender instanceof Player)) {
+                commandSender.sendMessage("§4you must be a player!§f");
+                return false;
+            }
+            commandSender.sendMessage("Ты охуел?");
+            Player pl = (Player)commandSender;
+            pl.kickPlayer("Ублюдок, мать твою, а ну иди сюда, говно собачье!");
+            return true;
         //me
-	if (command.getName().equalsIgnoreCase("me")) {
+        } else if (command.getName().equalsIgnoreCase("me")) {
                 commandSender.sendMessage("§4/me отключено, используйте *§f");
                 return true;    
         
@@ -1348,8 +1364,8 @@ implements Listener {
 		Player recip = null;
 		for (Player player : players) {
 		    if (mes.startsWith(player.getName())) {
-			player.sendMessage("<§2"+user.getName()+"§f->§a"+player.getName()+"§f>"+mes.replace(player.getName(), ""));
-			res = "<"+user.getName()+"->"+mes.replace(player.getName(), player.getName()+">");
+			player.sendMessage("<§2"+user.getName()+"§f->§a"+player.getName()+"§f>"+mes.replaceFirst(player.getName(), ""));
+			res = "<"+user.getName()+"->"+mes.replaceFirst(player.getName(), player.getName()+">");
 			recip = player;
 			found = true;
 		    }
@@ -1442,7 +1458,6 @@ implements Listener {
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ус")) {
                 collection.add("устойчивость к болезням");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("у")) {
-                collection.add("устойчивость к болезням");
 		collection.add("ужасно");
                 collection.add("уклонение");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("а")) {
@@ -1462,14 +1477,16 @@ implements Listener {
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("выж")) {
                 collection.add("выживание");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вы")) {
+                collection.add("врачевание");
                 collection.add("выносливость");
                 collection.add("выживание");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вл")) {
                 collection.add("владение оружием");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вн")) {
                 collection.add("внимательность");
+	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вр")) {
+                collection.add("врачевание");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("в")) {
-                collection.add("владение оружием");
                 collection.add("выносливость");
                 collection.add("внимательность");
                 collection.add("выживание");
@@ -1482,7 +1499,6 @@ implements Listener {
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ру")) {
                 collection.add("рукопашный бой");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("р")) {
-                collection.add("рукопашный бой");
                 collection.add("реакция");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("к")) {
                 collection.add("кулачный бой");
@@ -1502,10 +1518,8 @@ implements Listener {
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пере")) {
 		collection.add("передвижение");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пер")) {
-		collection.add("первая помощь");
 		collection.add("передвижение");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пе")) {
-		collection.add("первая помощь");
 		collection.add("передвижение");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
 		collection.add("превосходно");
@@ -1524,7 +1538,6 @@ implements Listener {
 		collection.add("превосходно");
                 collection.add("парирование");
                 collection.add("плавание");
-                collection.add("первая помощь");
 		collection.add("передвижение");
 	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("н")) {
 		collection.add("нормально");
@@ -1540,8 +1553,6 @@ implements Listener {
 		collection.add("превосходно");
 
                 collection.add("реакция");
-                collection.add("владение оружием");
-                collection.add("кулачный бой");
                 collection.add("борьба");
                 collection.add("парирование");
                 collection.add("уклонение");
@@ -1549,18 +1560,21 @@ implements Listener {
                 collection.add("бег");
                 collection.add("плавание");
                 collection.add("акробатика");
-                collection.add("физическая сила");
                 collection.add("выносливость");
-                collection.add("устойчивость к болезням");
                 collection.add("внимательность");
                 collection.add("скрытность");
                 collection.add("выживание");
                 collection.add("диагностика");
-                collection.add("первая помощь");
-                collection.add("зашивание ран");
                 collection.add("хирургия");
                 collection.add("передвижение");
-                collection.add("рукопашный бой");
+                collection.add("врачевание");
+            //    collection.add("физическая сила");
+            //    collection.add("кулачный бой");
+            //    collection.add("владение оружием");
+            //    collection.add("первая помощь");
+            //    collection.add("зашивание ран");
+            //    collection.add("рукопашный бой");
+            //    collection.add("устойчивость к болезням");
 	    }	
 	}
     }	
