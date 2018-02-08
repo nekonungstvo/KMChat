@@ -61,6 +61,7 @@ implements Listener {
     private Map<Integer, String> nMap = new Hashtable<Integer, String>();
     private Range[] allRanges = new Range[6];
     private String[] skillset;
+    private Random rnd = new Random();
     private List<ReactionList> sprReactionList = new ArrayList<ReactionList>();
     private List<String> whoUseAutoGM;
     private boolean wasrestarted = false;
@@ -655,7 +656,6 @@ implements Listener {
 
 	int[] dices = {-1, 0, 1};
 	int dice = 0;
-        Random rnd = new Random();
 	for (int i = 0; i < 4; ++i) {
 	    int rndInt = rnd.nextInt(3);
 	    dice = dices[rndInt];
