@@ -1,6 +1,6 @@
 name: KMChat
 main: KMChat.KMChat
-version: 0.7.1.4
+version: 0.7.1.7
 commands:
    me:
       description: Nothing
@@ -22,6 +22,14 @@ commands:
       description: Nothing
       usage: /<command>
       permission-message: You don't have <permission>
+   alwaysbuild:      
+      description: Nothing
+      usage: /<command>
+      permission-message: You don't have <permission>
+   alwaysbuilder:      
+      description: Nothing
+      usage: /<command>
+      permission-message: You don't have <permission>
    react:      
       description: Nothing
       usage: /<command>
@@ -31,5 +39,8 @@ permissions:
         description: Allow to tell
         default: op
     KMChat.gm:
+        description: GameMaster
+        default: op
+    KMChat.builder:
         description: GameMaster
         default: op

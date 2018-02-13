@@ -64,6 +64,7 @@ implements Listener {
     private Random rnd = new Random();
     private List<ReactionList> sprReactionList = new ArrayList<ReactionList>();
     private List<String> whoUseAutoGM;
+    private List<String> whoUseAutoBD;
     private boolean wasrestarted = false;
     public void onEnable() {
 
@@ -75,6 +76,7 @@ implements Listener {
         CHID = this.getConfig().getLong("channelid"); 
         DATA_PATH = this.getConfig().getString("datastorage");
         whoUseAutoGM = this.getConfig().getStringList("whoUseAutoGM");
+        whoUseAutoBD = this.getConfig().getStringList("whoUseAutoBD");
 	
         System.out.println("Logging bot in...");
         client = new ClientBuilder().withToken(TOKEN).build();
@@ -170,20 +172,28 @@ implements Listener {
 
 	boolean local = true;
 	boolean forgm = false; //to gm chat
+	boolean forbd = false; //to builders' chat
 	boolean norec = false; //no recipients at all
 	boolean sendraw = false; //either to send a raw message to discord
-
+	boolean strippedColon = false;
+	
 	String mes = asyncPlayerChatEvent.getMessage();
 	String raw = mes;
 	String name = player.getName();
 	Range setRange = null;
 	double range = this.getConfig().getInt("range.default");
 	
+
 	String adminprefix = "";
 	if (player.hasPermission("KMChat.prefix")) {
 	    adminprefix = this.getConfig().getString("adminprefix");
+	} else if (player.hasPermission("KMChat.builder") && !player.hasPermission("KMChat.prefix")) {
+	    adminprefix = this.getConfig().getString("bdprefix");
+	    if (mes.startsWith(":")) {
+                mes = mes.substring(1);
+                strippedColon = true;
+	    }
 	}
-	boolean strippedColon = false;
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
                 if (mes.startsWith(":")) {
@@ -206,9 +216,10 @@ implements Listener {
 		break;
 	    }
 	}
-	
+	String usesGM = null;
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
+		usesGM = nick;
                 if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
                     break;
                 } else {
@@ -218,6 +229,17 @@ implements Listener {
             break;
             } 
         }
+        for (String nick : whoUseAutoBD) {
+            if (player.getName().equals(nick) && !player.getName().equals(usesGM)) {
+                if (mes.startsWith("-") || mes.startsWith("+") || strippedColon) {
+                    break;
+                } else {
+                    mes = "+" + mes;
+                    forbd = true;
+                }
+            break;
+            }
+	}
 	String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
 	Pattern p = Pattern.compile("-d(4|6|8|10|12|14|20|100).*"); 
 	Matcher m = p.matcher(mes);  
@@ -326,7 +348,16 @@ implements Listener {
 	    }
 	    result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
 	    forgm = true;
+	} else if (mes.startsWith("+") && player.hasPermission("KMChat.builder")) {
+	    if (mes.startsWith("+ ")) {
+		mes = mes.substring(2);
+	    } else {
+		mes = mes.substring(1);
+	    }
+	    result = String.format("%s&a%s &f(to BD): &3(( %s ))&f", adminprefix, name, mes);
+	    forbd = true;
     
+
 	} else if (mes.startsWith(":msg") || mes.startsWith("msg")) {
             if (!player.hasPermission("KMCore.tell")) {
                 player.sendMessage("§4Недостаточно прав.§f");
@@ -394,6 +425,25 @@ implements Listener {
 		}
 	    }
 	    asyncPlayerChatEvent.getRecipients().addAll(recips);
+	} else if (forbd) {
+	    asyncPlayerChatEvent.getRecipients().clear();
+	    LinkedList<Player> recips = new LinkedList();
+	    recips.add(player);
+            for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
+                if (player2.hasPermission("KMChat.builder")) {
+                    if (!player2.getWorld().equals((Object)player.getWorld())) {
+                        result = result.replaceAll("§f", "§7");
+                        player2.sendMessage(result);
+                    } else if ( player.getLocation().distanceSquared(player2.getLocation()) > range*range) {
+                        result = result.replaceAll("§f", "§7");
+                        player2.sendMessage(result);
+                    } else {
+		        recips.add(player2);
+                    }
+		}
+	    }
+	    asyncPlayerChatEvent.getRecipients().addAll(recips);
+
 
 	} else if (local) {
 	    asyncPlayerChatEvent.getRecipients().clear();
@@ -1233,6 +1283,44 @@ implements Listener {
                     }   
                     sender.sendMessage("§7Автоматический ГМ-чат теперь §4выключен!§f");
         }
+	//AutoBD-chat
+            
+            } else if (command.getName().equalsIgnoreCase("alwaysbuild") || command.getName().equalsIgnoreCase("alwaysbuilder")) {
+            if (!(commandSender instanceof Player)) {
+                commandSender.sendMessage("§4you must be a player!§f");
+                return false;
+            }
+            Player sender = (Player)commandSender;
+            if (!sender.hasPermission("KMChat.builder")) {
+                sender.sendMessage("§4Недостаточно прав.§f");
+                return true;
+        }
+        if (args.length == 0) {
+                if (whoUseAutoBD.contains(sender.getName())) {
+                    sender.sendMessage("§7Автоматический билдер-чат §aвключён!§f");
+                } else {
+                    sender.sendMessage("§7Автоматический билдер-чат §4выключен!§f");
+                }
+            return true;
+        }
+        if (args[0].equals("help")) {
+                sender.sendMessage("§6Usage:\n§fNote that /alwaysbuild is equal to /alwaysbuilder\n/alwaysbuild - check condition\n/alwaysbuild on - turn on\n/alwaysgm off - turn off\n:message - regular chat (if alwaysbuild is on)");
+        } else if (args[0].equals("on")) {
+                    if (!whoUseAutoBD.contains(sender.getName())) {
+                        whoUseAutoBD.add(sender.getName());
+                        this.getConfig().set("whoUseAutoBD", whoUseAutoBD);
+                        this.saveConfig();
+                    }
+                    sender.sendMessage("§7Автоматический билдер-чат теперь §aвключён!§f"); 
+        } else if (args[0].equals("off")) {
+                    if (whoUseAutoBD.contains(sender.getName())) {
+                        whoUseAutoBD.remove(sender.getName());
+                        this.getConfig().set("whoUseAutoBD", whoUseAutoBD);
+                        this.saveConfig();
+                    }   
+                    sender.sendMessage("§7Автоматический билдер-чат теперь §4выключен!§f");
+        }
+
 
         } else if (command.getName().equalsIgnoreCase("ingamerestart")) {
                 if (!commandSender.hasPermission("KMCore.gm")) {
