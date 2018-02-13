@@ -238,10 +238,10 @@ implements Listener {
         }
         for (String nick : whoUseAutoBD) {
             if (player.getName().equals(nick) && !player.getName().equals(usesGM)) {
-                if (mes.startsWith("-") || mes.startsWith("+") || strippedColon) {
+                if (mes.startsWith("-") || mes.startsWith(";") || strippedColon) {
                     break;
                 } else {
-                    mes = "+" + mes;
+                    mes = ";" + mes;
                     forbd = true;
                 }
             break;
@@ -355,8 +355,8 @@ implements Listener {
 	    }
 	    result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
 	    forgm = true;
-	} else if (mes.startsWith("+") && player.hasPermission("KMChat.builder")) {
-	    if (mes.startsWith("+ ")) {
+	} else if (mes.startsWith(";") && player.hasPermission("KMChat.builder")) {
+	    if (mes.startsWith("; ")) {
 		mes = mes.substring(2);
 	    } else {
 		mes = mes.substring(1);
