@@ -189,10 +189,6 @@ implements Listener {
 	    adminprefix = this.getConfig().getString("adminprefix");
 	} else if (player.hasPermission("KMChat.builder") && !player.hasPermission("KMChat.prefix")) {
 	    adminprefix = this.getConfig().getString("bdprefix");
-	    if (mes.startsWith(":")) {
-                mes = mes.substring(1);
-                strippedColon = true;
-	    }
 	}
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
@@ -203,6 +199,17 @@ implements Listener {
             break;
             } 
         }
+        for (String nick : whoUseAutoBD) {
+            if (player.getName().equals(nick)) {
+                if (mes.startsWith(":")) {
+                    mes = mes.substring(1);
+                    strippedColon = true;
+                }
+            break;
+            } 
+        }
+
+
 	String describeRange = "";
 	int i = -1;
 	for (Range ran : allRanges) {
