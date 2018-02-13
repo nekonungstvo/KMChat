@@ -1311,7 +1311,7 @@ implements Listener {
             return true;
         }
         if (args[0].equals("help")) {
-                sender.sendMessage("§6Usage:\n§fNote that /alwaysbuild is equal to /alwaysbuilder\n/alwaysbuild - check condition\n/alwaysbuild on - turn on\n/alwaysgm off - turn off\n:message - regular chat (if alwaysbuild is on)");
+                sender.sendMessage("§6Usage:\n§fNote that /alwaysbuild is equal to /alwaysbuilder\n/alwaysbuild - check condition\n/alwaysbuild on - turn on\n/alwaysbuild off - turn off\n:message - regular chat (if alwaysbuild is on)");
         } else if (args[0].equals("on")) {
                     if (!whoUseAutoBD.contains(sender.getName())) {
                         whoUseAutoBD.add(sender.getName());
