@@ -238,7 +238,7 @@ implements Listener {
         }
         for (String nick : whoUseAutoBD) {
             if (player.getName().equals(nick) && !player.getName().equals(usesGM)) {
-                if (mes.startsWith("-") || mes.startsWith(";") || strippedColon) {
+                if (mes.startsWith(";") || mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
                     break;
                 } else {
                     mes = ";" + mes;
