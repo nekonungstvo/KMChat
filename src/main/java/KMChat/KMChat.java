@@ -1443,7 +1443,7 @@ public class KMChat
 
             } else if (message.getContent().startsWith("!msg ")) {
                 String mes = content.substring(5);
-                Player[] players = Bukkit.getServer().getOnlinePlayers().toArray(new Player[0]);
+                Player[] players = Bukkit.getServer().getOnlinePlayers();
                 boolean found = false;
                 Player recip = null;
                 for (Player player : players) {
@@ -1469,7 +1469,7 @@ public class KMChat
             } else if (content.startsWith("!online") || content.startsWith("!онлайн")) {
                 String online = "Текущий онлайн (%s): ";
                 int i = 0;
-                Player[] players = Bukkit.getServer().getOnlinePlayers().toArray(new Player[0]);
+                Player[] players = Bukkit.getServer().getOnlinePlayers();
                 for (Player player : players) {
                     i++;
                     if (player.hasPermission("KMChat.admin"))
