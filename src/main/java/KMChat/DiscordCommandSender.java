@@ -1,5 +1,6 @@
 package KMChat;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.conversations.Conversation;
@@ -33,7 +34,7 @@ public class DiscordCommandSender implements ConsoleCommandSender {
 
     @Override
     public Server getServer() {
-        return null;
+        return Bukkit.getServer();
     }
 
     @Override
