@@ -24,7 +24,6 @@ public class DiscordCommandSender implements ConsoleCommandSender {
     @Override
     public void sendMessage(String message) {
         RequestBuffer.request(() -> ingameChannel.sendMessage(message));
-
     }
 
     @Override
@@ -68,8 +67,8 @@ public class DiscordCommandSender implements ConsoleCommandSender {
     }
 
     @Override
-    public void sendRawMessage(String s) {
-
+    public void sendRawMessage(String message) {
+        RequestBuffer.request(() -> ingameChannel.sendMessage(message));
     }
 
     @Override
