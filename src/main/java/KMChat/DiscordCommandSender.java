@@ -21,14 +21,20 @@ public class DiscordCommandSender implements ConsoleCommandSender {
         this.ingameChannel = ingameChannel;
     }
 
-    @Override
-    public void sendMessage(String message) {
+    private void sendToDiscord(String message){
         RequestBuffer.request(() -> ingameChannel.sendMessage(message));
     }
 
     @Override
-    public void sendMessage(String[] strings) {
-        RequestBuffer.request(() -> ingameChannel.sendMessage(String.join("\n", strings)));
+    public void sendMessage(String message) {
+        this.sendToDiscord(message);
+    }
+
+    @Override
+    public void sendMessage(String[] messages) {
+        for (String message : messages) {
+            this.sendToDiscord(message);
+        }
     }
 
     @Override
@@ -68,7 +74,7 @@ public class DiscordCommandSender implements ConsoleCommandSender {
 
     @Override
     public void sendRawMessage(String message) {
-        RequestBuffer.request(() -> ingameChannel.sendMessage(message));
+        sendToDiscord(message);
     }
 
     @Override
