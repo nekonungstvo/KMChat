@@ -180,6 +180,7 @@ implements Listener {
 
 	boolean local = true;
 	boolean forgm = false; //to gm chat
+	boolean gmnotice = false; //***this kind of messages used by GM's***
 	boolean forbd = false; //to builders' chat
 	boolean norec = false; //no recipients at all
 	boolean sendraw = false; //either to send a raw message to discord
@@ -323,6 +324,7 @@ implements Listener {
 	    result = String.format("&a%s &f(to GM) &eбросает 4dF %s &f", name, dice);
 	
 	} else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
+	    gmnotice = true;
 	    sendraw = true;
 	    String[] vars = { "~",
 			      "*",
@@ -382,7 +384,7 @@ implements Listener {
 	    }
 	}
 
-	if (mes.startsWith("((") && mes.endsWith("))")) {
+	if (local && !forgm && !forbd && !gmnotice && mes.startsWith("((") && mes.endsWith("))")) {
             String str = "";
 	    if (setRange != null) {
 		str = setRange.getDescription().replaceAll("[),(, ]","") + " в ";
