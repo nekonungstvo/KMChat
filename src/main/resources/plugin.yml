@@ -1,6 +1,6 @@
 name: KMChat
 main: KMChat.KMChat
-version: 0.7.1.7
+version: 0.7.2
 commands:
    me:
       description: Nothing
@@ -31,6 +31,10 @@ commands:
       usage: /<command>
       permission-message: You don't have <permission>
    react:      
+      description: Nothing
+      usage: /<command>
+      permission-message: You don't have <permission>
+   remind:      
       description: Nothing
       usage: /<command>
       permission-message: You don't have <permission>

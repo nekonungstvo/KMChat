@@ -14,9 +14,11 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.nio.file.*;
 import java.nio.charset.*;
 import java.io.*;
+import org.json.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -59,6 +61,7 @@ public class KMChat
     private Logger log = Logger.getLogger("Minecraft");
     private String path = "logs/";
     private Map<Integer, String> nMap = new Hashtable<Integer, String>();
+    private Map<String, String> reminders = new Hashtable<String, String>();
     private Range[] allRanges = new Range[6];
     private String[] skillset;
     private Random rnd = new Random();
@@ -78,6 +81,26 @@ public class KMChat
         DATA_PATH = this.getConfig().getString("datastorage");
         whoUseAutoGM = this.getConfig().getStringList("whoUseAutoGM");
         whoUseAutoBD = this.getConfig().getStringList("whoUseAutoBD");
+
+
+	String remindersHolder = "plugins/KMChat/jreminders.json";
+	JSONObject jreminders = null;
+	try (BufferedReader br = new BufferedReader(new FileReader(remindersHolder))) {
+	    String line;
+	    if ((line = br.readLine()) != null) {
+		jreminders = new JSONObject(line);
+	    }
+	} catch (Exception e) {
+	    System.out.println(e);
+	}
+	if (jreminders!=null) {
+		Iterator<String> keys = jreminders.keys();
+		while( keys.hasNext() ){
+		    String key = (String)keys.next();
+	            String value = jreminders.getString(key); 
+		    reminders.put(key, value);
+	        }
+	}
 
         System.out.println("Logging bot in...");
         client = new ClientBuilder().withToken(TOKEN).build();
@@ -128,26 +151,45 @@ public class KMChat
         this.log.info(String.format("%s is enabled!", this.getDescription().getFullName()));
     }
 
-    public void onDisable() {
-        RequestBuffer.request(() -> ingameChannel.sendMessage("**Server is going offline!**"));
+    public void onDisable() {	
+	RequestBuffer.request(() -> ingameChannel.sendMessage("**Server is going offline!**"));
+	JSONObject jreminders = new JSONObject(reminders);
+	try (FileWriter file = new FileWriter("plugins/KMChat/jreminders.json")) {
+	    file.write(jreminders.toString());
+	    System.out.println("Successfully Copied JSON Object to File...");
+	    System.out.println("\nJSON Object: " + jreminders);
+	} catch (Exception e) {
+	    System.out.println("[ERROR] writing JSON:\n" + e);
+	}
         this.log.info(String.format("%s is disabled!", this.getDescription().getFullName()));
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
-        String name = playerJoinEvent.getPlayer().getName();
-        playerJoinEvent.setJoinMessage("§e" + name + "§f входит в игру");
-        String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
-        String message = name + " (" + ip + ")" + " входит в игру";
-        kmlog("whole", message);
-        kmlog("chat", message);
-        final String snd = message.replaceAll(name, "__" + name + "__");
-        RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
-        try (FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
-            writer.write(name + " " + ip + "\n");
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
+	String name = playerJoinEvent.getPlayer().getName();
+	String joinMessage = "§e" + name + "§f входит в игру";
+	String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
+	String message =  name + " ("+ip+")" + " входит в игру";
+	kmlog("whole", message);
+	kmlog("chat",  message);
+	final String snd = message.replaceAll(name, "__"+name+"__");
+	RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+	try(FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
+	    writer.write(name + " " + ip + "\n");
+	}
+	catch(IOException ex){
+	    System.out.println(ex.getMessage());
+	}
+	for (String key : reminders.keySet()) {
+	    if (key.equals(name)) {
+		String reminder = reminders.get(key);
+		joinMessage += "\n§e~"+reminder+" ~§f";
+		 RequestBuffer.request(() -> ingameChannel.sendMessage("Player **"+name+"** was reminded of:\n"+reminder));
+		reminders.remove(key);
+		break;
+	    }
+	}
+	playerJoinEvent.setJoinMessage(joinMessage);
     }
 
     @EventHandler
@@ -189,6 +231,7 @@ public class KMChat
         } else if (player.hasPermission("KMChat.builder") && !player.hasPermission("KMChat.prefix")) {
             adminprefix = this.getConfig().getString("bdprefix");
         }
+
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
                 if (mes.startsWith(":")) {
@@ -225,8 +268,10 @@ public class KMChat
         String usesGM = null;
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
+
                 usesGM = nick;
                 if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
+
                     break;
                 } else {
                     mes = "-" + mes;
@@ -363,7 +408,6 @@ public class KMChat
             result = String.format("%s&a%s &f(to BD): &3(( %s ))&f", adminprefix, name, mes);
             forbd = true;
 
-
         } else if (mes.startsWith(":msg") || mes.startsWith("msg")) {
             if (!player.hasPermission("KMCore.tell")) {
                 player.sendMessage("§4Недостаточно прав.§f");
@@ -373,7 +417,8 @@ public class KMChat
             }
         }
 
-        if (mes.startsWith("((") && mes.endsWith("))")) {
+
+	if (local && !forgm && !forbd && !gmnotice && mes.startsWith("((") && mes.endsWith("))")) {
             String str = "";
             if (setRange != null) {
                 str = setRange.getDescription().replaceAll("[),(, ]", "") + " в ";
@@ -1323,7 +1368,8 @@ public class KMChat
                 commandSender.sendMessage("§4Недостаточно прав.§f");
                 return false;
             }
-            //Player sender = (Player)commandSender;
+            
+	    //Player sender = (Player)commandSender;
             try {
                 client.logout();
             } catch (Exception e) {
@@ -1388,9 +1434,80 @@ public class KMChat
             }
             return true;
 
-        }
 
-        return true;
+
+	//Reminders
+	} else if (command.getName().equalsIgnoreCase("remind")) {
+	     if (commandSender instanceof Player) {
+		Player sender = (Player)commandSender;
+		if (!sender.hasPermission("KMChat.gm")) {
+		    sender.sendMessage("§4Недостаточно прав.§f");
+		    return true;
+		}
+	     }
+	     if (args.length == 0 || args[0].equals("help")) {
+		 commandSender.sendMessage("§e----------- §fHelp: remind §e--------------------§8\nRemind usage: Use this to remind player of something when he goes online.\n§e/remind Player You suffer from nausea.\n/remind show§f - show current reminders.\n§e/remind remove Player§f or §e/remind delete Player§f - delete reminder.\n§e/remind edit Player You are hungry§f - overwrite an existing reminder.\n§e/remind§f or §e/remind help§f - show this message.\n");
+		 return true;
+	    } else if (args[0].equals("show")) {
+		if (reminders.isEmpty()) {
+		    commandSender.sendMessage("§8Currently no reminders.§f");
+		    return true;
+		}
+		
+		commandSender.sendMessage("§eCurrent reminders:§f");
+		for (String key : reminders.keySet()) {
+		    commandSender.sendMessage("§a" + key + " : §f" + reminders.get(key) + "\n§f");
+		}
+		return true;
+	    } else if (args[0].equals("remove") || args[0].equals("delete"))  {
+		for (String key : reminders.keySet()) {
+		     if (args[1].equals(key)) {
+			reminders.remove(key);
+			commandSender.sendMessage("§eReminder successfully deleted!§f");
+			return true;
+		    }
+                }
+		commandSender.sendMessage("§4Reminder not found!§f");
+		return false;
+	    } else if (args[0].equals("edit")) {
+		boolean found = false;
+		for (String key : reminders.keySet()) {
+		     if (args[1].equals(key)) {
+			reminders.remove(key);
+			found = true;
+			break;
+		    }
+                }
+		if (!found) {
+		    commandSender.sendMessage("§4Reminder not found!§f");
+		    return false;
+		}
+		String sumargs = "";
+		 for (int i = 2; i < args.length; i++) {
+		    sumargs += " " + args[i];
+		 }
+		 
+		reminders.put(args[1], sumargs);
+		commandSender.sendMessage("§eReminder successfully edited!§f");
+		return true;
+		
+	    } else if (args.length > 1) {
+		 for (String key : reminders.keySet()) {
+                    if (args[0].equals(key)) {
+			commandSender.sendMessage("§4Existing reminder for this player found! Please use /remind edit to edit.§f");
+			return false;
+		    }
+		 }
+		 String sumargs = "";
+		 for (int i = 1; i < args.length; i++) {
+		    sumargs += " " + args[i];
+		 }
+		 reminders.put(args[0], sumargs);
+		commandSender.sendMessage("§eReminder successfully added!§f");
+		 return true;
+	     }
+
+	}
 
     }
     //---}}} Commands
