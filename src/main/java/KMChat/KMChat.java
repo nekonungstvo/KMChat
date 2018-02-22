@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.Date;
-import java.util.regex.Matcher;  
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -49,10 +49,10 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
 import sx.blah.discord.util.RateLimitException;
- 
+
 public class KMChat
-extends JavaPlugin
-implements Listener {
+        extends JavaPlugin
+        implements Listener {
     private static String TOKEN;
     private static long CHID;
     private static String DATA_PATH;
@@ -69,17 +69,19 @@ implements Listener {
     private List<String> whoUseAutoGM;
     private List<String> whoUseAutoBD;
     private boolean wasrestarted = false;
+
     public void onEnable() {
 
         this.getConfig().options().copyDefaults(true);
         this.saveConfig();
-        
+
         path = this.getConfig().getString("logsdir");
         TOKEN = this.getConfig().getString("bottoken");
-        CHID = this.getConfig().getLong("channelid"); 
+        CHID = this.getConfig().getLong("channelid");
         DATA_PATH = this.getConfig().getString("datastorage");
         whoUseAutoGM = this.getConfig().getStringList("whoUseAutoGM");
         whoUseAutoBD = this.getConfig().getStringList("whoUseAutoBD");
+
 
 	String remindersHolder = "plugins/KMChat/jreminders.json";
 	JSONObject jreminders = null;
@@ -104,25 +106,25 @@ implements Listener {
         client = new ClientBuilder().withToken(TOKEN).build();
         client.getDispatcher().registerListener(this);
         client.login();
-        
-	Range weakwhisper = new Range("weakwhisper", "whisper", " (едва слышно)", "===", "@@@");
-	Range whisper = new Range("whisper", "whisper", " (шепчет)", "==", "@@");
-	Range strongwhisper = new Range("strongwhisper", "whisper", " (вполголоса)", "=", "@");
-	
-	Range strongshout = new Range("strongshout", "shout", " (орёт)", "!!!");
-	Range shout = new Range("shout", "shout", " (кричит)", "!!");
-	Range weakshout = new Range("weakshout", "shout", " (восклицает)", "!");
 
-	allRanges[0] = weakwhisper;   //===
-	allRanges[1] = whisper;	      //==
-	allRanges[2] = strongwhisper; //=
-	allRanges[3] = strongshout;   //!!!
-	allRanges[4] = shout;	      //!!
-	allRanges[5] = weakshout;     //!   order is important
+        Range weakwhisper = new Range("weakwhisper", "whisper", " (едва слышно)", "===", "@@@");
+        Range whisper = new Range("whisper", "whisper", " (шепчет)", "==", "@@");
+        Range strongwhisper = new Range("strongwhisper", "whisper", " (вполголоса)", "=", "@");
 
-        this.getServer().getPluginManager().registerEvents((Listener)this, (Plugin)this);
-	//this.nMap.put(-3, "так ужасно, что хуже уже некуда");
-	this.nMap.put(-3, "абсолютно ублюдски");
+        Range strongshout = new Range("strongshout", "shout", " (орёт)", "!!!");
+        Range shout = new Range("shout", "shout", " (кричит)", "!!");
+        Range weakshout = new Range("weakshout", "shout", " (восклицает)", "!");
+
+        allRanges[0] = weakwhisper;   //===
+        allRanges[1] = whisper;          //==
+        allRanges[2] = strongwhisper; //=
+        allRanges[3] = strongshout;   //!!!
+        allRanges[4] = shout;          //!!
+        allRanges[5] = weakshout;     //!   order is important
+
+        this.getServer().getPluginManager().registerEvents((Listener) this, (Plugin) this);
+        //this.nMap.put(-3, "так ужасно, что хуже уже некуда");
+        this.nMap.put(-3, "абсолютно ублюдски");
         this.nMap.put(-2, "ужасно---");
         this.nMap.put(-1, "ужасно--");
         this.nMap.put(-1, "ужасно--");
@@ -137,14 +139,14 @@ implements Listener {
         this.nMap.put(8, "легендарно");
         this.nMap.put(9, "легендарно+");
         this.nMap.put(10, "легендарно++");
-        this.nMap.put(11, "легендарно+++");	
+        this.nMap.put(11, "легендарно+++");
 //      this.nMap.put(12, "ТАК ЛЕГЕНДАРНО, ЧТО ПОПАДЁТ ВО ВСЕ КНИГИ РЕКОРДОВ");
 //      this.nMap.put(12, "божественно");
         this.nMap.put(12, "КАК АЛЛАХ");
 
-	skillset = new String [] {"реакция", "владение оружием", "кулачный бой", "борьба", "парирование", "уклонение", "блокирование",
-		                    "бег", "плавание", "акробатика", "физическая сила", "выносливость", "устойчивость к болезням", "внимательность",
-				    "скрытность", "выживание", "диагностика", "первая помощь", "зашивание ран", "хирургия", "сила", "передвижение", "врачевание"};
+        skillset = new String[]{"реакция", "владение оружием", "кулачный бой", "борьба", "парирование", "уклонение", "блокирование",
+                "бег", "плавание", "акробатика", "физическая сила", "выносливость", "устойчивость к болезням", "внимательность",
+                "скрытность", "выживание", "диагностика", "первая помощь", "зашивание ран", "хирургия", "сила", "передвижение", "врачевание"};
 
         this.log.info(String.format("%s is enabled!", this.getDescription().getFullName()));
     }
@@ -161,7 +163,7 @@ implements Listener {
 	}
         this.log.info(String.format("%s is disabled!", this.getDescription().getFullName()));
     }
-   
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
 	String name = playerJoinEvent.getPlayer().getName();
@@ -192,53 +194,52 @@ implements Listener {
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent playerQuitEvent) {
-	Player player = playerQuitEvent.getPlayer(); 
-    	String name = player.getName();
-    	playerQuitEvent.setQuitMessage("§e" + name + "§f выходит из игры");
-	String ip = player.getAddress().getHostName();
-	String message = name + " ("+ip+")" + " выходит из игры";
-	kmlog("whole", message);
-	kmlog("chat", message);
-	RequestBuffer.request(() -> ingameChannel.sendMessage(message.replaceAll(name, "__"+name+"__")));
+        Player player = playerQuitEvent.getPlayer();
+        String name = player.getName();
+        playerQuitEvent.setQuitMessage("§e" + name + "§f выходит из игры");
+        String ip = player.getAddress().getHostName();
+        String message = name + " (" + ip + ")" + " выходит из игры";
+        kmlog("whole", message);
+        kmlog("chat", message);
+        RequestBuffer.request(() -> ingameChannel.sendMessage(message.replaceAll(name, "__" + name + "__")));
     }
-
 
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent asyncPlayerChatEvent) {
-	//Long beg = System.nanoTime();
-	Player player = asyncPlayerChatEvent.getPlayer();
-	int rangePosition = 6; // if no range specified, lands on the last element of array with descriptions
+        //Long beg = System.nanoTime();
+        Player player = asyncPlayerChatEvent.getPlayer();
+        int rangePosition = 6; // if no range specified, lands on the last element of array with descriptions
 
-	boolean local = true;
-	boolean forgm = false; //to gm chat
-	boolean gmnotice = false; //***this kind of messages used by GM's***
-	boolean forbd = false; //to builders' chat
-	boolean norec = false; //no recipients at all
-	boolean sendraw = false; //either to send a raw message to discord
-	boolean strippedColon = false;
-	
-	String mes = asyncPlayerChatEvent.getMessage();
-	String raw = mes;
-	String name = player.getName();
-	Range setRange = null;
-	double range = this.getConfig().getInt("range.default");
-	
+        boolean local = true;
+        boolean forgm = false; //to gm chat
+        boolean forbd = false; //to builders' chat
+        boolean norec = false; //no recipients at all
+        boolean sendraw = false; //either to send a raw message to discord
+        boolean strippedColon = false;
 
-	String adminprefix = "";
-	if (player.hasPermission("KMChat.prefix")) {
-	    adminprefix = this.getConfig().getString("adminprefix");
-	} else if (player.hasPermission("KMChat.builder") && !player.hasPermission("KMChat.prefix")) {
-	    adminprefix = this.getConfig().getString("bdprefix");
-	}
+        String mes = asyncPlayerChatEvent.getMessage();
+        String raw = mes;
+        String name = player.getName();
+        Range setRange = null;
+        double range = this.getConfig().getInt("range.default");
+
+
+        String adminprefix = "";
+        if (player.hasPermission("KMChat.prefix")) {
+            adminprefix = this.getConfig().getString("adminprefix");
+        } else if (player.hasPermission("KMChat.builder") && !player.hasPermission("KMChat.prefix")) {
+            adminprefix = this.getConfig().getString("bdprefix");
+        }
+
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
                 if (mes.startsWith(":")) {
                     mes = mes.substring(1);
                     strippedColon = true;
                 }
-            break;
-            } 
+                break;
+            }
         }
         for (String nick : whoUseAutoBD) {
             if (player.getName().equals(nick)) {
@@ -246,36 +247,38 @@ implements Listener {
                     mes = mes.substring(1);
                     strippedColon = true;
                 }
-            break;
-            } 
+                break;
+            }
         }
 
 
-	String describeRange = "";
-	int i = -1;
-	for (Range ran : allRanges) {
-	    ++i;
-	    if (ran.matches(mes) && player.hasPermission(ran.getPermission())) {
-		rangePosition = i;
-		mes = mes.substring(ran.getSymbol().length());
-		range = this.getConfig().getInt(ran.getRange());
-		describeRange = ran.getDescription();
-		setRange = ran;
-		break;
-	    }
-	}
-	String usesGM = null;
+        String describeRange = "";
+        int i = -1;
+        for (Range ran : allRanges) {
+            ++i;
+            if (ran.matches(mes) && player.hasPermission(ran.getPermission())) {
+                rangePosition = i;
+                mes = mes.substring(ran.getSymbol().length());
+                range = this.getConfig().getInt(ran.getRange());
+                describeRange = ran.getDescription();
+                setRange = ran;
+                break;
+            }
+        }
+        String usesGM = null;
         for (String nick : whoUseAutoGM) {
             if (player.getName().equals(nick)) {
-		usesGM = nick;
-                if (mes.startsWith(";") || mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
+
+                usesGM = nick;
+                if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
+
                     break;
                 } else {
                     mes = "-" + mes;
                     forgm = true;
                 }
-            break;
-            } 
+                break;
+            }
         }
         for (String nick : whoUseAutoBD) {
             if (player.getName().equals(nick) && !player.getName().equals(usesGM)) {
@@ -285,146 +288,145 @@ implements Listener {
                     mes = ";" + mes;
                     forbd = true;
                 }
-            break;
+                break;
             }
-	}
-	String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
-	Pattern p = Pattern.compile("-d(4|6|8|10|12|14|20|100).*"); 
-	Matcher m = p.matcher(mes);  
-	if (mes.startsWith("-d") && m.matches() && player.hasPermission("kmchat.dice")) {
-	    String helpmes = mes.substring(2);
-	    String dice = dnum(helpmes);
-	    if (dice != null) {
-		sendraw = true;
-		forgm = true;
-		result = String.format("&a%s &f(to GM) &eбросает %s &f", name, dice);
-	    }
-
-	} else if (mes.startsWith("d") && player.hasPermission("kmchat.dice")) {
-	    sendraw = true;
-	    String[] vars = { "едва слышно бросает", 
-			      "очень тихо бросает", 
-			      "тихо бросает", 
-			      "СВЕРХГРОМКО ОБРУШИВАЕТ", 
-			      "очень громко бросает", 
-			      "громко бросает", 
-			      "бросает" };
-	    String helpmes = mes.substring(1);
-	    String dice = dnum(helpmes);
-	    if (dice != null) {
-		result = String.format("&e(( &a%s &e%s %s ))&f", name, vars[rangePosition], dice);
-	    } else {
-		result = String.format("&a%s&f%s: %s", name, describeRange, mes);
+        }
+        String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
+        Pattern p = Pattern.compile("-d(4|6|8|10|12|14|20|100).*");
+        Matcher m = p.matcher(mes);
+        if (mes.startsWith("-d") && m.matches() && player.hasPermission("kmchat.dice")) {
+            String helpmes = mes.substring(2);
+            String dice = dnum(helpmes);
+            if (dice != null) {
+                sendraw = true;
+                forgm = true;
+                result = String.format("&a%s &f(to GM) &eбросает %s &f", name, dice);
             }
 
-	} else if (mes.startsWith("%")) {
-	    sendraw = true;
-	    String[] vars = { "едва слышно бросает",
-                              "очень тихо бросает",
-                              "тихо бросает",
-                              "СВЕРХГРОМКО ОБРУШИВАЕТ",
-                              "очень громко бросает",
-                              "громко бросает",
-                              "бросает" };
-	    int n = 2;
+        } else if (mes.startsWith("d") && player.hasPermission("kmchat.dice")) {
+            sendraw = true;
+            String[] vars = {"едва слышно бросает",
+                    "очень тихо бросает",
+                    "тихо бросает",
+                    "СВЕРХГРОМКО ОБРУШИВАЕТ",
+                    "очень громко бросает",
+                    "громко бросает",
+                    "бросает"};
+            String helpmes = mes.substring(1);
+            String dice = dnum(helpmes);
+            if (dice != null) {
+                result = String.format("&e(( &a%s &e%s %s ))&f", name, vars[rangePosition], dice);
+            } else {
+                result = String.format("&a%s&f%s: %s", name, describeRange, mes);
+            }
+
+        } else if (mes.startsWith("%")) {
+            sendraw = true;
+            String[] vars = {"едва слышно бросает",
+                    "очень тихо бросает",
+                    "тихо бросает",
+                    "СВЕРХГРОМКО ОБРУШИВАЕТ",
+                    "очень громко бросает",
+                    "громко бросает",
+                    "бросает"};
+            int n = 2;
             if (mes.startsWith("% ")) {
-	    	mes = mes.substring(2);
-	    } else {
-		mes = mes.substring(1);
-	    }
-	    String dice = dF(mes, player.getName());
-	    if (dice == null) {
-		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
-		norec = true;
-	    } else
-		result = String.format("&e(( &a%s&e %s 4dF %s ))&f", name, vars[rangePosition], dice);
-	
-	} else if (mes.startsWith("-%")) {
-	    sendraw = true;
-	    int n = 2;
-	    forgm = true;
-            if (mes.startsWith("-% ")) {
-	    	mes = mes.substring(3);
-	    } else {
-		mes = mes.substring(2);
-	    }
-	    String dice = dF(mes, player.getName());
-	    if (dice == null) {
-		player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");	
-		norec = true;
-	    }
-	    result = String.format("&a%s &f(to GM) &eбросает 4dF %s &f", name, dice);
-	
-	} else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
-	    gmnotice = true;
-	    sendraw = true;
-	    String[] vars = { "~",
-			      "*",
-			      "**",
-			      "******",
-			      "*****",
-			      "****",
-			      "***" };
-	    String[] gmRanges = { "closestdm",
-				  "closerdm",
-				  "closedm",
-				  "farestdm",
-				  "farerdm",
-				  "fardm",
-				  "default" };
-	    range = this.getConfig().getInt("range."+gmRanges[rangePosition]);
-	    mes = mes.substring(1);
-	    result = "&e" +vars[rangePosition] + mes + vars[rangePosition];
-		
-	} else if (mes.startsWith("*") && player.hasPermission("KMChat.me") && setRange == null) {
-	    mes = mes.substring(1);
-	    range = this.getConfig().getInt("range.me");
-	    result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
-		
-	} else if (mes.startsWith("^") && player.hasPermission("KMChat.global")) {
-	    local = false;
-	    mes = mes.substring(1);
-	    result = String.format("%s&a%s&f: &b(( %s ))&f", adminprefix, name, mes);
-		
-	} else if (mes.startsWith("_")) {
-	    mes = "(( " + mes.substring(1) + " ))";
-	
-	} else if (mes.startsWith("-")) {
-	    if (mes.startsWith("- ")) {
-		mes = mes.substring(2);
-	    } else {
-		mes = mes.substring(1);
-	    }
-	    result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
-	    forgm = true;
-	} else if (mes.startsWith(";") && player.hasPermission("KMChat.builder")) {
-	    if (mes.startsWith("; ")) {
-		mes = mes.substring(2);
-	    } else {
-		mes = mes.substring(1);
-	    }
-	    result = String.format("%s&a%s &f(to BD): &3(( %s ))&f", adminprefix, name, mes);
-	    forbd = true;
-    
+                mes = mes.substring(2);
+            } else {
+                mes = mes.substring(1);
+            }
+            String dice = dF(mes, player.getName());
+            if (dice == null) {
+                player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");
+                norec = true;
+            } else
+                result = String.format("&e(( &a%s&e %s 4dF %s ))&f", name, vars[rangePosition], dice);
 
-	} else if (mes.startsWith(":msg") || mes.startsWith("msg")) {
+        } else if (mes.startsWith("-%")) {
+            sendraw = true;
+            int n = 2;
+            forgm = true;
+            if (mes.startsWith("-% ")) {
+                mes = mes.substring(3);
+            } else {
+                mes = mes.substring(2);
+            }
+            String dice = dF(mes, player.getName());
+            if (dice == null) {
+                player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");
+                norec = true;
+            }
+            result = String.format("&a%s &f(to GM) &eбросает 4dF %s &f", name, dice);
+
+        } else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
+            sendraw = true;
+            String[] vars = {"~",
+                    "*",
+                    "**",
+                    "******",
+                    "*****",
+                    "****",
+                    "***"};
+            String[] gmRanges = {"closestdm",
+                    "closerdm",
+                    "closedm",
+                    "farestdm",
+                    "farerdm",
+                    "fardm",
+                    "default"};
+            range = this.getConfig().getInt("range." + gmRanges[rangePosition]);
+            mes = mes.substring(1);
+            result = "&e" + vars[rangePosition] + mes + vars[rangePosition];
+
+        } else if (mes.startsWith("*") && player.hasPermission("KMChat.me") && setRange == null) {
+            mes = mes.substring(1);
+            range = this.getConfig().getInt("range.me");
+            result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
+
+        } else if (mes.startsWith("^") && player.hasPermission("KMChat.global")) {
+            local = false;
+            mes = mes.substring(1);
+            result = String.format("%s&a%s&f: &b(( %s ))&f", adminprefix, name, mes);
+
+        } else if (mes.startsWith("_")) {
+            mes = "(( " + mes.substring(1) + " ))";
+
+        } else if (mes.startsWith("-")) {
+            if (mes.startsWith("- ")) {
+                mes = mes.substring(2);
+            } else {
+                mes = mes.substring(1);
+            }
+            result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
+            forgm = true;
+        } else if (mes.startsWith(";") && player.hasPermission("KMChat.builder")) {
+            if (mes.startsWith("; ")) {
+                mes = mes.substring(2);
+            } else {
+                mes = mes.substring(1);
+            }
+            result = String.format("%s&a%s &f(to BD): &3(( %s ))&f", adminprefix, name, mes);
+            forbd = true;
+
+        } else if (mes.startsWith(":msg") || mes.startsWith("msg")) {
             if (!player.hasPermission("KMCore.tell")) {
                 player.sendMessage("§4Недостаточно прав.§f");
             } else {
-		player.sendMessage("§4Используйте /msg!");
-		norec = true;
-	    }
-	}
+                player.sendMessage("§4Используйте /msg!");
+                norec = true;
+            }
+        }
+
 
 	if (local && !forgm && !forbd && !gmnotice && mes.startsWith("((") && mes.endsWith("))")) {
             String str = "";
-	    if (setRange != null) {
-		str = setRange.getDescription().replaceAll("[),(, ]","") + " в ";
-		if (rangePosition == 0) {
-		    str = "едва слышно в ";
-		    }
-		}
-	    result = String.format("%s&a%s&f (%sOOC): &d%s&f", adminprefix, name, str, mes);
+            if (setRange != null) {
+                str = setRange.getDescription().replaceAll("[),(, ]", "") + " в ";
+                if (rangePosition == 0) {
+                    str = "едва слышно в ";
+                }
+            }
+            result = String.format("%s&a%s&f (%sOOC): &d%s&f", adminprefix, name, str, mes);
             if (result.matches(".*\\(\\(\\S.*")) {
                 result = result.replace("((", "(( ");
             }
@@ -432,148 +434,148 @@ implements Listener {
                 result = result.replace("))", " ))");
             }
 
-	}
+        }
 
 
-	result = result.replaceAll("%", "%%");
-	result = result.replaceAll("&([a-z0-9])", "§$1");
-	result = result.replaceAll("\\]\\s\\.", "].");
-	asyncPlayerChatEvent.setFormat(result);
-	asyncPlayerChatEvent.setMessage(mes);
-	kmlog("whole", result);
-	kmlog("chat", result);
-	String res2discord = result.replaceAll("§([a-z0-9])", "");
-	res2discord = res2discord.replace(player.getName(), "**"+player.getName()+"**");
-	String mes2dis = null;
-	if (sendraw) {
-	    String raw2dis = "**" + player.getName() + "**: " + raw;
-	    mes2dis = raw2dis + '\n' + res2discord;
-	} else {
-	    mes2dis = res2discord;
-	}
-	final String sendme = mes2dis;
-	RequestBuffer.request(() -> ingameChannel.sendMessage(sendme));
+        result = result.replaceAll("%", "%%");
+        result = result.replaceAll("&([a-z0-9])", "§$1");
+        result = result.replaceAll("\\]\\s\\.", "].");
+        asyncPlayerChatEvent.setFormat(result);
+        asyncPlayerChatEvent.setMessage(mes);
+        kmlog("whole", result);
+        kmlog("chat", result);
+        String res2discord = result.replaceAll("§([a-z0-9])", "");
+        res2discord = res2discord.replace(player.getName(), "**" + player.getName() + "**");
+        String mes2dis = null;
+        if (sendraw) {
+            String raw2dis = "**" + player.getName() + "**: " + raw;
+            mes2dis = raw2dis + '\n' + res2discord;
+        } else {
+            mes2dis = res2discord;
+        }
+        final String sendme = mes2dis;
+        RequestBuffer.request(() -> ingameChannel.sendMessage(sendme));
 
-	if (norec) {
-	    asyncPlayerChatEvent.getRecipients().clear();
-	} else if (forgm) {
-	    asyncPlayerChatEvent.getRecipients().clear();
-	    LinkedList<Player> recips = new LinkedList();
-	    recips.add(player);
+        if (norec) {
+            asyncPlayerChatEvent.getRecipients().clear();
+        } else if (forgm) {
+            asyncPlayerChatEvent.getRecipients().clear();
+            LinkedList<Player> recips = new LinkedList();
+            recips.add(player);
             for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
                 if (player2.hasPermission("KMChat.admin")) {
-                    if (!player2.getWorld().equals((Object)player.getWorld())) {
+                    if (!player2.getWorld().equals((Object) player.getWorld())) {
                         result = result.replaceAll("§f", "§7");
                         player2.sendMessage(result);
-                    } else if ( player.getLocation().distanceSquared(player2.getLocation()) > range*range) {
+                    } else if (player.getLocation().distanceSquared(player2.getLocation()) > range * range) {
                         result = result.replaceAll("§f", "§7");
                         player2.sendMessage(result);
                     } else {
-		        recips.add(player2);
+                        recips.add(player2);
                     }
-		}
-	    }
-	    asyncPlayerChatEvent.getRecipients().addAll(recips);
-	} else if (forbd) {
-	    asyncPlayerChatEvent.getRecipients().clear();
-	    LinkedList<Player> recips = new LinkedList();
-	    recips.add(player);
+                }
+            }
+            asyncPlayerChatEvent.getRecipients().addAll(recips);
+        } else if (forbd) {
+            asyncPlayerChatEvent.getRecipients().clear();
+            LinkedList<Player> recips = new LinkedList();
+            recips.add(player);
             for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
                 if (player2.hasPermission("KMChat.builder")) {
-                    if (!player2.getWorld().equals((Object)player.getWorld())) {
+                    if (!player2.getWorld().equals((Object) player.getWorld())) {
                         result = result.replaceAll("§f", "§7");
                         player2.sendMessage(result);
-                    } else if ( player.getLocation().distanceSquared(player2.getLocation()) > range*range) {
+                    } else if (player.getLocation().distanceSquared(player2.getLocation()) > range * range) {
                         result = result.replaceAll("§f", "§7");
                         player2.sendMessage(result);
                     } else {
-		        recips.add(player2);
+                        recips.add(player2);
                     }
-		}
-	    }
-	    asyncPlayerChatEvent.getRecipients().addAll(recips);
+                }
+            }
+            asyncPlayerChatEvent.getRecipients().addAll(recips);
 
 
-	} else if (local) {
-	    asyncPlayerChatEvent.getRecipients().clear();
-	    asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
-	}
-	//System.out.println("range: " + range);
-	//Long end = System.nanoTime();
-	//System.out.println("speed:" + (end-beg));
-    }
-    
-    
-    //---}}} Various helpers
-    
-    protected List<Player> getLocalRecipients(Player player, String mes, double d) {
-    
-    
-    
-	Location location = player.getLocation();
-	LinkedList<Player> linkedList = new LinkedList<Player>();
-	double d2 = Math.pow(d, 2.0);
-	for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
-	    if (player2.hasPermission("KMChat.admin")) {
-		if (!player2.getWorld().equals((Object)player.getWorld())) {
-		    mes = mes.replaceAll("§e", "§7");
-		    mes = mes.replaceAll("§f", "§7");
-		    player2.sendMessage(mes);
-		    continue;
-		}
-		if (location.distanceSquared(player2.getLocation()) > d2) {
-		    mes = mes.replaceAll("§e", "§7");
-		    mes = mes.replaceAll("§f", "§7");
-		    player2.sendMessage(mes);
-	            continue;
-	        }
-		linkedList.add(player2);
-	        continue;
-	    }
-	    if (!player2.getWorld().equals((Object)player.getWorld()) || location.distanceSquared(player2.getLocation()) > d2) continue;
-	    linkedList.add(player2);
+        } else if (local) {
+            asyncPlayerChatEvent.getRecipients().clear();
+            asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
         }
-	return linkedList;
-    }	
+        //System.out.println("range: " + range);
+        //Long end = System.nanoTime();
+        //System.out.println("speed:" + (end-beg));
+    }
+
+
+    //---}}} Various helpers
+
+    protected List<Player> getLocalRecipients(Player player, String mes, double d) {
+
+
+        Location location = player.getLocation();
+        LinkedList<Player> linkedList = new LinkedList<Player>();
+        double d2 = Math.pow(d, 2.0);
+        for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
+            if (player2.hasPermission("KMChat.admin")) {
+                if (!player2.getWorld().equals((Object) player.getWorld())) {
+                    mes = mes.replaceAll("§e", "§7");
+                    mes = mes.replaceAll("§f", "§7");
+                    player2.sendMessage(mes);
+                    continue;
+                }
+                if (location.distanceSquared(player2.getLocation()) > d2) {
+                    mes = mes.replaceAll("§e", "§7");
+                    mes = mes.replaceAll("§f", "§7");
+                    player2.sendMessage(mes);
+                    continue;
+                }
+                linkedList.add(player2);
+                continue;
+            }
+            if (!player2.getWorld().equals((Object) player.getWorld()) || location.distanceSquared(player2.getLocation()) > d2)
+                continue;
+            linkedList.add(player2);
+        }
+        return linkedList;
+    }
+
     protected void kmlog(String where, String what) {
-	try(FileWriter writer = new FileWriter(path + where + "/" + where + "_current.log", true)) {
-	    Date date = new Date();
-	    what = what.replaceAll("§.", "");
-	    writer.write("[" + date.toString() + "] " + what + "\n");
-    	}
-	catch(IOException ex){
-	   System.out.println(ex.getMessage());
-	}
+        try (FileWriter writer = new FileWriter(path + where + "/" + where + "_current.log", true)) {
+            Date date = new Date();
+            what = what.replaceAll("§.", "");
+            writer.write("[" + date.toString() + "] " + what + "\n");
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public void send2discord(String message) {
         if (message.length() > 2000 && message.length() < 4000) {
-            final String snd1 = message.substring(0,2000);
+            final String snd1 = message.substring(0, 2000);
             RequestBuffer.request(() -> ingameChannel.sendMessage(snd1));
             final String snd2 = message.substring(2000);
             RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
         } else if (message.length() > 4000) {
-            final String snd1 = message.substring(0,2000);
+            final String snd1 = message.substring(0, 2000);
             RequestBuffer.request(() -> ingameChannel.sendMessage(snd1));
-            final String snd2 = message.substring(2000,4000);
+            final String snd2 = message.substring(2000, 4000);
             RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
             final String snd3 = message.substring(4000);
             RequestBuffer.request(() -> ingameChannel.sendMessage(snd3));
-        
+
         } else {
             final String snd = message;
             RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
         }
-        
+
     }
 
     public String getSkill(String desc, String nick) {
-	//we need to have a file "Playernick.skills" with skills listed as following: "skill:level"
-	Pattern skillpat = Pattern.compile("(.*):");
-	Pattern levelpat = Pattern.compile(":(.*)");
+        //we need to have a file "Playernick.skills" with skills listed as following: "skill:level"
+        Pattern skillpat = Pattern.compile("(.*):");
+        Pattern levelpat = Pattern.compile(":(.*)");
         boolean changedNick = false;
-	String skill = null;
-	String level = null;
+        String skill = null;
+        String level = null;
         String oldskill = null;
 
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -587,73 +589,73 @@ implements Listener {
             }
         }
 
-	Path path = Paths.get(DATA_PATH, nick + ".skills");
-	Charset charset = Charset.forName("UTF-8");
+        Path path = Paths.get(DATA_PATH, nick + ".skills");
+        Charset charset = Charset.forName("UTF-8");
         try {
-	    List<String> lines = Files.readAllLines(path, charset);
+            List<String> lines = Files.readAllLines(path, charset);
 
-	    for (String line : lines) {
-		Matcher skillmat = skillpat.matcher(line);
-		while (skillmat.find()) {
-		    skill = skillmat.group().replaceAll(":",""); //get the name of the skill
-		}
-		if (desc.toLowerCase().startsWith(skill)) {
-		    Matcher levelmat = levelpat.matcher(line);
-		    while (levelmat.find()) {
-		        level = levelmat.group(); //get the level of the skill
-		    }
-		    break;
-		} else {
-			skill = null;
-		}
-	    }
-	    if (skill == null) {
-	        for (String sk : skillset) {
-	            if (desc.toLowerCase().startsWith(sk)) {
+            for (String line : lines) {
+                Matcher skillmat = skillpat.matcher(line);
+                while (skillmat.find()) {
+                    skill = skillmat.group().replaceAll(":", ""); //get the name of the skill
+                }
+                if (desc.toLowerCase().startsWith(skill)) {
+                    Matcher levelmat = levelpat.matcher(line);
+                    while (levelmat.find()) {
+                        level = levelmat.group(); //get the level of the skill
+                    }
+                    break;
+                } else {
+                    skill = null;
+                }
+            }
+            if (skill == null) {
+                for (String sk : skillset) {
+                    if (desc.toLowerCase().startsWith(sk)) {
                         oldskill = desc.substring(0, sk.length());
-		        skill = sk;
-	    System.out.println("skill is " + skill + ", level is " + level);
+                        skill = sk;
+                        System.out.println("skill is " + skill + ", level is " + level);
                         break;
-		    } else {
+                    } else {
                         level = null;
                     }
-	        }
-	    }
-
-	} catch (IOException e) {
-	    System.out.println(e);
-	    level = null;
-	}
-            
-            System.out.println("SKILL: " + skill);
-	    if (level == null) {
-		level = ":ПЛОХО";
+                }
             }
-            System.out.println("!! skill is " + skill + ", level is " + level + ", oldskill = " + oldskill);
-            if (skill == null)
-                return null;
-            String result = "";
-            oldskill = desc.substring(0, skill.length());
-            if (oldskill == null) oldskill = skill;
-            if (changedNick) {
-	        result = desc.replaceFirst(oldskill, level + " ["+nick+" "+skill+"] (");
-            } else {
-	        result = desc.replaceFirst(oldskill, level + " ["+skill+"] (");
-            }
-	    //let's make the output pretty!
-	    //System.out.println(result);
-	    //System.out.println(desc);
 
-	    result = result.replaceFirst("\\(\\s", "\\(");
-	    result = result.substring(1, result.length()) + ")";
-	    if (result.contains("()"))
-		result = result.replaceFirst("\\(\\)", "");
-	    return result;
+        } catch (IOException e) {
+            System.out.println(e);
+            level = null;
+        }
+
+        System.out.println("SKILL: " + skill);
+        if (level == null) {
+            level = ":ПЛОХО";
+        }
+        System.out.println("!! skill is " + skill + ", level is " + level + ", oldskill = " + oldskill);
+        if (skill == null)
+            return null;
+        String result = "";
+        oldskill = desc.substring(0, skill.length());
+        if (oldskill == null) oldskill = skill;
+        if (changedNick) {
+            result = desc.replaceFirst(oldskill, level + " [" + nick + " " + skill + "] (");
+        } else {
+            result = desc.replaceFirst(oldskill, level + " [" + skill + "] (");
+        }
+        //let's make the output pretty!
+        //System.out.println(result);
+        //System.out.println(desc);
+
+        result = result.replaceFirst("\\(\\s", "\\(");
+        result = result.substring(1, result.length()) + ")";
+        if (result.contains("()"))
+            result = result.replaceFirst("\\(\\)", "");
+        return result;
 
     }
 
     public int getSkillValue(String levelName) {
-	for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
+        for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
             if (levelName.equals(entry.getValue())) {
                 return entry.getKey();
             }
@@ -672,50 +674,50 @@ implements Listener {
     }
 
     public String dF(String mes, String nick, boolean returnNumber) {
-	boolean weusedskill = false;
-	String result = "(";
-	int n = 666; //skill level represented as number
-	float mod = 0; //optinal modificator to skill level
+        boolean weusedskill = false;
+        String result = "(";
+        int n = 666; //skill level represented as number
+        float mod = 0; //optinal modificator to skill level
 
         if (!containsSkillValue(mes)) {
-		//int wordsNum = 1;
-		//String[] split = mes.split(" ", wordsNum + 2); //extra spot for optional modificator
-                String skillmes = getSkill(mes, nick);
-                if (skillmes != null) {
-		    mes = skillmes;
-		
-	        Pattern ourSkillPat = Pattern.compile("\\(([-,+][0-9]).*");
+            //int wordsNum = 1;
+            //String[] split = mes.split(" ", wordsNum + 2); //extra spot for optional modificator
+            String skillmes = getSkill(mes, nick);
+            if (skillmes != null) {
+                mes = skillmes;
+
+                Pattern ourSkillPat = Pattern.compile("\\(([-,+][0-9]).*");
                 Matcher ourSkillMat = ourSkillPat.matcher(skillmes);
                 String strmod = null;
                 if (ourSkillMat.find()) {
                     strmod = ourSkillMat.group(1);
                 }
 
-		if (strmod != null) {
-		    //String strmod = split[wordsNum];
-		    if (strmod.matches("[-,+][0-9]")) {
-			mes = mes.replace( "] (" + strmod, " " + strmod + "] (");
-			if (mes.contains("()"))
-				mes = mes.replaceFirst("\\(\\)", "");
-			mod = Float.parseFloat(strmod);
-		    }
-		}
-		weusedskill = true;
+                if (strmod != null) {
+                    //String strmod = split[wordsNum];
+                    if (strmod.matches("[-,+][0-9]")) {
+                        mes = mes.replace("] (" + strmod, " " + strmod + "] (");
+                        if (mes.contains("()"))
+                            mes = mes.replaceFirst("\\(\\)", "");
+                        mod = Float.parseFloat(strmod);
+                    }
                 }
-	    }
-        System.out.println("SKILL = " + mes);	
-	String level = "";
-	String comment = "";
-	try {
-	    level = mes.split(" ", 2)[0];
-	    if (!weusedskill) { //if we used skill, comment is already inside (braces)
-		comment = mes.split(" ", 2)[1];
-		mes = mes.replace(comment, "("+comment+")");
-	    }
-	} catch (Exception e) {
-	    System.out.println("dF() caugth exception: " + e);
-	    level = mes;
-	}
+                weusedskill = true;
+            }
+        }
+        System.out.println("SKILL = " + mes);
+        String level = "";
+        String comment = "";
+        try {
+            level = mes.split(" ", 2)[0];
+            if (!weusedskill) { //if we used skill, comment is already inside (braces)
+                comment = mes.split(" ", 2)[1];
+                mes = mes.replace(comment, "(" + comment + ")");
+            }
+        } catch (Exception e) {
+            System.out.println("dF() caugth exception: " + e);
+            level = mes;
+        }
 	/*
 	for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
 	    if (level.equals(entry.getValue())) {
@@ -724,110 +726,105 @@ implements Listener {
 	    }
 	}
 	*/
-	n = getSkillValue(level);
-	if (level.equals("ПЛОХО"))
-		n = 2;
+        n = getSkillValue(level);
+        if (level.equals("ПЛОХО"))
+            n = 2;
 
-	if (n == 666) {
-	    return null;
+        if (n == 666) {
+            return null;
 //        } else if (n < 1) {
 //		n = 1;
 //	} else if (n > 8) {
 //		n = 8;
-	}
+        }
 
-	int oldn = n;
-	n = n + Math.round(mod);
+        int oldn = n;
+        n = n + Math.round(mod);
 
-	if (n < -2) {
-		n = -2;
-	} else if (n > 11) {
-		n = 11;
-	}
-	if (mod != 0) {
-		try {
-			mes = mes.replaceFirst(level, nMap.get(n));
-		}
-		catch (Exception e) {
-			System.out.println(e);
-		}
-	}
+        if (n < -2) {
+            n = -2;
+        } else if (n > 11) {
+            n = 11;
+        }
+        if (mod != 0) {
+            try {
+                mes = mes.replaceFirst(level, nMap.get(n));
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
 
-	int[] dices = {-1, 0, 1};
-	int dice = 0;
-	for (int i = 0; i < 4; ++i) {
-	    int rndInt = rnd.nextInt(3);
-	    dice = dices[rndInt];
-	    if (dice < 0) {
-		n -= 1;
-		result += "-";
-	    }
-	    else if (dice > 0) {
-		n += 1;
-	        result += "+";
-	    }
-	    else {
-		result += "=";
-	    }
-	}
-	if (n < -3) {
-		n = -3;
-	} else if (n > 12) {
-		n = 12;
-	}
-	result += String.format(") от %s. Результат: %s", mes, nMap.get(n));
-	result = result.replace("( ", "("); 
-	return result; 
-    }	
+        int[] dices = {-1, 0, 1};
+        int dice = 0;
+        for (int i = 0; i < 4; ++i) {
+            int rndInt = rnd.nextInt(3);
+            dice = dices[rndInt];
+            if (dice < 0) {
+                n -= 1;
+                result += "-";
+            } else if (dice > 0) {
+                n += 1;
+                result += "+";
+            } else {
+                result += "=";
+            }
+        }
+        if (n < -3) {
+            n = -3;
+        } else if (n > 12) {
+            n = 12;
+        }
+        result += String.format(") от %s. Результат: %s", mes, nMap.get(n));
+        result = result.replace("( ", "(");
+        return result;
+    }
 
-    
+
     public String dF(String mes, String nick) {
-	return dF(mes, nick, false);
+        return dF(mes, nick, false);
     }
 
     public String dF(String mes) {
-	return dF(mes, "", false);
+        return dF(mes, "", false);
     }
- 
 
 
     protected String dnum(String mes) {
-	int[] poss = {4, 6, 8, 10, 12, 14, 20};
+        int[] poss = {4, 6, 8, 10, 12, 14, 20};
         int n = -1;
         for (int i = 0; i < poss.length; ++i) {
-	    int compare = poss[i];
-	    if (mes.startsWith(Integer.toString(compare))) {
-		n = poss[i];
-		if (mes.startsWith("100")) {
-		    n = 100;
-		    mes = mes.substring(3);
-		}
-		else {
-		    mes = mes.substring(Integer.toString(compare).length());
-		}
-	    break;
-	    }
-	}
-	String hlp = "";
-	if (!mes.isEmpty()) {
-	    if (mes.startsWith(" ")) {
-		mes = mes.substring(1);
-	    }
+            int compare = poss[i];
+            if (mes.startsWith(Integer.toString(compare))) {
+                n = poss[i];
+                if (mes.startsWith("100")) {
+                    n = 100;
+                    mes = mes.substring(3);
+                } else {
+                    mes = mes.substring(Integer.toString(compare).length());
+                }
+                break;
+            }
+        }
+        String hlp = "";
+        if (!mes.isEmpty()) {
+            if (mes.startsWith(" ")) {
+                mes = mes.substring(1);
+            }
             hlp = " (" + mes + ")";
-	}
+        }
 
-	if (n > 0) {
-	    int dice = new Random().nextInt(n);
+        if (n > 0) {
+            int dice = new Random().nextInt(n);
 
-        this.log.info(mes);
-	    return String.format("d%s%s. Выпадает %s", n, hlp, ++dice);
-	} else {
-	    return null;
-	}
+            this.log.info(mes);
+            return String.format("d%s%s. Выпадает %s", n, hlp, ++dice);
+        } else {
+            return null;
+        }
     }
 
     public int getNumFromDice(String dice) {
-        Pattern skillPat =  Pattern.compile("Результат:(§.)? ((абсолютно ублюдски|ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно|божественно)[+-]{0,3})");
+        Pattern skillPat = Pattern.compile("Результат:(§.)? ((абсолютно ублюдски|ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно|божественно)[+-]{0,3})");
         Matcher skillMat = skillPat.matcher(dice);
         skillMat.find();
         String found = skillMat.group(2);
@@ -837,12 +834,12 @@ implements Listener {
                 n = entry.getKey();
                 break;
             }
-      }
+        }
         return n;
 
     }
 
-    public  String reroll(String dice, ReactionList list) {
+    public String reroll(String dice, ReactionList list) {
         Pattern pat1 = Pattern.compile("от (абсолютно ублюдски|ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно|божественно)(.*)\\.\\sРезультат");
         Matcher mat1 = pat1.matcher(dice);
         mat1.find();
@@ -850,7 +847,7 @@ implements Listener {
         String desc = mat1.group(2);
         String newroll = simpledF(initial, desc);
         String newrollSave = newroll;
-        newroll = dice.substring(0,6) + newroll.substring(6);
+        newroll = dice.substring(0, 6) + newroll.substring(6);
         Pattern nickPat = Pattern.compile("от (ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно)\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+.*\\sРезультат:§?.?\\s(.*)");
         Matcher nickMat = nickPat.matcher(dice);
         nickMat.find();
@@ -866,15 +863,15 @@ implements Listener {
         logged = logged.replaceAll("§.", "");
         kmlog("chat", logged);
         kmlog("whole", logged);
-	send2discord(logged);
+        send2discord(logged);
         return newroll;
     }
 
-    public  boolean findReroll(String[] dices, int beg, ReactionList list) {
+    public boolean findReroll(String[] dices, int beg, ReactionList list) {
         return findReroll(dices, beg, list, false);
     }
 
-    public  boolean findReroll(String[] dices, int beg, ReactionList list, boolean isItRerolled) {
+    public boolean findReroll(String[] dices, int beg, ReactionList list, boolean isItRerolled) {
         //if (isItRerolled) System.out.println("IT IS REROLLED!");
         //System.out.println("HERE IS WHAT WE GET:\nbeg = " + beg + ", dices:");
         if (beg == dices.length) return true;
@@ -882,28 +879,28 @@ implements Listener {
         //for (String str : dices) {
         //    System.out.println(irrelevantCounter++ + str);
         //}
-        List <String> repeats = new ArrayList<String>();
+        List<String> repeats = new ArrayList<String>();
         String first = "";
         int begin = beg; //this is used to ignore previously rerolled dice
         if (begin >= dices.length) return false;
-  //      System.out.println("started with: " + begin);
+        //      System.out.println("started with: " + begin);
 //        if (begin > 0) System.out.println("...which is " + dices[begin]);
         int end = -1;
         List<String> rerolled = new ArrayList<String>();
-        for (int i = begin+1; i < dices.length ; i++) {
-            if ( !first.equals("") && (getNumFromDice(dices[i]) == getNumFromDice(first))) {
+        for (int i = begin + 1; i < dices.length; i++) {
+            if (!first.equals("") && (getNumFromDice(dices[i]) == getNumFromDice(first))) {
                 repeats.add(dices[i]);
                 end = i;
-            } else if (( end < 0 &&
-                       (i < dices.length-1 &&
-                       (getNumFromDice(dices[i]) == getNumFromDice(dices[i+1]))))
-                       ) {
+            } else if ((end < 0 &&
+                    (i < dices.length - 1 &&
+                            (getNumFromDice(dices[i]) == getNumFromDice(dices[i + 1]))))
+                    ) {
                 //if (dices[i].contains("§") && dices[i+1].contains("§") || !dices[i].contains("§") && !dices[i+1].contains("§")) {
 //                if (!dices[i].contains("§") || !dices[i+1].contains("§")) {
-                    begin = i;
-                    first = dices[i];
-                    repeats.add(dices[i]);
-  //              }
+                begin = i;
+                first = dices[i];
+                repeats.add(dices[i]);
+                //              }
             }
         }
         if (begin < 0) return false;
@@ -924,8 +921,8 @@ implements Listener {
         //if (isItRerolled) return false;
         //System.out.println("CONTINUE FINDING REROLLS WITH END = " + end);
         if (end > 0)
-        findReroll(dices, end, list);
-    //    System.out.println();
+            findReroll(dices, end, list);
+        //    System.out.println();
         return false;
     }
 
@@ -943,7 +940,7 @@ implements Listener {
     }
 
 
- public  String simpledF(String level, String desc) {
+    public String simpledF(String level, String desc) {
         int n = 666; //skill level represented as number
         float mod = 0; //optinal modificator to skill level
 
@@ -951,21 +948,21 @@ implements Listener {
         String result = "";
         n = getSkillValue(level);
         if (level.equals("ПЛОХО"))
-                n = 2;
+            n = 2;
 
         if (n == 666) {
             return null;
         } else if (n < 1) {
-                n = 1;
+            n = 1;
         } else if (n > 8) {
-                n = 8;
+            n = 8;
         }
 
         int oldn = n;
         n = n + Math.round(mod);
 
         if (n < -2) {
-                n = -2;
+            n = -2;
         } else if (n > 11) {
             n = 11;
         }
@@ -978,56 +975,53 @@ implements Listener {
             if (dice < 0) {
                 n -= 1;
                 result += "-";
-            }
-            else if (dice > 0) {
+            } else if (dice > 0) {
                 n += 1;
                 result += "+";
-            }
-            else {
+            } else {
                 result += "=";
             }
         }
         if (n < -3) {
-                n = -3;
+            n = -3;
         } else if (n > 12) {
-                n = 12;
+            n = 12;
         }
 
         return "(" + result + ") от " + level + desc + ". Результат:§o " + nMap.get(n);
     }
 
 
-
     //---}}} Various helpers
-    
-    
+
+
     //{{{--- Commands 
-       public boolean onCommand(CommandSender commandSender, Command command, String string, String[] args) {
-	if (command.getName().equalsIgnoreCase("butcher")) {
+    public boolean onCommand(CommandSender commandSender, Command command, String string, String[] args) {
+        if (command.getName().equalsIgnoreCase("butcher")) {
             if (!(commandSender instanceof Player)) {
                 commandSender.sendMessage("§4you must be a player!§f");
                 return false;
             }
             commandSender.sendMessage("Ты охуел?");
-            Player pl = (Player)commandSender;
+            Player pl = (Player) commandSender;
             pl.kickPlayer("Ублюдок, мать твою, а ну иди сюда, говно собачье!");
             return true;
-        //me
+            //me
         } else if (command.getName().equalsIgnoreCase("me")) {
-                commandSender.sendMessage("§4/me отключено, используйте *§f");
-                return true;    
-        
-        //reactionLists
+            commandSender.sendMessage("§4/me отключено, используйте *§f");
+            return true;
+
+            //reactionLists
         } else if (command.getName().equalsIgnoreCase("react")) {
             if (!(commandSender instanceof Player)) {
                 commandSender.sendMessage("§4you must be a player!§f");
                 return false;
             }
-            Player sender = (Player)commandSender;
+            Player sender = (Player) commandSender;
             if (!sender.hasPermission("KMChat.gm")) {
                 sender.sendMessage("§4Недостаточно прав.§f");
                 return true;
-        }
+            }
             if (args.length == 0 || args[0].equals("help")) {
                 commandSender.sendMessage("§e----------- §fHelp: react §e--------------------§8\nReact usage:\nYou can specify the name of the list after «/react». You can also add/edit/remove multiple reactions per time. {arg} is for optional arguments\n§6/react add %nick% {level} {mod}:§f add reactions\n§6/react edit %nick% {level} {mod}:§f edit reactions\n§6/react remove %nick%:§f remove reactions\n§6/react end:§а delete the list\n§6/react go:§f launch reactions, !go and =go also possible\n§6/react turns: show current queue\n§6/react list:§f see all lists\n§6/react show:§f show the list§f");
                 return true;
@@ -1036,19 +1030,19 @@ implements Listener {
             String comm = null;
             String[] cutArgs = new String[args.length];
             if (args.length > 1 && (
-                args[1].equals("add") || //in case list name is not specified
-                args[1].equals("remove") ||
-                args[1].equals("edit") ||
-                args[1].equals("end") ||
-                args[1].equals("show") ||
-                args[1].endsWith("turns") ||
-                args[1].equals("list") ||
-                args[1].equals("check") ||
-                args[1].endsWith("go") )
-                ) {
+                    args[1].equals("add") || //in case list name is not specified
+                            args[1].equals("remove") ||
+                            args[1].equals("edit") ||
+                            args[1].equals("end") ||
+                            args[1].equals("show") ||
+                            args[1].endsWith("turns") ||
+                            args[1].equals("list") ||
+                            args[1].equals("check") ||
+                            args[1].endsWith("go"))
+                    ) {
 
                 name = args[0];
-                if (name.equals("add") || name.equals("remove") || name.equals("edit") || name.equals("end") || name.equals("show") || name.equals("list") || name.equals("check") || name.equals("go") ){
+                if (name.equals("add") || name.equals("remove") || name.equals("edit") || name.equals("end") || name.equals("show") || name.equals("list") || name.equals("check") || name.equals("go")) {
                     commandSender.sendMessage("§4Некорректное название списка!§f");
                     return true;
                 }
@@ -1056,23 +1050,22 @@ implements Listener {
                 if (args.length > 2) {
                     cutArgs = Arrays.copyOfRange(args, 2, args.length);
                 }
-            }
-            else if (args.length > 0 && (
-                args[0].equals("add") || //in case list name is specified
-                args[0].equals("remove") ||
-                args[0].equals("edit") ||
-                args[0].equals("end") ||
-                args[0].equals("check") ||
-                args[0].endsWith("turns") ||
-                args[0].equals("show") ||
-                args[0].equals("list") ||
-                args[0].endsWith("go") )
-                ) {
+            } else if (args.length > 0 && (
+                    args[0].equals("add") || //in case list name is specified
+                            args[0].equals("remove") ||
+                            args[0].equals("edit") ||
+                            args[0].equals("end") ||
+                            args[0].equals("check") ||
+                            args[0].endsWith("turns") ||
+                            args[0].equals("show") ||
+                            args[0].equals("list") ||
+                            args[0].endsWith("go"))
+                    ) {
 
                 name = commandSender.getName();
                 comm = args[0];
                 if (args.length > 1)
-                cutArgs = Arrays.copyOfRange(args, 1, args.length);
+                    cutArgs = Arrays.copyOfRange(args, 1, args.length);
             }
             if (name == null || comm == null) {
                 commandSender.sendMessage("§4Неправильный ввод!§f");
@@ -1091,37 +1084,37 @@ implements Listener {
             }
 
 
-                if (comm.equals("add") && list == null) {
-                    try {
+            if (comm.equals("add") && list == null) {
+                try {
                     if (cutArgs[0] == null) {
                         commandSender.sendMessage("§4Нельзя добавить пустую реакцию!§f");
                         return true;
                     }
-                        ReactionList newList = new ReactionList(name, cutArgs);
-                        sprReactionList.add(newList);
-                        list = newList;
+                    ReactionList newList = new ReactionList(name, cutArgs);
+                    sprReactionList.add(newList);
+                    list = newList;
                     commandSender.sendMessage("§7Имена добавлены в новосозданный список!§f\n" + list.show());
                     return true;
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        commandSender.sendMessage("§4" + e.getMessage() + "§f");
-                        return false;
-                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    commandSender.sendMessage("§4" + e.getMessage() + "§f");
+                    return false;
                 }
-                if (comm.equals("list")) {
-                    String out = "";
-                    for (ReactionList rlist : sprReactionList){
-                        out += rlist.getListName() + " ";
-                    }
-                    commandSender.sendMessage("§7Списки: §6" + out + "§f");
-                    return true;
+            }
+            if (comm.equals("list")) {
+                String out = "";
+                for (ReactionList rlist : sprReactionList) {
+                    out += rlist.getListName() + " ";
                 }
-                if (list == null) {
-                    commandSender.sendMessage("§7Не найдено ни одного списка с таким именем!§f");
-                    return true;
-                }
-                if (comm.equals("add")) {
-                    try {
+                commandSender.sendMessage("§7Списки: §6" + out + "§f");
+                return true;
+            }
+            if (list == null) {
+                commandSender.sendMessage("§7Не найдено ни одного списка с таким именем!§f");
+                return true;
+            }
+            if (comm.equals("add")) {
+                try {
                     if (cutArgs[0] == null) {
                         commandSender.sendMessage("§4Нельзя добавить пустую реакцию!§f");
                         return true;
@@ -1129,146 +1122,145 @@ implements Listener {
                     list.add(cutArgs);
                     commandSender.sendMessage("§7Имена добавлены в список " + name + "!§f\n" + list.show());
                     return true;
-                    } catch (Exception e){
-                        commandSender.sendMessage("§4" + e.getMessage() + "§f");
-                        return false;
-                    }
+                } catch (Exception e) {
+                    commandSender.sendMessage("§4" + e.getMessage() + "§f");
+                    return false;
                 }
-                if (comm.equals("remove")) {
-                    list.remove(cutArgs);
-                    commandSender.sendMessage("§7Имена удалены из списка " + name + "!§f");
-                    return true;
-                }
-                if (comm.equals("edit")) {
-                        list.edit(cutArgs);
-                    commandSender.sendMessage("§7Имена изменены в списке " + name + "!§f");
-                    return true;
-                }
-                if (comm.equals("end")) {
-                    sprReactionList.remove(list);
-                    commandSender.sendMessage("§7Удалён список " + name + "!§f");
-                    return true;
-                }
-                if (comm.equals("show")) {
-                    String out = "";
-                            out = list.show();
-                            commandSender.sendMessage(out);
-                            return true;
-                }
-                if (comm.endsWith("go")) {
-                    try {
-                list.clearInfo();
-                Pattern pat = Pattern.compile("(.*)go");
-                Matcher mat = pat.matcher(comm);
-                if (mat.matches()) {
-                    String describeRange = "";
-                    int i = -1;
-                    double range = this.getConfig().getInt("range.default");
-                    int rangePosition = 6;
-    	            for (Range ran : allRanges) {
-	                ++i;
-	                if (ran.matches(mat.group(1)) && commandSender.hasPermission(ran.getPermission())) {
-		            rangePosition = i;
-		            range = this.getConfig().getInt(ran.getRange());
-		            break;
-	                }
-        	    }
-
-                String[] rawdices = list.getDices();
-                String[] dices = new String[rawdices.length];
-                String[] players = list.getPlayers();
-                String[] levels = list.getLevels();
-                Pattern resPat = Pattern.compile("Результат:\\s(.*)");
-                Pattern nickPat = Pattern.compile("(ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно)\\+{0,4}\\-{0,4}\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+");
-                for (int j = 0; j < rawdices.length; j++) {
-                    dices[j] = dF(rawdices[j], players[j]);
-                }
-                
-                bubbleSort(dices);
-                findReroll(dices, -1, list);
-
-                Pattern oldPat = Pattern.compile("\\$(.*?)(\\s|\\))");
-                String[] modNicks = new String[dices.length];
-                for (int j = 0; j < dices.length; j++) {
-                    Matcher oldMat = oldPat.matcher(dices[j]);
-                    if (oldMat.find()) {
-                        modNicks[j] = oldMat.group(1);
-                        dices[j] = dices[j].replaceFirst("\\$.*?\\s", " ");
-                        dices[j] = dices[j].replaceFirst("Результат:§o\\s(.*)", ("Результат: "+modNicks[j]));
-                    } else {
-                    Matcher resMat = resPat.matcher(dices[j]);
-                    resMat.find();
-                    String res = resMat.group(1);
-                    modNicks[j] = res;
-                }
-                }   
-                String[] reactName = new String[dices.length];
-                int h = 0;
-                for (int j = dices.length-1; j >= 0; j--) {
-                    Matcher matName = nickPat.matcher(dices[j]);
-                    matName.find();
-                    reactName[h++] = matName.group(3);
-                }
-
-                String reactNameOut = "§6Очередь: §a";
-                Pattern ininPat = Pattern.compile("Результат:§?.?\\s(.*)");
-                int whatever = modNicks.length-1;
-                for (String str : reactName) {
-                    String space = "-";
-                    reactNameOut += str + space + modNicks[whatever--] + " " + "|" + " " ;
-                }
-                
-               // for (int j = 0; j < players.length; j++) {
-               //     reactNameOut = reactNameOut.replace(players[j], players[j] + levels[j]);
-               // }
-                list.setTurns(reactNameOut);
-                reactNameOut = list.getTurns();
-
-                 String[] vars = { "едва слышно бросает",
-                    "очень тихо бросает",
-                    "тихо бросает",
-                    "СВЕРХГРОМКО ОБРУШИВАЕТ",
-                    "очень громко бросает",
-                    "громко бросает",
-                    "бросает" };
-
-
-                String noDelayMsg = "";
-                for (int j = dices.length-1; j >= 0; j--) {
-                        String out = String.format("§e(( §a%s §e%s %s ))§f", commandSender.getName(), vars[rangePosition], dices[j]);
-                        List<Player> recips = getLocalRecipients(sender, out, range);
-                        for (Player pl : recips) {
-                            pl.sendMessage(out);
+            }
+            if (comm.equals("remove")) {
+                list.remove(cutArgs);
+                commandSender.sendMessage("§7Имена удалены из списка " + name + "!§f");
+                return true;
+            }
+            if (comm.equals("edit")) {
+                list.edit(cutArgs);
+                commandSender.sendMessage("§7Имена изменены в списке " + name + "!§f");
+                return true;
+            }
+            if (comm.equals("end")) {
+                sprReactionList.remove(list);
+                commandSender.sendMessage("§7Удалён список " + name + "!§f");
+                return true;
+            }
+            if (comm.equals("show")) {
+                String out = "";
+                out = list.show();
+                commandSender.sendMessage(out);
+                return true;
+            }
+            if (comm.endsWith("go")) {
+                try {
+                    list.clearInfo();
+                    Pattern pat = Pattern.compile("(.*)go");
+                    Matcher mat = pat.matcher(comm);
+                    if (mat.matches()) {
+                        String describeRange = "";
+                        int i = -1;
+                        double range = this.getConfig().getInt("range.default");
+                        int rangePosition = 6;
+                        for (Range ran : allRanges) {
+                            ++i;
+                            if (ran.matches(mat.group(1)) && commandSender.hasPermission(ran.getPermission())) {
+                                rangePosition = i;
+                                range = this.getConfig().getInt(ran.getRange());
+                                break;
+                            }
                         }
+
+                        String[] rawdices = list.getDices();
+                        String[] dices = new String[rawdices.length];
+                        String[] players = list.getPlayers();
+                        String[] levels = list.getLevels();
+                        Pattern resPat = Pattern.compile("Результат:\\s(.*)");
+                        Pattern nickPat = Pattern.compile("(ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно)\\+{0,4}\\-{0,4}\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+");
+                        for (int j = 0; j < rawdices.length; j++) {
+                            dices[j] = dF(rawdices[j], players[j]);
+                        }
+
+                        bubbleSort(dices);
+                        findReroll(dices, -1, list);
+
+                        Pattern oldPat = Pattern.compile("\\$(.*?)(\\s|\\))");
+                        String[] modNicks = new String[dices.length];
+                        for (int j = 0; j < dices.length; j++) {
+                            Matcher oldMat = oldPat.matcher(dices[j]);
+                            if (oldMat.find()) {
+                                modNicks[j] = oldMat.group(1);
+                                dices[j] = dices[j].replaceFirst("\\$.*?\\s", " ");
+                                dices[j] = dices[j].replaceFirst("Результат:§o\\s(.*)", ("Результат: " + modNicks[j]));
+                            } else {
+                                Matcher resMat = resPat.matcher(dices[j]);
+                                resMat.find();
+                                String res = resMat.group(1);
+                                modNicks[j] = res;
+                            }
+                        }
+                        String[] reactName = new String[dices.length];
+                        int h = 0;
+                        for (int j = dices.length - 1; j >= 0; j--) {
+                            Matcher matName = nickPat.matcher(dices[j]);
+                            matName.find();
+                            reactName[h++] = matName.group(3);
+                        }
+
+                        String reactNameOut = "§6Очередь: §a";
+                        Pattern ininPat = Pattern.compile("Результат:§?.?\\s(.*)");
+                        int whatever = modNicks.length - 1;
+                        for (String str : reactName) {
+                            String space = "-";
+                            reactNameOut += str + space + modNicks[whatever--] + " " + "|" + " ";
+                        }
+
+                        // for (int j = 0; j < players.length; j++) {
+                        //     reactNameOut = reactNameOut.replace(players[j], players[j] + levels[j]);
+                        // }
+                        list.setTurns(reactNameOut);
+                        reactNameOut = list.getTurns();
+
+                        String[] vars = {"едва слышно бросает",
+                                "очень тихо бросает",
+                                "тихо бросает",
+                                "СВЕРХГРОМКО ОБРУШИВАЕТ",
+                                "очень громко бросает",
+                                "громко бросает",
+                                "бросает"};
+
+
+                        String noDelayMsg = "";
+                        for (int j = dices.length - 1; j >= 0; j--) {
+                            String out = String.format("§e(( §a%s §e%s %s ))§f", commandSender.getName(), vars[rangePosition], dices[j]);
+                            List<Player> recips = getLocalRecipients(sender, out, range);
+                            for (Player pl : recips) {
+                                pl.sendMessage(out);
+                            }
                             out.replaceAll("§.", "");
                             kmlog("chat", out);
                             kmlog("whole", out);
                             noDelayMsg += out + '\n';
-                    }
+                        }
 
-                send2discord(noDelayMsg); 
-                List<Player> recips = getLocalRecipients(sender, reactNameOut, range);
-                for (Player pl : recips) {
-                    pl.sendMessage(reactNameOut);
-                    list.setTurns(reactNameOut);
-                    reactNameOut = reactNameOut.replace("§.", "");
-                    kmlog("chat", reactNameOut);
-                    kmlog("whole", reactNameOut);
-                    final String snd2 = list.getTurns();
-                    RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
-                    
-            }  
-            return true;
-                } 
-        }   
-             catch (Exception e){
-                commandSender.sendMessage("§4" + e.getMessage() + "§f");
-            }
+                        send2discord(noDelayMsg);
+                        List<Player> recips = getLocalRecipients(sender, reactNameOut, range);
+                        for (Player pl : recips) {
+                            pl.sendMessage(reactNameOut);
+                            list.setTurns(reactNameOut);
+                            reactNameOut = reactNameOut.replace("§.", "");
+                            kmlog("chat", reactNameOut);
+                            kmlog("whole", reactNameOut);
+                            final String snd2 = list.getTurns();
+                            RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
+
+                        }
+                        return true;
+                    }
+                } catch (Exception e) {
+                    commandSender.sendMessage("§4" + e.getMessage() + "§f");
+                }
             }
             if (comm.endsWith("turns")) {
-                    String out = list.getTurns();
-                    //String out = "§8" + list.getInfo() + list.getTurns();
-                    int range = this.getConfig().getInt("range.default");
+                String out = list.getTurns();
+                //String out = "§8" + list.getInfo() + list.getTurns();
+                int range = this.getConfig().getInt("range.default");
 
                 Pattern pat2 = Pattern.compile("(.*)turns");
                 Matcher mat2 = pat2.matcher(comm);
@@ -1281,100 +1273,100 @@ implements Listener {
                     }
                 }
 
-                    List<Player> recips = getLocalRecipients(sender, out, range);
-                        for (Player pl : recips) {
-                            pl.sendMessage(out);
-           //                 out.replaceAll("§.", "");
-                            kmlog("chat", out);
-                            kmlog("whole", out);
-        //                    final String snd = out.replaceAll("§.", "");
-         //                   RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
-                        }
-                        
-                    return true;
+                List<Player> recips = getLocalRecipients(sender, out, range);
+                for (Player pl : recips) {
+                    pl.sendMessage(out);
+                    //                 out.replaceAll("§.", "");
+                    kmlog("chat", out);
+                    kmlog("whole", out);
+                    //                    final String snd = out.replaceAll("§.", "");
+                    //                   RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
                 }
-                
-                
-        //AutoGM-chat
-            
-            } else if (command.getName().equalsIgnoreCase("alwaysgm")) {
+
+                return true;
+            }
+
+
+            //AutoGM-chat
+
+        } else if (command.getName().equalsIgnoreCase("alwaysgm")) {
             if (!(commandSender instanceof Player)) {
                 commandSender.sendMessage("§4you must be a player!§f");
                 return false;
             }
-            Player sender = (Player)commandSender;
+            Player sender = (Player) commandSender;
             if (!sender.hasPermission("KMChat.gm")) {
                 sender.sendMessage("§4Недостаточно прав.§f");
                 return true;
-        }
-        if (args.length == 0) {
+            }
+            if (args.length == 0) {
                 if (whoUseAutoGM.contains(sender.getName())) {
                     sender.sendMessage("§7Автоматический ГМ-чат §aвключён!§f");
                 } else {
                     sender.sendMessage("§7Автоматический ГМ-чат §4выключен!§f");
                 }
-            return true;
-        }
-        if (args[0].equals("help")) {
+                return true;
+            }
+            if (args[0].equals("help")) {
                 sender.sendMessage("§6Usage:\n§f/alwaysgm - check condition\n/alwaysgm on - turn on\n/alwaysgm off - turn off\n:message - regular chat (if alwaysgm is on)");
-        } else if (args[0].equals("on")) {
-                    if (!whoUseAutoGM.contains(sender.getName())) {
-                        whoUseAutoGM.add(sender.getName());
-                        this.getConfig().set("whoUseAutoGM", whoUseAutoGM);
-                        this.saveConfig();
-                    }
-                    sender.sendMessage("§7Автоматический ГМ-чат теперь §aвключён!§f"); 
-        } else if (args[0].equals("off")) {
-                    if (whoUseAutoGM.contains(sender.getName())) {
-                        whoUseAutoGM.remove(sender.getName());
-                        this.getConfig().set("whoUseAutoGM", whoUseAutoGM);
-                        this.saveConfig();
-                    }   
-                    sender.sendMessage("§7Автоматический ГМ-чат теперь §4выключен!§f");
-        }
-	//AutoBD-chat
-            
-            } else if (command.getName().equalsIgnoreCase("alwaysbuild") || command.getName().equalsIgnoreCase("alwaysbuilder")) {
+            } else if (args[0].equals("on")) {
+                if (!whoUseAutoGM.contains(sender.getName())) {
+                    whoUseAutoGM.add(sender.getName());
+                    this.getConfig().set("whoUseAutoGM", whoUseAutoGM);
+                    this.saveConfig();
+                }
+                sender.sendMessage("§7Автоматический ГМ-чат теперь §aвключён!§f");
+            } else if (args[0].equals("off")) {
+                if (whoUseAutoGM.contains(sender.getName())) {
+                    whoUseAutoGM.remove(sender.getName());
+                    this.getConfig().set("whoUseAutoGM", whoUseAutoGM);
+                    this.saveConfig();
+                }
+                sender.sendMessage("§7Автоматический ГМ-чат теперь §4выключен!§f");
+            }
+            //AutoBD-chat
+
+        } else if (command.getName().equalsIgnoreCase("alwaysbuild") || command.getName().equalsIgnoreCase("alwaysbuilder")) {
             if (!(commandSender instanceof Player)) {
                 commandSender.sendMessage("§4you must be a player!§f");
                 return false;
             }
-            Player sender = (Player)commandSender;
+            Player sender = (Player) commandSender;
             if (!sender.hasPermission("KMChat.builder")) {
                 sender.sendMessage("§4Недостаточно прав.§f");
                 return true;
-        }
-        if (args.length == 0) {
+            }
+            if (args.length == 0) {
                 if (whoUseAutoBD.contains(sender.getName())) {
                     sender.sendMessage("§7Автоматический билдер-чат §aвключён!§f");
                 } else {
                     sender.sendMessage("§7Автоматический билдер-чат §4выключен!§f");
                 }
-            return true;
-        }
-        if (args[0].equals("help")) {
+                return true;
+            }
+            if (args[0].equals("help")) {
                 sender.sendMessage("§6Usage:\n§fNote that /alwaysbuild is equal to /alwaysbuilder\n/alwaysbuild - check condition\n/alwaysbuild on - turn on\n/alwaysbuild off - turn off\n:message - regular chat (if alwaysbuild is on)");
-        } else if (args[0].equals("on")) {
-                    if (!whoUseAutoBD.contains(sender.getName())) {
-                        whoUseAutoBD.add(sender.getName());
-                        this.getConfig().set("whoUseAutoBD", whoUseAutoBD);
-                        this.saveConfig();
-                    }
-                    sender.sendMessage("§7Автоматический билдер-чат теперь §aвключён!§f"); 
-        } else if (args[0].equals("off")) {
-                    if (whoUseAutoBD.contains(sender.getName())) {
-                        whoUseAutoBD.remove(sender.getName());
-                        this.getConfig().set("whoUseAutoBD", whoUseAutoBD);
-                        this.saveConfig();
-                    }   
-                    sender.sendMessage("§7Автоматический билдер-чат теперь §4выключен!§f");
-        }
+            } else if (args[0].equals("on")) {
+                if (!whoUseAutoBD.contains(sender.getName())) {
+                    whoUseAutoBD.add(sender.getName());
+                    this.getConfig().set("whoUseAutoBD", whoUseAutoBD);
+                    this.saveConfig();
+                }
+                sender.sendMessage("§7Автоматический билдер-чат теперь §aвключён!§f");
+            } else if (args[0].equals("off")) {
+                if (whoUseAutoBD.contains(sender.getName())) {
+                    whoUseAutoBD.remove(sender.getName());
+                    this.getConfig().set("whoUseAutoBD", whoUseAutoBD);
+                    this.saveConfig();
+                }
+                sender.sendMessage("§7Автоматический билдер-чат теперь §4выключен!§f");
+            }
 
 
         } else if (command.getName().equalsIgnoreCase("ingamerestart")) {
-                if (!commandSender.hasPermission("KMCore.gm")) {
-                    commandSender.sendMessage("§4Недостаточно прав.§f");
-                    return false;
+            if (!commandSender.hasPermission("KMCore.gm")) {
+                commandSender.sendMessage("§4Недостаточно прав.§f");
+                return false;
             }
             
 	    //Player sender = (Player)commandSender;
@@ -1383,64 +1375,66 @@ implements Listener {
             } catch (Exception e) {
                 System.out.println(e);
             }
-                wasrestarted = true;
+            wasrestarted = true;
             try {
-              client.login();
+                client.login();
             } catch (Exception e) {
                 System.out.println(e);
             }
             commandSender.sendMessage("§8Ingame bot was reloaded!§f");
             return true;
-	} else if (command.getName().equalsIgnoreCase("msg")) {
-	    if (!(commandSender instanceof Player)) {
-	        commandSender.sendMessage("§4You must be a player!§f");
+        } else if (command.getName().equalsIgnoreCase("msg")) {
+            if (!(commandSender instanceof Player)) {
+                commandSender.sendMessage("§4You must be a player!§f");
                 return false;
             }
-	    
-            Player sender = (Player)commandSender;
+
+            Player sender = (Player) commandSender;
             if (args.length == 0) {
-		sender.sendMessage("§8...и чего сказать хотел?§f");
+                sender.sendMessage("§8...и чего сказать хотел?§f");
                 return true;
             }
 
-	    Player recip = sender.getServer().getPlayer(args[0]);
-	    if (recip == null) {
-		sender.sendMessage("§4Нет такого игрока!§f");
-		return true;
-	    }
-	    
+            Player recip = sender.getServer().getPlayer(args[0]);
+            if (recip == null) {
+                sender.sendMessage("§4Нет такого игрока!§f");
+                return true;
+            }
+
             if (!sender.hasPermission("KMCore.tell")) {
-		sender.sendMessage("§4Недостаточно прав.§f");
-		return true;
+                sender.sendMessage("§4Недостаточно прав.§f");
+                return true;
             }
 
 
             String senderName = sender.getName();
-	    String recipName = recip.getName();
-            args[0] = "&8[&a"+ senderName + "&8->&a" + recipName + "&8]:&f";
-	    String message = "";
+            String recipName = recip.getName();
+            args[0] = "&8[&a" + senderName + "&8->&a" + recipName + "&8]:&f";
+            String message = "";
             for (String arg : args) {
-		message = message + " " + arg;
+                message = message + " " + arg;
             }
-	    
-	    message = message.replaceAll("&([a-z0-9])", "§$1");
+
+            message = message.replaceAll("&([a-z0-9])", "§$1");
 
             sender.sendMessage(message);
             recip.sendMessage(message);
-	    kmlog("whole", message);
-	    kmlog("chat", message);
+            kmlog("whole", message);
+            kmlog("chat", message);
 
-	    final String snd = message.replaceAll("§([a-z0-9])","");
-	    RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+            final String snd = message.replaceAll("§([a-z0-9])", "");
+            RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
 
-            for (Player player: Bukkit.getServer().getOnlinePlayers()) {
-	        if (player.hasPermission("KMChat.admin")) {
-		    if (player != sender && player != recip) {
-			player.sendMessage(message);
-		    }
-		}
-	    }
-	    return true;
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                if (player.hasPermission("KMChat.admin")) {
+                    if (player != sender && player != recip) {
+                        player.sendMessage(message);
+                    }
+                }
+            }
+            return true;
+
+
 
 	//Reminders
 	} else if (command.getName().equalsIgnoreCase("remind")) {
@@ -1515,251 +1509,252 @@ implements Listener {
 
 	}
 
-    return true;
-	
     }
     //---}}} Commands
-    
+
     //{{{--- IngameBot
     @EventSubscriber
     public void onReady(ReadyEvent event) {
         System.out.println("Bot is now ready!");
-	ingameChannel = client.getChannelByID(CHID);
+        ingameChannel = client.getChannelByID(CHID);
         String mes = "**Server is going online!**";
         if (wasrestarted) {
             mes = "**I was reloaded!**";
         }
         final String snd = mes;
-	RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+        RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
     }
-    
-    
+
+
     @EventSubscriber
     public void onMessage(MessageReceivedEvent event) throws RateLimitException, DiscordException, MissingPermissionsException {
-	IMessage message = event.getMessage();
-	String content = message.getContent();
-	IUser user = message.getAuthor();
-	if (user.isBot()) return;
-	
-	IChannel channel = message.getChannel();
-	if (channel != ingameChannel) return;
+        IMessage message = event.getMessage();
+        String content = message.getContent();
+        IUser user = message.getAuthor();
+        if (user.isBot()) return;
 
-	IGuild guild = message.getGuild();
-	String[] split = message.getContent().split(" ");
+        IChannel channel = message.getChannel();
+        if (channel != ingameChannel) return;
 
-    String res = null;
-	if ( content.startsWith(":msg") || content.startsWith("/msg") ) {
-	    res = "Пользуйтесь !msg {player} {message}";
-	
-	} else if (content.startsWith("!")) {
-	    if (content.startsWith("!help")) {
-		res = "Все команды начинаются с символа !\n!exec {command} — выполнить команду в игре;\n!online либо !онлайн — показать текущий онлайн;\n!msg {ник} {сообщение} — написать игроку в лс\n!d{число} — дайс (виден только в дискорде);\n!% значение — фуджедайс (виден только в дискорде);\n!help — вывести эту справку.";
-		
-	    } else if (content.startsWith("!d")) {
-		String dice = dnum(message.getContent().substring(2));
-		res = user.mention() + " бросает " + dice;
+        IGuild guild = message.getGuild();
+        String[] split = message.getContent().split(" ");
 
-	    } else if (content.startsWith("!% ")) {
-		String dice = dF(message.getContent().substring(3));
-		if (dice == null)
-		    res = "Для броска дайса пропишите: \"% значение\".";	
-		else
-		    res = user.mention() + " бросает " + dice;
-	    
-	    } else if (message.getContent().startsWith("!msg ")) {
-		String mes = content.substring(5);
-		Player[] players = Bukkit.getServer().getOnlinePlayers();
-		boolean found = false;
-		Player recip = null;
-		for (Player player : players) {
-		    if (mes.startsWith(player.getName())) {
-			player.sendMessage("<§2"+user.getName()+"§f->§a"+player.getName()+"§f>"+mes.replaceFirst(player.getName(), ""));
-			res = "<"+user.getName()+"->"+mes.replaceFirst(player.getName(), player.getName()+">");
-			recip = player;
-			found = true;
-		    }
-		}
-		if (!found) {
-		    res = "Нет такого игрока!";
-		} else {
-		    for (Player admin: Bukkit.getServer().getOnlinePlayers()) {
-		       if (admin.hasPermission("KMChat.admin")) {
-			    if (admin != recip) {
-			        admin.sendMessage("<§2"+user.getName()+"§f->§a"+recip.getName()+"§f>"+mes.replace(recip.getName(), ""));
-			    }
-			}
-		    }
-		}
+        String res = null;
+        if (content.startsWith(":msg") || content.startsWith("/msg")) {
+            res = "Пользуйтесь !msg {player} {message}";
 
-	    } else if (content.startsWith("!online") || content.startsWith("!онлайн")) {
-		String online = "Текущий онлайн (%s): ";
-		int i = 0;
-		Player[] players = Bukkit.getServer().getOnlinePlayers();
-		for (Player player: players) {
-		    i++;
-		    if (player.hasPermission("KMChat.admin"))
-			online += "**" + player.getName() + "**";
-		    else
-			online += player.getName();
-		    if (i == players.length)
-			online += ".";
-		    else 
-			online += ", ";
-		}
-		if (i == 0)
-		    res = "Никого онлайн!";
-		else
-		    res = String.format(online, i);
-	    
-	    } else if (content.startsWith("!exec ")) {
-		if (content.startsWith("!exec msg")) {
-		    res = "Так не получится. Пользуйтесь !msg {player} {message}";
-		} else {
-		String mes = "";
-		try { content.substring(6); }
-		catch (Exception e) { return; }
-		BukkitScheduler scheduler = getServer().getScheduler();
-		if (
-		scheduler.scheduleSyncDelayedTask(this, new Runnable() {    
-		    @Override
-		    public void run() {
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), message.getContent().substring(6));    
-		    }
-		}, 1L) == -1)
-		    res = "_Что-то пошло не так, команда не была выполнена!_";
-		}
-	    }
-	} else {
-	    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-		player.sendMessage("<§2"+user.getName()+"§f> "+message);
-	    }
-	}
-	final String snd = res;
-	if (snd != null) {
-	    RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
-	}
+        } else if (content.startsWith("!")) {
+            if (content.startsWith("!help")) {
+                res = "Все команды начинаются с символа !\n!exec {command} — выполнить команду в игре;\n!online либо !онлайн — показать текущий онлайн;\n!msg {ник} {сообщение} — написать игроку в лс\n!d{число} — дайс (виден только в дискорде);\n!% значение — фуджедайс (виден только в дискорде);\n!help — вывести эту справку.";
+
+            } else if (content.startsWith("!d")) {
+                String dice = dnum(message.getContent().substring(2));
+                res = user.mention() + " бросает " + dice;
+
+            } else if (content.startsWith("!% ")) {
+                String dice = dF(message.getContent().substring(3));
+                if (dice == null)
+                    res = "Для броска дайса пропишите: \"% значение\".";
+                else
+                    res = user.mention() + " бросает " + dice;
+
+            } else if (message.getContent().startsWith("!msg ")) {
+                String mes = content.substring(5);
+                Player[] players = Bukkit.getServer().getOnlinePlayers();
+                boolean found = false;
+                Player recip = null;
+                for (Player player : players) {
+                    if (mes.startsWith(player.getName())) {
+                        player.sendMessage("<§2" + user.getName() + "§f->§a" + player.getName() + "§f>" + mes.replaceFirst(player.getName(), ""));
+                        res = "<" + user.getName() + "->" + mes.replaceFirst(player.getName(), player.getName() + ">");
+                        recip = player;
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    res = "Нет такого игрока!";
+                } else {
+                    for (Player admin : Bukkit.getServer().getOnlinePlayers()) {
+                        if (admin.hasPermission("KMChat.admin")) {
+                            if (admin != recip) {
+                                admin.sendMessage("<§2" + user.getName() + "§f->§a" + recip.getName() + "§f>" + mes.replace(recip.getName(), ""));
+                            }
+                        }
+                    }
+                }
+
+            } else if (content.startsWith("!online") || content.startsWith("!онлайн")) {
+                String online = "Текущий онлайн (%s): ";
+                int i = 0;
+                Player[] players = Bukkit.getServer().getOnlinePlayers();
+                for (Player player : players) {
+                    i++;
+                    if (player.hasPermission("KMChat.admin"))
+                        online += "**" + player.getName() + "**";
+                    else
+                        online += player.getName();
+                    if (i == players.length)
+                        online += ".";
+                    else
+                        online += ", ";
+                }
+                if (i == 0)
+                    res = "Никого онлайн!";
+                else
+                    res = String.format(online, i);
+
+            } else if (content.startsWith("!exec ")) {
+                if (content.startsWith("!exec msg")) {
+                    res = "Так не получится. Пользуйтесь !msg {player} {message}";
+                } else {
+                    String mes = "";
+                    try {
+                        content.substring(6);
+                    } catch (Exception e) {
+                        return;
+                    }
+                    BukkitScheduler scheduler = getServer().getScheduler();
+                    if (
+                            scheduler.scheduleSyncDelayedTask(this, new Runnable() {
+                                @Override
+                                public void run() {
+                                    Bukkit.getServer().dispatchCommand(new DiscordCommandSender(ingameChannel), message.getContent().substring(6));
+                                }
+                            }, 1L) == -1)
+                        res = "_Что-то пошло не так, команда не была выполнена!_";
+                }
+            }
+        } else {
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                player.sendMessage("<§2" + user.getName() + "§f> " + message);
+            }
+        }
+        final String snd = res;
+        if (snd != null) {
+            RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+        }
     }
     //---}}} IngameBot
-    
-    //---{{{ Tabs
-        @EventHandler
-    public void onChatTab(PlayerChatTabCompleteEvent playerChatTabCompleteEvent) {
-    	String mes = playerChatTabCompleteEvent.getChatMessage();
-    	if (mes.startsWith("% ") ||
-	    mes.startsWith("-% ") ||
-            mes.startsWith("=% ") ||
-	    mes.startsWith("!% ") ||
-	    mes.startsWith("==% ") ||
-	    mes.startsWith("!!% ") ||
-	    mes.startsWith("===% ") ||
-	    mes.startsWith("!!!% ") ||
-	    mes.startsWith(":% ") ) {
 
-	    Collection<String> collection = playerChatTabCompleteEvent.getTabCompletions();
-	    if (!playerChatTabCompleteEvent.getPlayer().hasPermission("KMChat.gm")) {
+    //---{{{ Tabs
+    @EventHandler
+    public void onChatTab(PlayerChatTabCompleteEvent playerChatTabCompleteEvent) {
+        String mes = playerChatTabCompleteEvent.getChatMessage();
+        if (mes.startsWith("% ") ||
+                mes.startsWith("-% ") ||
+                mes.startsWith("=% ") ||
+                mes.startsWith("!% ") ||
+                mes.startsWith("==% ") ||
+                mes.startsWith("!!% ") ||
+                mes.startsWith("===% ") ||
+                mes.startsWith("!!!% ") ||
+                mes.startsWith(":% ")) {
+
+            Collection<String> collection = playerChatTabCompleteEvent.getTabCompletions();
+            if (!playerChatTabCompleteEvent.getPlayer().hasPermission("KMChat.gm")) {
                 collection.clear();
             }
 
-	    if (playerChatTabCompleteEvent.getLastToken().startsWith("уж")) {
-		collection.add("ужасно");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ук")) {
+            if (playerChatTabCompleteEvent.getLastToken().startsWith("уж")) {
+                collection.add("ужасно");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ук")) {
                 collection.add("уклонение");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ус")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ус")) {
                 collection.add("устойчивость к болезням");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("у")) {
-		collection.add("ужасно");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("у")) {
+                collection.add("ужасно");
                 collection.add("уклонение");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("а")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("а")) {
                 collection.add("акробатика");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("бe")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("бe")) {
                 collection.add("бег");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("бл")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("бл")) {
                 collection.add("блокирование");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("бо")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("бо")) {
                 collection.add("борьба");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("б")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("б")) {
                 collection.add("борьба");
                 collection.add("блокирование");
                 collection.add("бег");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вын")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вын")) {
                 collection.add("выносливость");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("выж")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("выж")) {
                 collection.add("выживание");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вы")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вы")) {
                 collection.add("врачевание");
                 collection.add("выносливость");
                 collection.add("выживание");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вл")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вл")) {
                 collection.add("владение оружием");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вн")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вн")) {
                 collection.add("внимательность");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вр")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("вр")) {
                 collection.add("врачевание");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("в")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("в")) {
                 collection.add("выносливость");
                 collection.add("внимательность");
                 collection.add("выживание");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("д")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("д")) {
                 collection.add("диагностика");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("з")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("з")) {
                 collection.add("зашивание ран");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ре")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ре")) {
                 collection.add("реакция");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ру")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ру")) {
                 collection.add("рукопашный бой");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("р")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("р")) {
                 collection.add("реакция");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("к")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("к")) {
                 collection.add("кулачный бой");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ф")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("ф")) {
                 collection.add("физическая сила");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("с")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("с")) {
                 collection.add("скрытность");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("хи")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("хи")) {
                 collection.add("хирургия");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("хо")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("хо")) {
                 collection.add("хорошо");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("х")) {
                 collection.add("хирургия");
                 collection.add("хорошо");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("перв")) {
-		collection.add("первая помощь");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пере")) {
-		collection.add("передвижение");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пер")) {
-		collection.add("передвижение");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пе")) {
-		collection.add("передвижение");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
-		collection.add("превосходно");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пла")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("перв")) {
+                collection.add("первая помощь");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пере")) {
+                collection.add("передвижение");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пер")) {
+                collection.add("передвижение");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пе")) {
+                collection.add("передвижение");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пр")) {
+                collection.add("превосходно");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пла")) {
                 collection.add("плавание");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пло")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пло")) {
                 collection.add("плохо");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пл")) {
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("пл")) {
                 collection.add("плохо");
                 collection.add("плавание");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("по")) {
-		collection.add("посредственно");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("п")) {
-		collection.add("плохо");
-		collection.add("посредственно");
-		collection.add("превосходно");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("по")) {
+                collection.add("посредственно");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("п")) {
+                collection.add("плохо");
+                collection.add("посредственно");
+                collection.add("превосходно");
                 collection.add("парирование");
                 collection.add("плавание");
-		collection.add("передвижение");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("н")) {
-		collection.add("нормально");
-	    } else if (playerChatTabCompleteEvent.getLastToken().startsWith("о")) {
-		collection.add("отлично");
-	    } else {
-		collection.add("ужасно");
-		collection.add("плохо");
-		collection.add("посредственно");
-		collection.add("нормально");
-		collection.add("хорошо");
-		collection.add("отлично");
-		collection.add("превосходно");
+                collection.add("передвижение");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("н")) {
+                collection.add("нормально");
+            } else if (playerChatTabCompleteEvent.getLastToken().startsWith("о")) {
+                collection.add("отлично");
+            } else {
+                collection.add("ужасно");
+                collection.add("плохо");
+                collection.add("посредственно");
+                collection.add("нормально");
+                collection.add("хорошо");
+                collection.add("отлично");
+                collection.add("превосходно");
 
                 collection.add("реакция");
                 collection.add("борьба");
@@ -1777,15 +1772,15 @@ implements Listener {
                 collection.add("хирургия");
                 collection.add("передвижение");
                 collection.add("врачевание");
-            //    collection.add("физическая сила");
-            //    collection.add("кулачный бой");
-            //    collection.add("владение оружием");
-            //    collection.add("первая помощь");
-            //    collection.add("зашивание ран");
-            //    collection.add("рукопашный бой");
-            //    collection.add("устойчивость к болезням");
-	    }	
-	}
-    }	
+                //    collection.add("физическая сила");
+                //    collection.add("кулачный бой");
+                //    collection.add("владение оружием");
+                //    collection.add("первая помощь");
+                //    collection.add("зашивание ран");
+                //    collection.add("рукопашный бой");
+                //    collection.add("устойчивость к болезням");
+            }
+        }
+    }
 //---}}} Tabs
 }
