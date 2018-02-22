@@ -213,6 +213,7 @@ public class KMChat
 
         boolean local = true;
         boolean forgm = false; //to gm chat
+	boolean gmnotice = false; //***this kind of messages used by GM's***
         boolean forbd = false; //to builders' chat
         boolean norec = false; //no recipients at all
         boolean sendraw = false; //either to send a raw message to discord
@@ -997,17 +998,7 @@ public class KMChat
 
     //{{{--- Commands 
     public boolean onCommand(CommandSender commandSender, Command command, String string, String[] args) {
-        if (command.getName().equalsIgnoreCase("butcher")) {
-            if (!(commandSender instanceof Player)) {
-                commandSender.sendMessage("§4you must be a player!§f");
-                return false;
-            }
-            commandSender.sendMessage("Ты охуел?");
-            Player pl = (Player) commandSender;
-            pl.kickPlayer("Ублюдок, мать твою, а ну иди сюда, говно собачье!");
-            return true;
-            //me
-        } else if (command.getName().equalsIgnoreCase("me")) {
+        if (command.getName().equalsIgnoreCase("me")) {
             commandSender.sendMessage("§4/me отключено, используйте *§f");
             return true;
 
@@ -1508,6 +1499,8 @@ public class KMChat
 	     }
 
 	}
+
+	return true;
 
     }
     //---}}} Commands
