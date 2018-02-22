@@ -14,9 +14,11 @@ import java.util.Date;
 import java.util.regex.Matcher;  
 import java.util.regex.Pattern;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.nio.file.*;
 import java.nio.charset.*;
 import java.io.*;
+import org.json.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -78,7 +80,26 @@ implements Listener {
         DATA_PATH = this.getConfig().getString("datastorage");
         whoUseAutoGM = this.getConfig().getStringList("whoUseAutoGM");
         whoUseAutoBD = this.getConfig().getStringList("whoUseAutoBD");
-	
+
+	String remindersHolder = "plugins/KMChat/jreminders.json";
+	JSONObject jreminders = null;
+	try (BufferedReader br = new BufferedReader(new FileReader(remindersHolder))) {
+	    String line;
+	    if ((line = br.readLine()) != null) {
+		jreminders = new JSONObject(line);
+	    }
+	} catch (Exception e) {
+	    System.out.println(e);
+	}
+	if (jreminders!=null) {
+		Iterator<String> keys = jreminders.keys();
+		while( keys.hasNext() ){
+		    String key = (String)keys.next();
+	            String value = jreminders.getString(key); 
+		    reminders.put(key, value);
+	        }
+	}
+
         System.out.println("Logging bot in...");
         client = new ClientBuilder().withToken(TOKEN).build();
         client.getDispatcher().registerListener(this);
@@ -130,13 +151,21 @@ implements Listener {
 
     public void onDisable() {	
 	RequestBuffer.request(() -> ingameChannel.sendMessage("**Server is going offline!**"));
+	JSONObject jreminders = new JSONObject(reminders);
+	try (FileWriter file = new FileWriter("plugins/KMChat/jreminders.json")) {
+	    file.write(jreminders.toString());
+	    System.out.println("Successfully Copied JSON Object to File...");
+	    System.out.println("\nJSON Object: " + jreminders);
+	} catch (Exception e) {
+	    System.out.println("[ERROR] writing JSON:\n" + e);
+	}
         this.log.info(String.format("%s is disabled!", this.getDescription().getFullName()));
     }
    
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
 	String name = playerJoinEvent.getPlayer().getName();
-	playerJoinEvent.setJoinMessage("§e" + name + "§f входит в игру");
+	String joinMessage = "§e" + name + "§f входит в игру";
 	String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
 	String message =  name + " ("+ip+")" + " входит в игру";
 	kmlog("whole", message);
@@ -151,11 +180,14 @@ implements Listener {
 	}
 	for (String key : reminders.keySet()) {
 	    if (key.equals(name)) {
-		playerJoinEvent.getPlayer().sendMessage("§e~"+reminders.get(key)+" ~§f");
+		String reminder = reminders.get(key);
+		joinMessage += "\n§e~"+reminder+" ~§f";
+		 RequestBuffer.request(() -> ingameChannel.sendMessage("Player **"+name+"** was reminded of:\n"+reminder));
 		reminders.remove(key);
 		break;
+	    }
 	}
-    }
+	playerJoinEvent.setJoinMessage(joinMessage);
     }
 
     @EventHandler
@@ -1410,7 +1442,7 @@ implements Listener {
 	    }
 	    return true;
 
-
+	//Reminders
 	} else if (command.getName().equalsIgnoreCase("remind")) {
 	     if (commandSender instanceof Player) {
 		Player sender = (Player)commandSender;
@@ -1420,7 +1452,7 @@ implements Listener {
 		}
 	     }
 	     if (args.length == 0 || args[0].equals("help")) {
-		 commandSender.sendMessage("§e----------- §fHelp: remind §e--------------------§8\nRemind usage: Use this to remind player of something when he goes online.\n§e/remind Player You suffer from nausea.\n/remind show§f - show current reminders.\n§e/remind remove Player§f - delete reminder.\n§e/remind edit Player You are hungry§f - overwrite an existing reminder.\n§e/remind§f or §e/remind help§f - show this message.\n");
+		 commandSender.sendMessage("§e----------- §fHelp: remind §e--------------------§8\nRemind usage: Use this to remind player of something when he goes online.\n§e/remind Player You suffer from nausea.\n/remind show§f - show current reminders.\n§e/remind remove Player§f or §e/remind delete Player§f - delete reminder.\n§e/remind edit Player You are hungry§f - overwrite an existing reminder.\n§e/remind§f or §e/remind help§f - show this message.\n");
 		 return true;
 	    } else if (args[0].equals("show")) {
 		if (reminders.isEmpty()) {
@@ -1433,7 +1465,7 @@ implements Listener {
 		    commandSender.sendMessage("§a" + key + " : §f" + reminders.get(key) + "\n§f");
 		}
 		return true;
-	    } else if (args[0].equals("remove")) {
+	    } else if (args[0].equals("remove") || args[0].equals("delete"))  {
 		for (String key : reminders.keySet()) {
 		     if (args[1].equals(key)) {
 			reminders.remove(key);
@@ -1457,11 +1489,11 @@ implements Listener {
 		    return false;
 		}
 		String sumargs = "";
-		 for (int i = 1; i < args.length; i++) {
+		 for (int i = 2; i < args.length; i++) {
 		    sumargs += " " + args[i];
 		 }
 		 
-		reminders.put(args[0], sumargs);
+		reminders.put(args[1], sumargs);
 		commandSender.sendMessage("§eReminder successfully edited!§f");
 		return true;
 		
