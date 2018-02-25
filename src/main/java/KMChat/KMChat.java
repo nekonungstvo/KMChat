@@ -271,7 +271,7 @@ public class KMChat
             if (player.getName().equals(nick)) {
 
                 usesGM = nick;
-                if (mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
+                if (mes.startsWith(";") | mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
 
                     break;
                 } else {
