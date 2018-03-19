@@ -183,7 +183,8 @@ public class KMChat
 	for (String key : reminders.keySet()) {
 	    if (key.equals(name)) {
 		String reminder = reminders.get(key);
-		joinMessage += "\n§e~"+reminder+" ~§f";
+//		joinMessage += "\n§e~"+reminder+" ~§f";
+		playerJoinEvent.getPlayer().sendMessage("§6~"+reminder+"~§f");
 		 RequestBuffer.request(() -> ingameChannel.sendMessage("Player **"+name+"** was reminded of:\n"+reminder));
 		reminders.remove(key);
 		break;
@@ -1379,8 +1380,14 @@ public class KMChat
                 commandSender.sendMessage("§4You must be a player!§f");
                 return false;
             }
-
+            
             Player sender = (Player) commandSender;
+            if (!sender.hasPermission("KMCore.tell")) {
+                sender.sendMessage("§4Недостаточно прав. Для связи с ГМ-ами используйте ГМ-чат с помощью символа -.§f");
+                return true;
+            }
+
+
             if (args.length == 0) {
                 sender.sendMessage("§8...и чего сказать хотел?§f");
                 return true;
@@ -1392,12 +1399,7 @@ public class KMChat
                 return true;
             }
 
-            if (!sender.hasPermission("KMCore.tell")) {
-                sender.sendMessage("§4Недостаточно прав.§f");
-                return true;
-            }
-
-
+            
             String senderName = sender.getName();
             String recipName = recip.getName();
             args[0] = "&8[&a" + senderName + "&8->&a" + recipName + "&8]:&f";
