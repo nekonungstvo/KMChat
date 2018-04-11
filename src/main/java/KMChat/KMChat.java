@@ -258,11 +258,13 @@ public class KMChat
             }
         }
         String usesGM = null;
+        Pattern dicePat = Pattern.compile("d(4|6|8|10|12|14|20|100).*");
+        Matcher diceMat = dicePat.matcher(mes);
         for (String nick : whoUseAutoGM) {
             if (player.getName().equalsIgnoreCase(nick)) {
 
                 usesGM = nick;
-                if (mes.startsWith(";") | mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
+                if (mes.startsWith(";") || mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || diceMat.matches() || strippedColon) {
 
                     break;
                 } else {
@@ -274,7 +276,7 @@ public class KMChat
         }
         for (String nick : whoUseAutoBD) {
             if (player.getName().equalsIgnoreCase(nick) && !player.getName().equalsIgnoreCase(usesGM)) {
-                if (mes.startsWith(";") || mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || mes.startsWith("d") || strippedColon) {
+                if (mes.startsWith(";") || mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || diceMat.matches() || strippedColon) {
                     break;
                 } else {
                     mes = ";" + mes;
@@ -295,7 +297,7 @@ public class KMChat
                 result = String.format("&a%s &f(to GM) &eбросает %s &f", name, dice);
             }
 
-        } else if (mes.startsWith("d") && m.matches() && player.hasPermission("kmchat.dice")) {
+        } else if (mes.startsWith("d") && player.hasPermission("kmchat.dice")) {
             sendraw = true;
             String[] vars = {"едва слышно бросает",
                     "очень тихо бросает",
@@ -733,26 +735,30 @@ public class KMChat
             //int wordsNum = 1;
             //String[] split = mes.split(" ", wordsNum + 2); //extra spot for optional modificator
             String skillmes = getSkill(mes, nick);
-
-            if (mes.toLowerCase().startsWith("бег") && skillmes.contains("ПЛОХО")) {
+            String f_word = mes.split(" ")[0];
+            String s_word = "";
+            if (mes.split(" ").length > 1)
+                s_word = mes.split(" ")[1];
+            //System.out.println("f_word: " + f_word + "; s_word: " + s_word);
+            if ( (f_word.contains("бег") || s_word.contains("бег")) && skillmes.contains("ПЛОХО")) {
                 String anotherTry = getSkill(mes.toLowerCase().replace("бег", "передвижение"), nick);
                 if (!anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             }
 
-            if (mes.toLowerCase().startsWith("передвижение") && skillmes.contains("ПЛОХО")) {
+            if ( (f_word.contains("передвижение") || s_word.contains("передвижение")) && skillmes.contains("ПЛОХО")) {
                 String anotherTry = getSkill(mes.toLowerCase().replace("передвижение", "бег"), nick);
                 if (!anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             }
 
-            if (mes.toLowerCase().startsWith("сила") && skillmes.contains("ПЛОХО")) {
+            if ( (f_word.contains("сила")  || s_word.contains("сила")) && skillmes.contains("ПЛОХО")) {
                 String anotherTry = getSkill(mes.toLowerCase().replace("сила", "физическая сила"), nick);
                 if (!anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             }
 
-            if (mes.toLowerCase().startsWith("физическая сила") && skillmes.contains("ПЛОХО")) {
+            if ( (f_word.contains("физическая сила") || s_word.contains("физическая сила")) && skillmes.contains("ПЛОХО")) {
                 String anotherTry = getSkill(mes.toLowerCase().replace("физическая сила", "сила"), nick);
                 if (!anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
