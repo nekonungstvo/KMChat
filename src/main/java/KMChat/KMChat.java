@@ -758,8 +758,8 @@ public class KMChat
                     skillmes = anotherTry;
             }
 
-            if ( (f_word.contains("физическая сила") || s_word.contains("физическая сила")) && skillmes.contains("ПЛОХО")) {
-                String anotherTry = getSkill(mes.toLowerCase().replace("физическая сила", "сила"), nick);
+            if ( (f_word.contains("физическая") || s_word.contains("физическая")) && skillmes.contains("ПЛОХО")) {
+                String anotherTry = getSkill(mes.toLowerCase().replace("физическая ", ""), nick);
                 if (!anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             }
