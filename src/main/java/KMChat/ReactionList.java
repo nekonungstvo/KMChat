@@ -70,6 +70,28 @@ public class ReactionList {
         return turns;
     }
 
+    public int size() {
+        int i = 0;
+        for (i = 0; i < rlist.size(); i++);
+        return i;
+    }
+
+    public Reaction get(int i) {
+        return rlist.get(i);
+    }
+
+    public void set(int i, Reaction r) {
+        rlist.set(i, r);
+    }
+
+    public Reaction getReactionByName(String name) {
+        for (Reaction r : rlist) {
+            if (r.getPlayer().equals(name))
+                return r;
+        }
+        return new Reaction();
+    }
+
     public void modTurns(String nick, String initial) {
     //    System.out.println("!!");
   //      System.out.println(nick +  " " + initial);

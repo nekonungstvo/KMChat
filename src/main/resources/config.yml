@@ -4,6 +4,7 @@ logsdir: "logs/"
 bottoken: "HERE GOES BOT TOKEN"
 channelid: "HERE GOES CHANNEL ID"
 datastorage: "HERE GOES DATA STORAGE"
+modifiersUrl: ""
 whoUseAutoGM: []
 whoUseAutoBD: []
 range.default: 18

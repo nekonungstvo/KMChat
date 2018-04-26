@@ -2,6 +2,7 @@ package KMChat;
 import java.util.Map;
 import java.util.Hashtable;
 
+
 public class Reaction {
     
     private Map<Integer, String> nMap = new Hashtable<Integer, String>();
@@ -10,6 +11,10 @@ public class Reaction {
     String player = null;
     String level = "";
     int mod = 0;
+    int woundsMod = 0;
+    int armorMod = 0;
+
+    Reaction() {};
 
     Reaction (String pl) {
 	player = pl;
@@ -32,6 +37,16 @@ public class Reaction {
 	    return false;
 	this.mod = mod;
 	return true;
+    }  
+    
+    public boolean setWoundsMod(int m) {
+	this.woundsMod = m;
+	return true;
+    }
+    
+    public boolean setArmorMod(int m) {
+	this.armorMod = m;
+	return true;
     }
 
     public boolean setLevel(String level) {
@@ -48,29 +63,48 @@ public class Reaction {
     public int getMod() {
 	return mod;
     }
+    public int getFinalMod() {
+        return mod + armorMod + woundsMod;
+    }
+
     public String getModStr() {
-	String modStr = Integer.toString(mod);
+	String modStr = "";
+        if (woundsMod == -666 || armorMod == -666)
+            return modStr + " §4без учёта брони и ран§e";
+
+        if (mod!=0)
+            modStr = Integer.toString(mod);
+            if (mod > 0)
+                modStr = "+" + modStr;
+        
+        if (woundsMod!=0)
+            modStr = "§4" + Integer.toString(woundsMod) + "§e " + modStr;
+        if (armorMod!=0)
+            modStr += " §8" + Integer.toString(armorMod) + "§e";
+        modStr = modStr.replaceAll("\\s\\s", " ");
 	return modStr;
     }
 
     public String show() {
         String sign = "";
-        if (mod > 0)
+        if (getFinalMod() > 0)
             sign = "+";
         String out = (player + " " + level + " " + sign + mod);
         return out;
     }
 
     public String getDice() {
-            String sign = "";
-            if (this.mod > 0) sign = "+"; 
+        String sign = "";
+        if (this.getFinalMod() > 0) sign = "+";
+
+        //если мы используем автобросок
         if (this.level.equals("")) {
             String helpMod = "";
-            if (mod != 0) helpMod = Integer.toString(mod);
+            if (getFinalMod() != 0) helpMod = Integer.toString(getFinalMod());
             String mes4dice = "реакция " + sign + helpMod + this.player;
             return mes4dice;
         }
-
+        //если мы используем уровень навыка вместо автоброска
 	nMap.put(-3, "абсолютно ублюдски");
         nMap.put(-2, "ужасно---");
         nMap.put(-1, "ужасно--");
@@ -94,12 +128,16 @@ public class Reaction {
                 levelInt = entry.getKey();
             }
         }
-        levelInt += mod;
+        levelInt += getFinalMod();
         String helpMod = "";
-        if (mod != 0) helpMod = Integer.toString(mod);
+        if (getFinalMod() != 0) helpMod = Integer.toString(getFinalMod());
+            
+
         if (!sign.equals("")) sign = " " + sign;
-        if (mod < 0) helpMod = " " + helpMod;
+        if (getFinalMod() < 0) helpMod = " " + helpMod;
         String mes = nMap.get(levelInt) + " " + this.player + " реакция"  + sign + helpMod;
         return mes;
     }
+
+
 }

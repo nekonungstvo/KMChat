@@ -7,6 +7,10 @@ import java.util.regex.Pattern;
 import java.nio.file.*;
 import java.nio.charset.*;
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+
+import org.apache.commons.codec.binary.Base64;
 
 import org.json.*;
 
@@ -46,6 +50,8 @@ public class KMChat
     private static String TOKEN;
     private static long CHID;
     private static String DATA_PATH;
+    private static String modifiersUrl;
+    private static String modifiersAuth;
     private static IDiscordClient client;
     private static IChannel ingameChannel;
     private Logger log = Logger.getLogger("Minecraft");
@@ -67,6 +73,8 @@ public class KMChat
         this.saveConfig();
 
         path = this.getConfig().getString("logsdir");
+        modifiersUrl = this.getConfig().getString("modifiersUrl");
+        modifiersAuth = this.getConfig().getString("modifiersAuth");
         TOKEN = this.getConfig().getString("bottoken");
         CHID = this.getConfig().getLong("channelid");
         DATA_PATH = this.getConfig().getString("datastorage");
@@ -81,7 +89,7 @@ public class KMChat
                 jreminders = new JSONObject(line);
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error enabling KMChat: " + e);
         }
         if (jreminders != null) {
             Iterator<String> keys = jreminders.keys();
@@ -167,7 +175,7 @@ public class KMChat
         try (FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
             writer.write(name + " " + ip + "\n");
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("Error while writing player's ip: " + ex.getMessage());
         }
         for (String key : reminders.keySet()) {
             if (key.equalsIgnoreCase(name)) {
@@ -498,9 +506,6 @@ public class KMChat
             asyncPlayerChatEvent.getRecipients().clear();
             asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
         }
-        //System.out.println("range: " + range);
-        //Long end = System.nanoTime();
-        //System.out.println("speed:" + (end-beg));
     }
 
 
@@ -555,7 +560,7 @@ public class KMChat
             what = what.replaceAll("§.", "");
             writer.write("[" + date.toString() + "] " + what + "\n");
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("Error in kmlog(): " + ex.getMessage());
         }
     }
 
@@ -641,27 +646,6 @@ public class KMChat
 
             if (skill == null) { //if we didn't find the needed skill in the file
 
-            //NOTE: THIS WILL PROBABLY LEAD TO ENDLESS RECURSION
-                /*
-                if (desc.toLowerCase().startsWith("бег")) {
-                    String res = getSkill(desc.replace("бег", "передвижение"), nick);
-                    if (res.contains("ПЛОХО"))
-                        return res;
-                } else if (desc.toLowerCase().startsWith("передвижение")) {
-                    String res = getSkill(desc.replace("передвижение", "бег"), nick);
-                    if (res.contains("ПЛОХО"))
-                        return res;
-                } else if (desc.toLowerCase().startsWith("сила")) {
-                    String res = getSkill(desc.replace("сила", "физическая сила"), nick);
-                    if (res.contains("ПЛОХО"))
-                        return res;
-                } else if (desc.toLowerCase().startsWith("физическая сила")) {
-                    String res = getSkill(desc.replace("физическая сила", "сила"), nick);
-                    if (res.contains("ПЛОХО"))
-                        return res;
-                }
-                //END OF NOTE
-                */
                 for (String sk : skillset) {
                     if (desc.toLowerCase().startsWith(sk)) { //check if skill name is legit
                         oldskill = desc.substring(0, sk.length());
@@ -675,7 +659,7 @@ public class KMChat
             }
 
         } catch (IOException e) {
-            System.out.println(e);
+            System.out.println("Error getting skill:" + e);
             level = null;
         }
 
@@ -744,48 +728,84 @@ public class KMChat
                 String anotherTry = getSkill(mes.toLowerCase().replace("бег", "передвижение"), nick);
                 if (!anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
-            }
-
-            if ( (f_word.contains("передвижение") || s_word.contains("передвижение")) && skillmes.contains("ПЛОХО")) {
+            } else if ( (f_word.contains("передвижение") || s_word.contains("передвижение")) && skillmes.contains("ПЛОХО")) {
                 String anotherTry = getSkill(mes.toLowerCase().replace("передвижение", "бег"), nick);
                 if (!anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             }
 
-            if ( !mes.toLowerCase().contains("физическая") && (f_word.contains("сила")  || s_word.contains("сила")) && skillmes.contains("ПЛОХО")) {
+            if ( !mes.toLowerCase().contains("физическая") && (f_word.contains("сила") || s_word.contains("сила")) && skillmes.contains("ПЛОХО")) {
                 String anotherTry = getSkill(mes.toLowerCase().replace("сила", "физическая сила"), nick);
                 if (!anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
-            }
-
-            if ( (f_word.contains("физическая") || s_word.contains("физическая")) && skillmes.contains("ПЛОХО")) {
-                System.out.println(mes.toLowerCase().replace("физическая ", ""));
+            } else if ( (f_word.contains("физическая") || s_word.contains("физическая")) && skillmes.contains("ПЛОХО")) {
+                //System.out.println(mes.toLowerCase().replace("физическая ", ""));
                 String anotherTry = getSkill(mes.toLowerCase().replace("физическая ", ""), nick);
-                System.out.println(skillmes);
+                //System.out.println(skillmes);
                 if (!anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             }
-
+            
             if (skillmes != null) {
                 mes = skillmes;
+                
+                float armorMod = 0;
+                String[] armorDependentSkills = {"реакция", "уклонение", "передвижение", "бег", "акробатика", "скрытность"};
+                for (String skill : armorDependentSkills) {
+                    if (skillmes.toLowerCase().contains(skill)) {
+                        armorMod = getArmorMod(nick);
+                        break;
+                    }
+                }
+
+                String armorModStr = "";
+                if (armorMod == -666)
+                    armorMod = 0;
+                if (armorMod != 0)
+                    armorModStr = "§8"+Integer.toString((int)armorMod)+"§e";
 
                 Pattern ourSkillPat = Pattern.compile("\\(([-,+][0-9]).*");
                 Matcher ourSkillMat = ourSkillPat.matcher(skillmes);
-                String strmod = null;
+                String strmod = "";
                 if (ourSkillMat.find()) {
                     strmod = ourSkillMat.group(1);
                 }
-
-                if (strmod != null) {
-                    //String strmod = split[wordsNum];
+		
+		float woundsMod = getWoundsMod(nick);
+		String woundsModStr = "";
+		if (woundsMod == -666) {
+		    woundsModStr = " §4без учёта ран и брони§e";
+                    woundsMod = 0;
+		}
+		else if (woundsMod != 0) {
+		    woundsModStr = "§4" + Integer.toString((int) woundsMod) +"§e";
+		}
+                List<String> listMods = new ArrayList<>();
+                listMods.add(woundsModStr);
+                listMods.add(strmod);
+                listMods.add(armorModStr);
+                String joinedMods = " " + String.join(" ", listMods).trim(); 
+                
+                if (strmod != "") {
                     if (strmod.matches("[-,+][0-9]")) {
-                        mes = mes.replace("] (" + strmod, " " + strmod + "] (");
-                        if (mes.contains("()"))
-                            mes = mes.replaceFirst("\\(\\)", "");
                         mod = Float.parseFloat(strmod);
+			mes = mes.replace("] (" + strmod, joinedMods + "] (");
                     }
+                } else {
+                    mes = mes.replace("]", joinedMods+"]");
+
                 }
-                weusedskill = true;
+		mod = mod + woundsMod + armorMod;
+                if (mes.contains("()"))
+                    mes = mes.replaceFirst("\\(\\)", "");
+                if (mes.contains("  "))
+                    mes = mes.replaceFirst("\\s\\s", " ");
+                //else if (woundsModStr != "") {
+		//    mes = mes.replace("]", woundsModStr + "]");
+		//    mod = woundsMod;
+
+		//}
+		    weusedskill = true;
             }
         }
         //System.out.println("SKILL = " + mes);
@@ -833,7 +853,7 @@ public class KMChat
             try {
                 mes = mes.replaceFirst(level, nMap.get(n));
             } catch (Exception e) {
-                System.out.println(e);
+                System.out.println("dF() caught exception: " + e.getMessage());
             }
         }
 
@@ -1073,6 +1093,86 @@ public class KMChat
 
         return "(" + result + ") от " + level + desc + ". Результат:§o " + nMap.get(n);
     }
+    
+ public float getWoundsMod(String name) {
+	String url = modifiersUrl + name + "/modifiers";
+        //System.out.println("url: " + url);
+	JSONObject responce = new JSONObject();
+	try {
+	    responce = readJsonFromUrl(url, modifiersAuth);
+	} catch (Exception e) {
+            System.out.println("ERROR while fetching wounds: " + e.getMessage());
+	    return -666;
+	}
+	if (responce.isNull("wounds"))
+	    return 0;
+	return (float) responce.getDouble("wounds");
+    }
+    
+    public float getArmorMod(String name) {
+	String url = modifiersUrl + name + "/modifiers";
+	JSONObject responce = new JSONObject();
+	try {
+	    responce = readJsonFromUrl(url, modifiersAuth);
+	} catch (Exception e) {
+            System.out.println("ERROR while fetching armor: " + e.getMessage());
+	    return -666;
+	}
+	if (responce.isNull("armor"))
+	    return 0;
+	return (float) responce.getDouble("armor");
+    }
+
+    private static String readAll(Reader rd) throws IOException {
+	StringBuilder sb = new StringBuilder();
+	int cp;
+	while ((cp = rd.read()) != -1) {
+	    sb.append((char) cp);
+	}
+	return sb.toString();
+    }	
+
+    public static JSONObject readJsonFromUrl(String webpage, String authString) throws IOException, JSONException {
+        URL url = new URL(webpage);
+
+        byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+        String authStringEnc = new String(authEncBytes);
+        URLConnection urlConnection = url.openConnection();
+
+        urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+//	urlConnection.setRequestProperty("Authorization", authStringEnc);
+        //System.out.println(authString);
+
+	InputStream is = urlConnection.getInputStream();
+	////InputStream is = new URL(url).openStream();
+
+	try {
+	    BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+	    String jsonText = readAll(rd);
+	    JSONObject json = new JSONObject(jsonText);
+	    return json;
+	} finally {
+	    is.close();
+	}
+    }
+
+    public Reaction considerMods(Reaction reaction) {
+        float woundsMod = getWoundsMod(reaction.getPlayer());
+        if (woundsMod == -666) {
+            woundsMod = 0;
+        }
+        
+        float armorMod = getArmorMod(reaction.getPlayer());
+        if (armorMod == -666) {
+            armorMod = 0;
+        }
+        //System.out.println("considerMods: " + woundsMod);
+        reaction.setWoundsMod((int)woundsMod);
+        reaction.setArmorMod((int)armorMod);
+        return reaction;
+
+
+    }
 
 
     //---}}} Various helpers
@@ -1169,7 +1269,7 @@ public class KMChat
                     commandSender.sendMessage("§7Имена добавлены в новосозданный список!§f\n" + list.show());
                     return true;
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    System.out.println("Ошибка при добавлении имён: " + e.getMessage() + "\n" + e.getStackTrace());
                     commandSender.sendMessage("§4" + e.getMessage() + "§f");
                     return false;
                 }
@@ -1196,7 +1296,7 @@ public class KMChat
                     commandSender.sendMessage("§7Имена добавлены в список " + name + "!§f\n" + list.show());
                     return true;
                 } catch (Exception e) {
-                    commandSender.sendMessage("§4" + e.getMessage() + "§f");
+                    commandSender.sendMessage("§4Ошибка при добавлении имён: " + e.getMessage() + "§f");
                     return false;
                 }
             }
@@ -1224,6 +1324,12 @@ public class KMChat
             if (comm.endsWith("go")) {
                 try {
                     list.clearInfo();
+                        for (int k = 0; k < list.size(); k++) {
+                            list.set(k, considerMods(list.get(k)));
+                        }
+                        //for (int k = 0; k < list.size(); k++) {
+                        //    System.out.println(list.get(k).getModStr());
+                        //}
                     Pattern pat = Pattern.compile("(.*)go");
                     Matcher mat = pat.matcher(comm);
                     if (mat.matches()) {
@@ -1300,7 +1406,25 @@ public class KMChat
 
 
                         String noDelayMsg = "";
+                        for (int count = dices.length - 1; count >= 0; count--) {
+                            Pattern nickPat2 = Pattern.compile("от (ужасно|плохо|ПЛОХО|посредственно|нормально|хорошо|отлично|превосходно|легендарно|КАК АЛЛАХ)(\\+|-){0,3}\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+.*\\sРезультат:§?.?\\s(.*)");
+                            Matcher nickMat2 = nickPat2.matcher(dices[count]);
+                            if (nickMat2.find()) {
+                                try {
+                                    String name2 = nickMat2.group(4);
+                                //System.out.println("found nick: " + name2);
+                                Reaction r = list.getReactionByName(name2);
+                                //System.out.println(dices[count]);
+                                dices[count] = dices[count].replaceAll("я ?(\\+|-)?[0-9]?\\)\\.", "я " + r.getModStr() + ").");
+                                dices[count] = dices[count].replaceAll("\\s\\)", ")");
+                                //System.out.println(dices[count]);
+                                } catch (Exception e) {
+                                }
+                            }
+                        }        
                         for (int j = dices.length - 1; j >= 0; j--) {
+                            //dice with armor + wounds mods
+
                             String out = String.format("§e(( §a%s §e%s %s ))§f", commandSender.getName(), vars[rangePosition], dices[j]);
                             List<Player> recips = getLocalRecipients(sender, out, range);
                             for (Player pl : recips) {
@@ -1327,7 +1451,8 @@ public class KMChat
                         return true;
                     }
                 } catch (Exception e) {
-                    commandSender.sendMessage("§4" + e.getMessage() + "§f");
+                    commandSender.sendMessage("§4Ошибка при броске реакций: " + e + "§f");
+                    //System.out.println(commandSender.getName() + ": ошибка при броске реакций: \n" + e.toString());
                 }
             }
             if (comm.endsWith("turns")) {
