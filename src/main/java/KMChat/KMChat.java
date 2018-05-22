@@ -1,754 +1,772 @@
-package KMChat;
+    package KMChat;
 
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.nio.file.*;
-import java.nio.charset.*;
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
+    import java.util.*;
+    import java.util.logging.Logger;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+    import java.nio.file.*;
+    import java.nio.charset.*;
+    import java.io.*;
+    import java.net.URL;
+    import java.net.URLConnection;
 
-import org.apache.commons.codec.binary.Base64;
+    import org.apache.commons.codec.binary.Base64;
 
-import org.json.*;
+    import org.json.*;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.configuration.file.FileConfigurationOptions;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChatTabCompleteEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.scheduler.BukkitScheduler;
+    import org.bukkit.Bukkit;
+    import org.bukkit.Location;
+    import org.bukkit.Server;
+    import org.bukkit.configuration.file.FileConfigurationOptions;
+    import org.bukkit.entity.Player;
+    import org.bukkit.event.EventHandler;
+    import org.bukkit.event.Listener;
+    import org.bukkit.event.player.AsyncPlayerChatEvent;
+    import org.bukkit.event.player.PlayerChatTabCompleteEvent;
+    import org.bukkit.event.player.PlayerJoinEvent;
+    import org.bukkit.event.player.PlayerQuitEvent;
+    import org.bukkit.plugin.Plugin;
+    import org.bukkit.plugin.PluginDescriptionFile;
+    import org.bukkit.plugin.PluginManager;
+    import org.bukkit.plugin.java.JavaPlugin;
+    import org.bukkit.command.Command;
+    import org.bukkit.command.CommandSender;
+    import org.bukkit.scheduler.BukkitScheduler;
 
-import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
-import sx.blah.discord.handle.impl.events.ReadyEvent;
-import sx.blah.discord.handle.obj.*;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RequestBuffer;
-import sx.blah.discord.util.RateLimitException;
+    import sx.blah.discord.api.ClientBuilder;
+    import sx.blah.discord.api.IDiscordClient;
+    import sx.blah.discord.api.events.EventSubscriber;
+    import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+    import sx.blah.discord.handle.impl.events.ReadyEvent;
+    import sx.blah.discord.handle.obj.*;
+    import sx.blah.discord.util.DiscordException;
+    import sx.blah.discord.util.MissingPermissionsException;
+    import sx.blah.discord.util.RequestBuffer;
+    import sx.blah.discord.util.RateLimitException;
 
-public class KMChat
-        extends JavaPlugin
-        implements Listener {
-    private static String TOKEN;
-    private static long CHID;
-    private static String DATA_PATH;
-    private static String modifiersUrl;
-    private static String modifiersAuth;
-    private static IDiscordClient client;
-    private static IChannel ingameChannel;
-    private Logger log = Logger.getLogger("Minecraft");
-    private String path = "logs/";
-    private Map<Integer, String> nMap = new Hashtable<Integer, String>();
-    private Map<String, String> reminders = new Hashtable<String, String>();
-    private Range[] allRanges = new Range[6];
-    private String[] skillset;
-    private Random rnd = new Random();
-    private List<ReactionList> sprReactionList = new ArrayList<ReactionList>();
-    private List<String> whoUseAutoGM;
-    private List<String> whoUseAutoBD;
-    private Map<String, Double> customRanges = new HashMap<String, Double>();
-    private boolean wasrestarted = false;
+    public class KMChat
+            extends JavaPlugin
+            implements Listener {
+        private static String TOKEN;
+        private static long CHID;
+        private static String DATA_PATH;
+        private static String modifiersUrl;
+        private static String modifiersAuth;
+        private static IDiscordClient client;
+        private static IChannel ingameChannel;
+        private Logger log = Logger.getLogger("Minecraft");
+        private String path = "logs/";
+        private Map<Integer, String> nMap = new Hashtable<Integer, String>();
+        private Map<String, String> reminders = new Hashtable<String, String>();
+        private Range[] allRanges = new Range[6];
+        private String[] skillset;
+        private Random rnd = new Random();
+        private List<ReactionList> sprReactionList = new ArrayList<ReactionList>();
+        private List<String> whoUseAutoGM;
+        private List<String> whoUseAutoBD;
+        private Map<String, Double> customRanges = new HashMap<String, Double>();
+        private boolean wasrestarted = false;
 
-    public void onEnable() {
+        public void onEnable() {
 
-        this.getConfig().options().copyDefaults(true);
-        this.saveConfig();
+            this.getConfig().options().copyDefaults(true);
+            this.saveConfig();
 
-        path = this.getConfig().getString("logsdir");
-        modifiersUrl = this.getConfig().getString("modifiersUrl");
-        modifiersAuth = this.getConfig().getString("modifiersAuth");
-        TOKEN = this.getConfig().getString("bottoken");
-        CHID = this.getConfig().getLong("channelid");
-        DATA_PATH = this.getConfig().getString("datastorage");
-        whoUseAutoGM = this.getConfig().getStringList("whoUseAutoGM");
-        whoUseAutoBD = this.getConfig().getStringList("whoUseAutoBD");
+            path = this.getConfig().getString("logsdir");
+            modifiersUrl = this.getConfig().getString("modifiersUrl");
+            modifiersAuth = this.getConfig().getString("modifiersAuth");
+            TOKEN = this.getConfig().getString("bottoken");
+            CHID = this.getConfig().getLong("channelid");
+            DATA_PATH = this.getConfig().getString("datastorage");
+            whoUseAutoGM = this.getConfig().getStringList("whoUseAutoGM");
+            whoUseAutoBD = this.getConfig().getStringList("whoUseAutoBD");
 
-        String remindersHolder = "plugins/KMChat/jreminders.json";
-        JSONObject jreminders = null;
-        try (BufferedReader br = new BufferedReader(new FileReader(remindersHolder))) {
-            String line;
-            if ((line = br.readLine()) != null) {
-                jreminders = new JSONObject(line);
-            }
-        } catch (Exception e) {
-            System.out.println("Error enabling KMChat: " + e);
-        }
-        if (jreminders != null) {
-            Iterator<String> keys = jreminders.keys();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                String value = jreminders.getString(key);
-                reminders.put(key, value);
-            }
-        }
-
-        System.out.println("Logging bot in...");
-        client = new ClientBuilder().withToken(TOKEN).build();
-        client.getDispatcher().registerListener(this);
-        client.login();
-
-        Range weakwhisper = new Range("weakwhisper", "whisper", " (едва слышно)", "===", "@@@");
-        Range whisper = new Range("whisper", "whisper", " (шепчет)", "==", "@@");
-        Range strongwhisper = new Range("strongwhisper", "whisper", " (вполголоса)", "=", "@");
-
-        Range strongshout = new Range("strongshout", "shout", " (орёт)", "!!!");
-        Range shout = new Range("shout", "shout", " (кричит)", "!!");
-        Range weakshout = new Range("weakshout", "shout", " (восклицает)", "!");
-
-        allRanges[0] = weakwhisper;   //===
-        allRanges[1] = whisper;          //==
-        allRanges[2] = strongwhisper; //=
-        allRanges[3] = strongshout;   //!!!
-        allRanges[4] = shout;          //!!
-        allRanges[5] = weakshout;     //!   order is important
-
-        this.getServer().getPluginManager().registerEvents((Listener) this, (Plugin) this);
-        //this.nMap.put(-3, "так ужасно, что хуже уже некуда");
-        this.nMap.put(-3, "абсолютно ублюдски");
-        this.nMap.put(-2, "ужасно---");
-        this.nMap.put(-1, "ужасно--");
-        this.nMap.put(-1, "ужасно--");
-        this.nMap.put(0, "ужасно-");
-        this.nMap.put(1, "ужасно");
-        this.nMap.put(2, "плохо");
-        this.nMap.put(3, "посредственно");
-        this.nMap.put(4, "нормально");
-        this.nMap.put(5, "хорошо");
-        this.nMap.put(6, "отлично");
-        this.nMap.put(7, "превосходно");
-        this.nMap.put(8, "легендарно");
-        this.nMap.put(9, "легендарно+");
-        this.nMap.put(10, "легендарно++");
-        this.nMap.put(11, "легендарно+++");
-//      this.nMap.put(12, "ТАК ЛЕГЕНДАРНО, ЧТО ПОПАДЁТ ВО ВСЕ КНИГИ РЕКОРДОВ");
-//      this.nMap.put(12, "божественно");
-        this.nMap.put(12, "КАК АЛЛАХ");
-
-        skillset = new String[]{"реакция", "владение оружием", "кулачный бой", "борьба", "парирование", "уклонение", "блокирование",
-                "бег", "плавание", "акробатика", "физическая сила", "выносливость", "устойчивость к болезням", "внимательность",
-                "скрытность", "выживание", "диагностика", "первая помощь", "зашивание ран", "хирургия", "сила", "передвижение", "врачевание"};
-
-        this.log.info(String.format("%s is enabled!", this.getDescription().getFullName()));
-    }
-
-    public void onDisable() {
-        RequestBuffer.request(() -> ingameChannel.sendMessage("**Server is going offline!**"));
-        JSONObject jreminders = new JSONObject(reminders);
-        try (FileWriter file = new FileWriter("plugins/KMChat/jreminders.json")) {
-            file.write(jreminders.toString());
-            System.out.println("Successfully Copied JSON Object to File...");
-            System.out.println("\nJSON Object: " + jreminders);
-        } catch (Exception e) {
-            System.out.println("[ERROR] writing JSON:\n" + e);
-        }
-        this.log.info(String.format("%s is disabled!", this.getDescription().getFullName()));
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
-        String name = playerJoinEvent.getPlayer().getName();
-        String joinMessage = "§e" + name + "§f входит в игру";
-        String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
-        String message = name + " (" + ip + ")" + " входит в игру";
-        kmlog("whole", message);
-        kmlog("chat", message);
-        final String snd = message.replaceAll(name, "__" + name + "__");
-        RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
-        try (FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
-            writer.write(name + " " + ip + "\n");
-        } catch (IOException ex) {
-            System.out.println("Error while writing player's ip: " + ex.getMessage());
-        }
-        for (String key : reminders.keySet()) {
-            if (key.equalsIgnoreCase(name)) {
-                String reminder = reminders.get(key);
-//		joinMessage += "\n§e~"+reminder+" ~§f";
-                playerJoinEvent.getPlayer().sendMessage("§6~" + reminder + "~§f");
-                RequestBuffer.request(() -> ingameChannel.sendMessage("Player **" + name + "** was reminded of:\n" + reminder));
-                reminders.remove(key);
-                break;
-            }
-        }
-        playerJoinEvent.setJoinMessage(joinMessage);
-    }
-
-    @EventHandler
-    public void onPlayerLeave(PlayerQuitEvent playerQuitEvent) {
-        Player player = playerQuitEvent.getPlayer();
-        String name = player.getName();
-        customRanges.remove(player.getName());
-        playerQuitEvent.setQuitMessage("§e" + name + "§f выходит из игры");
-        String ip = player.getAddress().getHostName();
-        String message = name + " (" + ip + ")" + " выходит из игры";
-        kmlog("whole", message);
-        kmlog("chat", message);
-        RequestBuffer.request(() -> ingameChannel.sendMessage(message.replaceAll(name, "__" + name + "__")));
-    }
-
-
-    @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent asyncPlayerChatEvent) {
-        //Long beg = System.nanoTime();
-        Player player = asyncPlayerChatEvent.getPlayer();
-        int rangePosition = 6; // if no range specified, lands on the last element of array with descriptions
-
-        boolean local = true;
-        boolean forgm = false; //to gm chat
-        boolean gmnotice = false; //***this kind of messages used by GM's***
-        boolean forbd = false; //to builders' chat
-        boolean norec = false; //no recipients at all
-        boolean sendraw = false; //either to send a raw message to discord
-        boolean strippedColon = false;
-
-        String mes = asyncPlayerChatEvent.getMessage();
-        String raw = mes;
-        String name = player.getName();
-        Range setRange = null;
-        double range = this.getConfig().getInt("range.default");
-
-
-        String adminprefix = "";
-        if (player.hasPermission("KMChat.prefix")) {
-            adminprefix = this.getConfig().getString("adminprefix");
-        } else if (player.hasPermission("KMChat.builder") && !player.hasPermission("KMChat.prefix")) {
-            adminprefix = this.getConfig().getString("bdprefix");
-        }
-
-        for (String nick : whoUseAutoGM) {
-            if (player.getName().equalsIgnoreCase(nick)) {
-                if (mes.startsWith(":")) {
-                    mes = mes.substring(1);
-                    strippedColon = true;
+            String remindersHolder = "plugins/KMChat/jreminders.json";
+            JSONObject jreminders = null;
+            try (BufferedReader br = new BufferedReader(new FileReader(remindersHolder))) {
+                String line;
+                if ((line = br.readLine()) != null) {
+                    jreminders = new JSONObject(line);
                 }
-                break;
+            } catch (Exception e) {
+                System.out.println("Error enabling KMChat: " + e);
             }
-        }
-        for (String nick : whoUseAutoBD) {
-            if (player.getName().equalsIgnoreCase(nick)) {
-                if (mes.startsWith(":")) {
-                    mes = mes.substring(1);
-                    strippedColon = true;
+            if (jreminders != null) {
+                Iterator<String> keys = jreminders.keys();
+                while (keys.hasNext()) {
+                    String key = (String) keys.next();
+                    String value = jreminders.getString(key);
+                    reminders.put(key, value);
                 }
-                break;
             }
+
+            System.out.println("Logging bot in...");
+            client = new ClientBuilder().withToken(TOKEN).build();
+            client.getDispatcher().registerListener(this);
+            client.login();
+
+            Range weakwhisper = new Range("weakwhisper", "whisper", " (едва слышно)", "===", "@@@");
+            Range whisper = new Range("whisper", "whisper", " (шепчет)", "==", "@@");
+            Range strongwhisper = new Range("strongwhisper", "whisper", " (вполголоса)", "=", "@");
+
+            Range strongshout = new Range("strongshout", "shout", " (орёт)", "!!!");
+            Range shout = new Range("shout", "shout", " (кричит)", "!!");
+            Range weakshout = new Range("weakshout", "shout", " (восклицает)", "!");
+
+            allRanges[0] = weakwhisper;   //===
+            allRanges[1] = whisper;          //==
+            allRanges[2] = strongwhisper; //=
+            allRanges[3] = strongshout;   //!!!
+            allRanges[4] = shout;          //!!
+            allRanges[5] = weakshout;     //!   order is important
+
+            this.getServer().getPluginManager().registerEvents((Listener) this, (Plugin) this);
+            //this.nMap.put(-3, "так ужасно, что хуже уже некуда");
+            this.nMap.put(-3, "абсолютно ублюдски");
+            this.nMap.put(-2, "ужасно---");
+            this.nMap.put(-1, "ужасно--");
+            this.nMap.put(-1, "ужасно--");
+            this.nMap.put(0, "ужасно-");
+            this.nMap.put(1, "ужасно");
+            this.nMap.put(2, "плохо");
+            this.nMap.put(3, "посредственно");
+            this.nMap.put(4, "нормально");
+            this.nMap.put(5, "хорошо");
+            this.nMap.put(6, "отлично");
+            this.nMap.put(7, "превосходно");
+            this.nMap.put(8, "легендарно");
+            this.nMap.put(9, "легендарно+");
+            this.nMap.put(10, "легендарно++");
+            this.nMap.put(11, "легендарно+++");
+    //      this.nMap.put(12, "ТАК ЛЕГЕНДАРНО, ЧТО ПОПАДЁТ ВО ВСЕ КНИГИ РЕКОРДОВ");
+    //      this.nMap.put(12, "божественно");
+            this.nMap.put(12, "КАК АЛЛАХ");
+
+            skillset = new String[]{"реакция", "владение оружием", "кулачный бой", "борьба", "парирование", "уклонение", "блокирование",
+                    "бег", "плавание", "акробатика", "физическая сила", "выносливость", "устойчивость к болезням", "внимательность",
+                    "скрытность", "выживание", "диагностика", "первая помощь", "зашивание ран", "хирургия", "сила", "передвижение", "врачевание"};
+
+            this.log.info(String.format("%s is enabled!", this.getDescription().getFullName()));
         }
 
-
-        String describeRange = "";
-        int i = -1;
-        for (Range ran : allRanges) {
-            ++i;
-            if (ran.matches(mes) && player.hasPermission(ran.getPermission())) {
-                rangePosition = i;
-                mes = mes.substring(ran.getSymbol().length());
-                range = this.getConfig().getInt(ran.getRange());
-                describeRange = ran.getDescription();
-                setRange = ran;
-                break;
+        public void onDisable() {
+            RequestBuffer.request(() -> ingameChannel.sendMessage("**Server is going offline!**"));
+            JSONObject jreminders = new JSONObject(reminders);
+            try (FileWriter file = new FileWriter("plugins/KMChat/jreminders.json")) {
+                file.write(jreminders.toString());
+                System.out.println("Successfully Copied JSON Object to File...");
+                System.out.println("\nJSON Object: " + jreminders);
+            } catch (Exception e) {
+                System.out.println("[ERROR] writing JSON:\n" + e);
             }
+            this.log.info(String.format("%s is disabled!", this.getDescription().getFullName()));
         }
-        String usesGM = null;
-        Pattern dicePat = Pattern.compile("d(4|6|8|10|12|14|20|100).*");
-        Matcher diceMat = dicePat.matcher(mes);
-        for (String nick : whoUseAutoGM) {
-            if (player.getName().equalsIgnoreCase(nick)) {
 
-                usesGM = nick;
-                if (mes.startsWith(";") || mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || diceMat.matches() || strippedColon) {
-
+        @EventHandler
+        public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
+            String name = playerJoinEvent.getPlayer().getName();
+            String joinMessage = "§e" + name + "§f входит в игру";
+            String ip = playerJoinEvent.getPlayer().getAddress().getHostName();
+            String message = name + " (" + ip + ")" + " входит в игру";
+            kmlog("whole", message);
+            kmlog("chat", message);
+            final String snd = message.replaceAll(name, "__" + name + "__");
+            RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+            try (FileWriter writer = new FileWriter(path + "ipgame.log", true)) {
+                writer.write(name + " " + ip + "\n");
+            } catch (IOException ex) {
+                System.out.println("Error while writing player's ip: " + ex.getMessage());
+            }
+            for (String key : reminders.keySet()) {
+                if (key.equalsIgnoreCase(name)) {
+                    String reminder = reminders.get(key);
+    //		joinMessage += "\n§e~"+reminder+" ~§f";
+                    playerJoinEvent.getPlayer().sendMessage("§6~" + reminder + "~§f");
+                    RequestBuffer.request(() -> ingameChannel.sendMessage("Player **" + name + "** was reminded of:\n" + reminder));
+                    reminders.remove(key);
                     break;
-                } else {
-                    mes = "-" + mes;
+                }
+            }
+            playerJoinEvent.setJoinMessage(joinMessage);
+        }
+
+        @EventHandler
+        public void onPlayerLeave(PlayerQuitEvent playerQuitEvent) {
+            Player player = playerQuitEvent.getPlayer();
+            String name = player.getName();
+            customRanges.remove(player.getName());
+            playerQuitEvent.setQuitMessage("§e" + name + "§f выходит из игры");
+            String ip = player.getAddress().getHostName();
+            String message = name + " (" + ip + ")" + " выходит из игры";
+            kmlog("whole", message);
+            kmlog("chat", message);
+            RequestBuffer.request(() -> ingameChannel.sendMessage(message.replaceAll(name, "__" + name + "__")));
+        }
+
+
+        @EventHandler
+        public void onPlayerChat(AsyncPlayerChatEvent asyncPlayerChatEvent) {
+            //Long beg = System.nanoTime();
+            Player player = asyncPlayerChatEvent.getPlayer();
+            int rangePosition = 6; // if no range specified, lands on the last element of array with descriptions
+
+            boolean local = true;
+            boolean forgm = false; //to gm chat
+            boolean gmnotice = false; //***this kind of messages used by GM's***
+            boolean forbd = false; //to builders' chat
+            boolean norec = false; //no recipients at all
+            boolean sendraw = false; //either to send a raw message to discord
+            boolean strippedColon = false;
+
+            String mes = asyncPlayerChatEvent.getMessage();
+            String raw = mes;
+            String name = player.getName();
+            Range setRange = null;
+            double range = this.getConfig().getInt("range.default");
+
+
+            String adminprefix = "";
+            if (player.hasPermission("KMChat.prefix")) {
+                adminprefix = this.getConfig().getString("adminprefix");
+            } else if (player.hasPermission("KMChat.builder") && !player.hasPermission("KMChat.prefix")) {
+                adminprefix = this.getConfig().getString("bdprefix");
+            }
+
+            for (String nick : whoUseAutoGM) {
+                if (player.getName().equalsIgnoreCase(nick)) {
+                    if (mes.startsWith(":")) {
+                        mes = mes.substring(1);
+                        strippedColon = true;
+                    }
+                    break;
+                }
+            }
+            for (String nick : whoUseAutoBD) {
+                if (player.getName().equalsIgnoreCase(nick)) {
+                    if (mes.startsWith(":")) {
+                        mes = mes.substring(1);
+                        strippedColon = true;
+                    }
+                    break;
+                }
+            }
+
+
+            String describeRange = "";
+            int i = -1;
+            for (Range ran : allRanges) {
+                ++i;
+                if (ran.matches(mes) && player.hasPermission(ran.getPermission())) {
+                    rangePosition = i;
+                    mes = mes.substring(ran.getSymbol().length());
+                    range = this.getConfig().getInt(ran.getRange());
+                    describeRange = ran.getDescription();
+                    setRange = ran;
+                    break;
+                }
+            }
+            String usesGM = null;
+            Pattern dicePat = Pattern.compile("d(4|6|8|10|12|14|20|100).*");
+            Matcher diceMat = dicePat.matcher(mes);
+            for (String nick : whoUseAutoGM) {
+                if (player.getName().equalsIgnoreCase(nick)) {
+
+                    usesGM = nick;
+                    if (mes.startsWith(";") || mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || diceMat.matches() || strippedColon) {
+
+                        break;
+                    } else {
+                        mes = "-" + mes;
+                        forgm = true;
+                    }
+                    break;
+                }
+            }
+            for (String nick : whoUseAutoBD) {
+                if (player.getName().equalsIgnoreCase(nick) && !player.getName().equalsIgnoreCase(usesGM)) {
+                    if (mes.startsWith(";") || mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || diceMat.matches() || strippedColon) {
+                        break;
+                    } else {
+                        mes = ";" + mes;
+                        forbd = true;
+                    }
+                    break;
+                }
+            }
+            String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
+            Pattern p = Pattern.compile("-d(4|6|8|10|12|14|20|100).*");
+            Matcher m = p.matcher(mes);
+            if (mes.startsWith("-d") && m.matches() && player.hasPermission("kmchat.dice")) {
+                String helpmes = mes.substring(2);
+                String dice = dnum(helpmes);
+                if (dice != null) {
+                    sendraw = true;
                     forgm = true;
+                    result = String.format("&a%s &f(to GM) &eбросает %s &f", name, dice);
                 }
-                break;
-            }
-        }
-        for (String nick : whoUseAutoBD) {
-            if (player.getName().equalsIgnoreCase(nick) && !player.getName().equalsIgnoreCase(usesGM)) {
-                if (mes.startsWith(";") || mes.startsWith("#") || mes.startsWith("%") || mes.startsWith("_") || mes.startsWith("-") || mes.startsWith("№") || diceMat.matches() || strippedColon) {
-                    break;
-                } else {
-                    mes = ";" + mes;
-                    forbd = true;
-                }
-                break;
-            }
-        }
-        String result = String.format("%s&a%s&f%s: %s", adminprefix, name, describeRange, mes);
-        Pattern p = Pattern.compile("-d(4|6|8|10|12|14|20|100).*");
-        Matcher m = p.matcher(mes);
-        if (mes.startsWith("-d") && m.matches() && player.hasPermission("kmchat.dice")) {
-            String helpmes = mes.substring(2);
-            String dice = dnum(helpmes);
-            if (dice != null) {
+
+            } else if (mes.startsWith("d") && player.hasPermission("kmchat.dice")) {
                 sendraw = true;
+                String[] vars = {"едва слышно бросает",
+                        "очень тихо бросает",
+                        "тихо бросает",
+                        "СВЕРХГРОМКО ОБРУШИВАЕТ",
+                        "очень громко бросает",
+                        "громко бросает",
+                        "бросает"};
+                String helpmes = mes.substring(1);
+                String dice = dnum(helpmes);
+                if (dice != null) {
+                    result = String.format("&e(( &a%s &e%s %s ))&f", name, vars[rangePosition], dice);
+                } else {
+                    result = String.format("&a%s&f%s: %s", name, describeRange, mes);
+                }
+
+            } else if (mes.startsWith("%")) {
+                sendraw = true;
+                String[] vars = {"едва слышно бросает",
+                        "очень тихо бросает",
+                        "тихо бросает",
+                        "СВЕРХГРОМКО ОБРУШИВАЕТ",
+                        "очень громко бросает",
+                        "громко бросает",
+                        "бросает"};
+                int n = 2;
+                if (mes.startsWith("% ")) {
+                    mes = mes.substring(2);
+                } else {
+                    mes = mes.substring(1);
+                }
+                String dice = dF(mes, player.getName());
+                if (dice == null) {
+                    player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");
+                    norec = true;
+                } else
+                    result = String.format("&e(( &a%s&e %s 4dF %s ))&f", name, vars[rangePosition], dice);
+
+            } else if (mes.startsWith("-%")) {
+                sendraw = true;
+                int n = 2;
                 forgm = true;
-                result = String.format("&a%s &f(to GM) &eбросает %s &f", name, dice);
-            }
+                if (mes.startsWith("-% ")) {
+                    mes = mes.substring(3);
+                } else {
+                    mes = mes.substring(2);
+                }
+                String dice = dF(mes, player.getName());
+                if (dice == null) {
+                    player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");
+                    norec = true;
+                }
+                result = String.format("&a%s &f(to GM) &eбросает 4dF %s &f", name, dice);
 
-        } else if (mes.startsWith("d") && player.hasPermission("kmchat.dice")) {
-            sendraw = true;
-            String[] vars = {"едва слышно бросает",
-                    "очень тихо бросает",
-                    "тихо бросает",
-                    "СВЕРХГРОМКО ОБРУШИВАЕТ",
-                    "очень громко бросает",
-                    "громко бросает",
-                    "бросает"};
-            String helpmes = mes.substring(1);
-            String dice = dnum(helpmes);
-            if (dice != null) {
-                result = String.format("&e(( &a%s &e%s %s ))&f", name, vars[rangePosition], dice);
-            } else {
-                result = String.format("&a%s&f%s: %s", name, describeRange, mes);
-            }
-
-        } else if (mes.startsWith("%")) {
-            sendraw = true;
-            String[] vars = {"едва слышно бросает",
-                    "очень тихо бросает",
-                    "тихо бросает",
-                    "СВЕРХГРОМКО ОБРУШИВАЕТ",
-                    "очень громко бросает",
-                    "громко бросает",
-                    "бросает"};
-            int n = 2;
-            if (mes.startsWith("% ")) {
-                mes = mes.substring(2);
-            } else {
+            } else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
+                sendraw = true;
+                String[] vars = {"~",
+                        "*",
+                        "**",
+                        "******",
+                        "*****",
+                        "****",
+                        "***"};
+                String[] gmRanges = {"closestdm",
+                        "closerdm",
+                        "closedm",
+                        "farestdm",
+                        "farerdm",
+                        "fardm",
+                        "default"};
+                range = this.getConfig().getInt("range." + gmRanges[rangePosition]);
                 mes = mes.substring(1);
-            }
-            String dice = dF(mes, player.getName());
-            if (dice == null) {
-                player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");
-                norec = true;
-            } else
-                result = String.format("&e(( &a%s&e %s 4dF %s ))&f", name, vars[rangePosition], dice);
+                result = "&e" + vars[rangePosition] + mes + vars[rangePosition];
 
-        } else if (mes.startsWith("-%")) {
-            sendraw = true;
-            int n = 2;
-            forgm = true;
-            if (mes.startsWith("-% ")) {
-                mes = mes.substring(3);
-            } else {
-                mes = mes.substring(2);
-            }
-            String dice = dF(mes, player.getName());
-            if (dice == null) {
-                player.sendMessage("§4Для броска дайса пропишите: \"% значение\"§f");
-                norec = true;
-            }
-            result = String.format("&a%s &f(to GM) &eбросает 4dF %s &f", name, dice);
-
-        } else if ((mes.startsWith("#") || mes.startsWith("№")) && player.hasPermission("KMChat.dm")) {
-            sendraw = true;
-            String[] vars = {"~",
-                    "*",
-                    "**",
-                    "******",
-                    "*****",
-                    "****",
-                    "***"};
-            String[] gmRanges = {"closestdm",
-                    "closerdm",
-                    "closedm",
-                    "farestdm",
-                    "farerdm",
-                    "fardm",
-                    "default"};
-            range = this.getConfig().getInt("range." + gmRanges[rangePosition]);
-            mes = mes.substring(1);
-            result = "&e" + vars[rangePosition] + mes + vars[rangePosition];
-
-        } else if (mes.startsWith("*") && player.hasPermission("KMChat.me") && setRange == null) {
-            mes = mes.substring(1);
-            range = this.getConfig().getInt("range.me");
-            result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
-
-        } else if (mes.startsWith("^") && player.hasPermission("KMChat.global")) {
-            local = false;
-            mes = mes.substring(1);
-            result = String.format("%s&a%s&f: &b(( %s ))&f", adminprefix, name, mes);
-
-        } else if (mes.startsWith("_")) {
-            mes = "(( " + mes.substring(1) + " ))";
-
-        } else if (mes.startsWith("-")) {
-            if (mes.startsWith("- ")) {
-                mes = mes.substring(2);
-            } else {
+            } else if (mes.startsWith("*") && player.hasPermission("KMChat.me") && setRange == null) {
                 mes = mes.substring(1);
-            }
-            result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
-            forgm = true;
-        } else if (mes.startsWith(";") && player.hasPermission("KMChat.builder")) {
-            if (mes.startsWith("; ")) {
-                mes = mes.substring(2);
-            } else {
+                range = this.getConfig().getInt("range.me");
+                result = String.format("* %s&a%s&f %s", adminprefix, name, mes);
+
+            } else if (mes.startsWith("^") && player.hasPermission("KMChat.global")) {
+                local = false;
                 mes = mes.substring(1);
-            }
-            result = String.format("%s&a%s &f(to BD): &3(( %s ))&f", adminprefix, name, mes);
-            forbd = true;
+                result = String.format("%s&a%s&f: &b(( %s ))&f", adminprefix, name, mes);
 
-        } else if (mes.startsWith(":msg") || mes.startsWith("msg")) {
-            if (!player.hasPermission("KMCore.tell")) {
-                player.sendMessage("§4Недостаточно прав.§f");
-            } else {
-                player.sendMessage("§4Используйте /msg!");
-                norec = true;
-            }
-        }
+            } else if (mes.startsWith("_")) {
+                mes = "(( " + mes.substring(1) + " ))";
 
+            } else if (mes.startsWith("-")) {
+                if (mes.startsWith("- ")) {
+                    mes = mes.substring(2);
+                } else {
+                    mes = mes.substring(1);
+                }
+                result = String.format("%s&a%s &f(to GM): &6(( %s ))&f", adminprefix, name, mes);
+                forgm = true;
+            } else if (mes.startsWith(";") && player.hasPermission("KMChat.builder")) {
+                if (mes.startsWith("; ")) {
+                    mes = mes.substring(2);
+                } else {
+                    mes = mes.substring(1);
+                }
+                result = String.format("%s&a%s &f(to BD): &3(( %s ))&f", adminprefix, name, mes);
+                forbd = true;
 
-        if (local && !forgm && !forbd && !gmnotice && mes.startsWith("((") && mes.endsWith("))")) {
-            String str = "";
-            if (setRange != null) {
-                str = setRange.getDescription().replaceAll("[),(, ]", "") + " в ";
-                if (rangePosition == 0) {
-                    str = "едва слышно в ";
+            } else if (mes.startsWith(":msg") || mes.startsWith("msg")) {
+                if (!player.hasPermission("KMCore.tell")) {
+                    player.sendMessage("§4Недостаточно прав.§f");
+                } else {
+                    player.sendMessage("§4Используйте /msg!");
+                    norec = true;
                 }
             }
-            result = String.format("%s&a%s&f (%sOOC): &d%s&f", adminprefix, name, str, mes);
-            if (result.matches(".*\\(\\(\\S.*")) {
-                result = result.replace("((", "(( ");
-            }
-            if (result.matches(".*\\S\\)\\).*")) {
-                result = result.replace("))", " ))");
+
+
+            if (local && !forgm && !forbd && !gmnotice && mes.startsWith("((") && mes.endsWith("))")) {
+                String str = "";
+                if (setRange != null) {
+                    str = setRange.getDescription().replaceAll("[),(, ]", "") + " в ";
+                    if (rangePosition == 0) {
+                        str = "едва слышно в ";
+                    }
+                }
+                result = String.format("%s&a%s&f (%sOOC): &d%s&f", adminprefix, name, str, mes);
+                if (result.matches(".*\\(\\(\\S.*")) {
+                    result = result.replace("((", "(( ");
+                }
+                if (result.matches(".*\\S\\)\\).*")) {
+                    result = result.replace("))", " ))");
+                }
+
             }
 
+
+            result = result.replaceAll("%", "%%");
+            result = result.replaceAll("&([a-z0-9])", "§$1");
+            result = result.replaceAll("\\]\\s\\.", "].");
+            result = result.replaceAll("\\s\\]", "]");
+            asyncPlayerChatEvent.setFormat(result);
+            asyncPlayerChatEvent.setMessage(mes);
+            kmlog("whole", result);
+            kmlog("chat", result);
+            String res2discord = result.replaceAll("§([a-z0-9])", "");
+            res2discord = res2discord.replace(player.getName(), "**" + player.getName() + "**");
+            String mes2dis = null;
+            if (sendraw) {
+                String raw2dis = "**" + player.getName() + "**: " + raw;
+                mes2dis = raw2dis + '\n' + res2discord;
+            } else {
+                mes2dis = res2discord;
+            }
+            final String sendme = mes2dis;
+            RequestBuffer.request(() -> ingameChannel.sendMessage(sendme));
+
+            if (norec) {
+                asyncPlayerChatEvent.getRecipients().clear();
+            } else if (forgm) {
+                asyncPlayerChatEvent.getRecipients().clear();
+                LinkedList<Player> recips = new LinkedList();
+                recips.add(player);
+                for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
+                    if (player2.hasPermission("KMChat.admin")) {
+                        if (!player2.getWorld().equals((Object) player.getWorld())) {
+                            result = result.replaceAll("§f", "§7");
+                            player2.sendMessage(result);
+                        } else if (player.getLocation().distanceSquared(player2.getLocation()) > range * range) {
+                            result = result.replaceAll("§f", "§7");
+                            player2.sendMessage(result);
+                        } else {
+                            recips.add(player2);
+                        }
+                    }
+                }
+                asyncPlayerChatEvent.getRecipients().addAll(recips);
+            } else if (forbd) {
+                asyncPlayerChatEvent.getRecipients().clear();
+                LinkedList<Player> recips = new LinkedList();
+                recips.add(player);
+                for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
+                    if (player2.hasPermission("KMChat.builder")) {
+                        if (!player2.getWorld().equals((Object) player.getWorld())) {
+
+                            result = result.replaceAll("§f", "§7");
+                            player2.sendMessage(result);
+
+                        } else if ((player.getLocation().distanceSquared(player2.getLocation())) > range * range) {
+
+                            result = result.replaceAll("§f", "§7");
+                            player2.sendMessage(result);
+
+                        } else {
+                            recips.add(player2);
+                        }
+                    }
+                }
+                asyncPlayerChatEvent.getRecipients().addAll(recips);
+
+
+            } else if (local) {
+                asyncPlayerChatEvent.getRecipients().clear();
+                asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
+            }
         }
 
 
-        result = result.replaceAll("%", "%%");
-        result = result.replaceAll("&([a-z0-9])", "§$1");
-        result = result.replaceAll("\\]\\s\\.", "].");
-        asyncPlayerChatEvent.setFormat(result);
-        asyncPlayerChatEvent.setMessage(mes);
-        kmlog("whole", result);
-        kmlog("chat", result);
-        String res2discord = result.replaceAll("§([a-z0-9])", "");
-        res2discord = res2discord.replace(player.getName(), "**" + player.getName() + "**");
-        String mes2dis = null;
-        if (sendraw) {
-            String raw2dis = "**" + player.getName() + "**: " + raw;
-            mes2dis = raw2dis + '\n' + res2discord;
-        } else {
-            mes2dis = res2discord;
-        }
-        final String sendme = mes2dis;
-        RequestBuffer.request(() -> ingameChannel.sendMessage(sendme));
+        //---}}} Various helpers
 
-        if (norec) {
-            asyncPlayerChatEvent.getRecipients().clear();
-        } else if (forgm) {
-            asyncPlayerChatEvent.getRecipients().clear();
-            LinkedList<Player> recips = new LinkedList();
-            recips.add(player);
+        protected List<Player> getLocalRecipients(Player player, String mes, double d) {
+
+
+            Location location = player.getLocation();
+            LinkedList<Player> linkedList = new LinkedList<Player>();
+            double d2 = Math.pow(d, 2.0);
             for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
                 if (player2.hasPermission("KMChat.admin")) {
                     if (!player2.getWorld().equals((Object) player.getWorld())) {
-                        result = result.replaceAll("§f", "§7");
-                        player2.sendMessage(result);
-                    } else if (player.getLocation().distanceSquared(player2.getLocation()) > range * range) {
-                        result = result.replaceAll("§f", "§7");
-                        player2.sendMessage(result);
-                    } else {
-                        recips.add(player2);
+                      //  if (gmInRange(player2.getName(), 0)) {
+                            mes = mes.replaceAll("§e", "§7");
+                            mes = mes.replaceAll("§f", "§7");
+                            player2.sendMessage(mes);
+                            continue;
+                   //     }
                     }
-                }
-            }
-            asyncPlayerChatEvent.getRecipients().addAll(recips);
-        } else if (forbd) {
-            asyncPlayerChatEvent.getRecipients().clear();
-            LinkedList<Player> recips = new LinkedList();
-            recips.add(player);
-            for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
-                if (player2.hasPermission("KMChat.builder")) {
-                    if (!player2.getWorld().equals((Object) player.getWorld())) {
-
-                        result = result.replaceAll("§f", "§7");
-                        player2.sendMessage(result);
-
-                    } else if ((player.getLocation().distanceSquared(player2.getLocation())) > range * range) {
-
-                        result = result.replaceAll("§f", "§7");
-                        player2.sendMessage(result);
-
-                    } else {
-                        recips.add(player2);
+                    if (location.distanceSquared(player2.getLocation()) > d2) {
+                   //     System.out.println("PRE_LOCATION: "+location.distanceSquared(player2.getLocation()) + '\n'+ "PRE_D2: " + d2);
+                        if (gmInRange(player2.getName(), location.distanceSquared(player2.getLocation()) )) {
+                            mes = mes.replaceAll("§e", "§7");
+                            mes = mes.replaceAll("§f", "§7");
+                            player2.sendMessage(mes);
+                            continue;
+                        }
                     }
-                }
-            }
-            asyncPlayerChatEvent.getRecipients().addAll(recips);
-
-
-        } else if (local) {
-            asyncPlayerChatEvent.getRecipients().clear();
-            asyncPlayerChatEvent.getRecipients().addAll(this.getLocalRecipients(player, result, range));
-        }
-    }
-
-
-    //---}}} Various helpers
-
-    protected List<Player> getLocalRecipients(Player player, String mes, double d) {
-
-
-        Location location = player.getLocation();
-        LinkedList<Player> linkedList = new LinkedList<Player>();
-        double d2 = Math.pow(d, 2.0);
-        for (Player player2 : Bukkit.getServer().getOnlinePlayers()) {
-            if (player2.hasPermission("KMChat.admin")) {
-                if (!player2.getWorld().equals((Object) player.getWorld())) {
-                  //  if (gmInRange(player2.getName(), 0)) {
-                        mes = mes.replaceAll("§e", "§7");
-                        mes = mes.replaceAll("§f", "§7");
-                        player2.sendMessage(mes);
-                        continue;
-               //     }
-                }
-                if (location.distanceSquared(player2.getLocation()) > d2) {
-               //     System.out.println("PRE_LOCATION: "+location.distanceSquared(player2.getLocation()) + '\n'+ "PRE_D2: " + d2);
                     if (gmInRange(player2.getName(), location.distanceSquared(player2.getLocation()) )) {
-                        mes = mes.replaceAll("§e", "§7");
-                        mes = mes.replaceAll("§f", "§7");
-                        player2.sendMessage(mes);
-                        continue;
+                        linkedList.add(player2);
                     }
+                    continue;
                 }
-                if (gmInRange(player2.getName(), location.distanceSquared(player2.getLocation()) )) {
+                if (!player2.getWorld().equals((Object) player.getWorld()) || location.distanceSquared(player2.getLocation()) > d2)
+                    continue;
+
+               // if (!player2.hasPermission("KMChat.gm")) {
+              //      linkedList.add(player2);
+              //  } else if (gmInRange(player2.getName(), d2)) {
                     linkedList.add(player2);
-                }
-                continue;
+             //   }
+
             }
-            if (!player2.getWorld().equals((Object) player.getWorld()) || location.distanceSquared(player2.getLocation()) > d2)
-                continue;
-
-           // if (!player2.hasPermission("KMChat.gm")) {
-          //      linkedList.add(player2);
-          //  } else if (gmInRange(player2.getName(), d2)) {
-                linkedList.add(player2);
-         //   }
-
-        }
-        return linkedList;
-    }
-
-    protected void kmlog(String where, String what) {
-        try (FileWriter writer = new FileWriter(path + where + "/" + where + "_current.log", true)) {
-            Date date = new Date();
-            what = what.replaceAll("§.", "");
-            writer.write("[" + date.toString() + "] " + what + "\n");
-        } catch (IOException ex) {
-            System.out.println("Error in kmlog(): " + ex.getMessage());
-        }
-    }
-
-    public void send2discord(String message) {
-        if (message.length() > 2000 && message.length() < 4000) {
-            final String snd1 = message.substring(0, 2000);
-            RequestBuffer.request(() -> ingameChannel.sendMessage(snd1));
-            final String snd2 = message.substring(2000);
-            RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
-        } else if (message.length() > 4000) {
-            final String snd1 = message.substring(0, 2000);
-            RequestBuffer.request(() -> ingameChannel.sendMessage(snd1));
-            final String snd2 = message.substring(2000, 4000);
-            RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
-            final String snd3 = message.substring(4000);
-            RequestBuffer.request(() -> ingameChannel.sendMessage(snd3));
-
-        } else {
-            final String snd = message;
-            RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+            return linkedList;
         }
 
-    }
-
-    public boolean gmInRange(String nick, double distance) {
-       // System.out.println("gmInRange("+nick+", "+distance);
-        //System.out.println("customRange: "+customRanges.get(nick));
-        for (String str : customRanges.keySet()) {
-            if (str.equalsIgnoreCase(nick)) {
-                double customRange = customRanges.get(nick);
-                if (distance < Math.pow(customRange, 2.0)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public String getSkill(String desc, String nick) {
-        //we need to have a file "Playernick.skills" with skills listed as following: "skill:level"
-        Pattern skillpat = Pattern.compile("(.*):");
-        Pattern levelpat = Pattern.compile(":(.*)");
-        boolean changedNick = false;
-        String skill = null;
-        String level = null;
-        String oldskill = null;
-
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            if (desc.startsWith(player.getName())) {
-                if (getServer().getPlayer(nick).hasPermission("KMChat.gm")) {
-                    nick = player.getName();
-                    desc = desc.substring(nick.length() + 1);
-                    changedNick = true;
-                    break;
-                }
+        protected void kmlog(String where, String what) {
+            try (FileWriter writer = new FileWriter(path + where + "/" + where + "_current.log", true)) {
+                Date date = new Date();
+                what = what.replaceAll("§.", "");
+                writer.write("[" + date.toString() + "] " + what + "\n");
+            } catch (IOException ex) {
+                System.out.println("Error in kmlog(): " + ex.getMessage());
             }
         }
 
-        Path path = Paths.get(DATA_PATH, nick + ".skills");
-        Charset charset = Charset.forName("UTF-8");
-        try {
-            List<String> lines = Files.readAllLines(path, charset);
+        public void send2discord(String message) {
+            if (message.length() > 2000 && message.length() < 4000) {
+                final String snd1 = message.substring(0, 2000);
+                RequestBuffer.request(() -> ingameChannel.sendMessage(snd1));
+                final String snd2 = message.substring(2000);
+                RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
+            } else if (message.length() > 4000) {
+                final String snd1 = message.substring(0, 2000);
+                RequestBuffer.request(() -> ingameChannel.sendMessage(snd1));
+                final String snd2 = message.substring(2000, 4000);
+                RequestBuffer.request(() -> ingameChannel.sendMessage(snd2));
+                final String snd3 = message.substring(4000);
+                RequestBuffer.request(() -> ingameChannel.sendMessage(snd3));
 
-            for (String line : lines) {
-                Matcher skillmat = skillpat.matcher(line);
-                while (skillmat.find()) {
-                    skill = skillmat.group().replaceAll(":", ""); //get the name of the skill
-                }
-                if (desc.toLowerCase().startsWith(skill)) { //check if this is the skill that we need
-                    Matcher levelmat = levelpat.matcher(line);
-                    while (levelmat.find()) {
-                        level = levelmat.group(); //get the level of the skill
+            } else {
+                final String snd = message;
+                RequestBuffer.request(() -> ingameChannel.sendMessage(snd));
+            }
+
+        }
+
+        public boolean gmInRange(String nick, double distance) {
+           // System.out.println("gmInRange("+nick+", "+distance);
+            //System.out.println("customRange: "+customRanges.get(nick));
+            for (String str : customRanges.keySet()) {
+                if (str.equalsIgnoreCase(nick)) {
+                    double customRange = customRanges.get(nick);
+                    if (distance < Math.pow(customRange, 2.0)) {
+                        return true;
+                    } else {
+                        return false;
                     }
-                    break;
-                } else {
-                    skill = null;
+                }
+            }
+            return true;
+        }
+
+        public String getSkill(String desc, String nick) {
+            //we need to have a file "Playernick.skills" with skills listed as following: "skill:level"
+            Pattern skillpat = Pattern.compile("(.*):");
+            Pattern levelpat = Pattern.compile(":(.*)");
+            boolean changedNick = false;
+            String skill = null;
+            String level = null;
+            String oldskill = null;
+            String gmnick = nick;
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                if (desc.startsWith(player.getName())) {
+                    if (getServer().getPlayer(nick).hasPermission("KMChat.gm")) {
+                        nick = player.getName();
+                        try {
+                            desc = desc.substring(nick.length() + 1);
+                        } catch (Exception e) {
+                            getServer().getPlayer(gmnick).sendMessage("§4Что-то пошло не так. Вы уверены, что ввели название навыка?");
+                            return null;
+                        }
+                        changedNick = true;
+                        break;
+                    }
                 }
             }
 
+            Path path = Paths.get(DATA_PATH, nick + ".skills");
+            Charset charset = Charset.forName("UTF-8");
+            try {
+                List<String> lines = Files.readAllLines(path, charset);
 
-
-            if (skill == null) { //if we didn't find the needed skill in the file
-
-                for (String sk : skillset) {
-                    if (desc.toLowerCase().startsWith(sk)) { //check if skill name is legit
-                        oldskill = desc.substring(0, sk.length());
-                        skill = sk; //set the skill name
-                       // System.out.println("skill is " + skill + ", level is " + level);
+                for (String line : lines) {
+                    Matcher skillmat = skillpat.matcher(line);
+                    while (skillmat.find()) {
+                        skill = skillmat.group().replaceAll(":", ""); //get the name of the skill
+                    }
+                    if (desc.toLowerCase().startsWith(skill)) { //check if this is the skill that we need
+                        Matcher levelmat = levelpat.matcher(line);
+                        while (levelmat.find()) {
+                            level = levelmat.group(); //get the level of the skill
+                        }
                         break;
                     } else {
-                        level = null; //level is ПЛОХО if we didn't find skill in file
+                        skill = null;
                     }
                 }
+
+
+
+                if (skill == null) { //if we didn't find the needed skill in the file
+
+                    for (String sk : skillset) {
+                        if (desc.toLowerCase().startsWith(sk)) { //check if skill name is legit
+                            oldskill = desc.substring(0, sk.length());
+                            skill = sk; //set the skill name
+                           // System.out.println("skill is " + skill + ", level is " + level);
+                            break;
+                        } else {
+                            level = null; //level is ПЛОХО if we didn't find skill in file
+                        }
+                    }
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error getting skill:" + e);
+                level = null;
             }
 
-        } catch (IOException e) {
-            System.out.println("Error getting skill:" + e);
-            level = null;
-        }
-
-     //   System.out.println("SKILL: " + skill);
-        if (level == null) {
-            level = ":ПЛОХО";
-        }
-   //     System.out.println("!! skill is " + skill + ", level is " + level + ", oldskill = " + oldskill);
-        if (skill == null) //if skill name is not legit and not found in the file
-            return null;
-        String result = "";
-        oldskill = desc.substring(0, skill.length());
-        if (oldskill == null) oldskill = skill;
-        if (changedNick) {
-            result = desc.replaceFirst(oldskill, level + " [" + nick + " " + skill + "] (");
-        } else {
-            result = desc.replaceFirst(oldskill, level + " [" + skill + "] (");
-        }
-        //let's make the output pretty!
-        //System.out.println(result);
-        //System.out.println(desc);
-
-        result = result.replaceFirst("\\(\\s", "\\(");
-        result = result.substring(1, result.length()) + ")";
-        if (result.contains("()"))
-            result = result.replaceFirst("\\(\\)", "");
-        return result;
-
-    }
-
-    public int getSkillValue(String levelName) {
-        for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
-            if (levelName.equalsIgnoreCase(entry.getValue())) {
-                return entry.getKey();
+         //   System.out.println("SKILL: " + skill);
+            if (level == null) {
+                level = ":ПЛОХО";
             }
-        }
-        return 666;
-    }
-
-    public boolean containsSkillValue(String message) {
-        for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
-            if (message.toLowerCase().startsWith(entry.getValue())) {
-                return true;
+       //     System.out.println("!! skill is " + skill + ", level is " + level + ", oldskill = " + oldskill);
+            if (skill == null) //if skill name is not legit and not found in the file
+                return null;
+            String result = "";
+            oldskill = desc.substring(0, skill.length());
+            if (oldskill == null) oldskill = skill;
+            if (changedNick) {
+                result = desc.replaceFirst(oldskill, level + " [" + nick + " " + skill + "] (");
+            } else {
+                result = desc.replaceFirst(oldskill, level + " [" + skill + "] (");
             }
+            //let's make the output pretty!
+            //System.out.println(result);
+            //System.out.println(desc);
+
+            result = result.replaceFirst("\\(\\s", "\\(");
+            result = result.substring(1, result.length()) + ")";
+            if (result.contains("()"))
+                result = result.replaceFirst("\\(\\)", "");
+            return result;
+
         }
-        return false;
 
-    }
+        public int getSkillValue(String levelName) {
+            for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
+                if (levelName.equalsIgnoreCase(entry.getValue())) {
+                    return entry.getKey();
+                }
+            }
+            return 666;
+        }
 
-    public String dF(String mes, String nick, boolean returnNumber) {
-        boolean weusedskill = false;
-        String result = "(";
-        int n = 666; //skill level represented as number
-        float mod = 0; //optinal modificator to skill level
+        public boolean containsSkillValue(String message) {
+            for (Map.Entry<Integer, String> entry : nMap.entrySet()) {
+                if (message.toLowerCase().contains(entry.getValue())) {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
+        public String dF(String mes, String nick, boolean returnNumber) {
+            boolean weusedskill = false;
+            String result = "(";
+            String initialNick = nick;
+            int n = 666; //skill level represented as number
+            float mod = 0; //optinal modificator to skill level
+
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        if (mes.startsWith((player.getName()))) {
+                            nick = player.getName();
+                            break;
+                        }
+                }
+
 
         if (!containsSkillValue(mes)) {
             //int wordsNum = 1;
             //String[] split = mes.split(" ", wordsNum + 2); //extra spot for optional modificator
-            String skillmes = getSkill(mes, nick);
-            String f_word = mes.split(" ")[0];
-            String s_word = "";
-            if (mes.split(" ").length > 1)
+            String skillmes = getSkill(mes, initialNick);
+            if (skillmes != null) {
+                String f_word = mes.split(" ")[0];
+                String s_word = "";
+                if (mes.split(" ").length > 1)
                 s_word = mes.split(" ")[1];
-            //System.out.println("f_word: " + f_word + "; s_word: " + s_word);
+
             if ( (f_word.contains("бег") || s_word.contains("бег")) && skillmes.contains("ПЛОХО")) {
-                String anotherTry = getSkill(mes.toLowerCase().replace("бег", "передвижение"), nick);
-                if (!anotherTry.contains("ПЛОХО"))
+                String anotherTry = getSkill(mes.replaceFirst(nick, "").trim().toLowerCase().replace("бег", "передвижение"), nick);
+                if (anotherTry!=null && !anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             } else if ( (f_word.contains("передвижение") || s_word.contains("передвижение")) && skillmes.contains("ПЛОХО")) {
-                String anotherTry = getSkill(mes.toLowerCase().replace("передвижение", "бег"), nick);
-                if (!anotherTry.contains("ПЛОХО"))
+                String anotherTry = getSkill(mes.replaceFirst(nick, "").trim().toLowerCase().replace("передвижение", "бег"), nick);
+                if (anotherTry!=null && !anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             }
 
             if ( !mes.toLowerCase().contains("физическая") && (f_word.contains("сила") || s_word.contains("сила")) && skillmes.contains("ПЛОХО")) {
-                String anotherTry = getSkill(mes.toLowerCase().replace("сила", "физическая сила"), nick);
-                if (!anotherTry.contains("ПЛОХО"))
+                String anotherTry = getSkill(mes.replaceFirst(nick, "").trim().toLowerCase().replace("сила", "физическая сила"), nick);
+                if (anotherTry!=null && !anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             } else if ( (f_word.contains("физическая") || s_word.contains("физическая")) && skillmes.contains("ПЛОХО")) {
                 //System.out.println(mes.toLowerCase().replace("физическая ", ""));
-                String anotherTry = getSkill(mes.toLowerCase().replace("физическая ", ""), nick);
+                String anotherTry = getSkill(mes.replaceFirst(nick, "").trim().toLowerCase().replace("физическая ", ""), nick);
                 //System.out.println(skillmes);
-                if (!anotherTry.contains("ПЛОХО"))
+                if (anotherTry!=null && !anotherTry.contains("ПЛОХО"))
                     skillmes = anotherTry;
             }
+            }
             
+ 
+
             if (skillmes != null) {
                 mes = skillmes;
-                
                 float armorMod = 0;
                 String[] armorDependentSkills = {"реакция", "уклонение", "передвижение", "бег", "акробатика", "скрытность"};
                 for (String skill : armorDependentSkills) {
@@ -830,10 +848,13 @@ public class KMChat
 	}
 	*/
         n = getSkillValue(level);
+//        System.out.println("level: " + level);
+        
         if (level.equals("ПЛОХО"))
             n = 2;
 
         if (n == 666) {
+  //      System.out.println(n);
             return null;
 //        } else if (n < 1) {
 //		n = 1;
@@ -951,10 +972,11 @@ public class KMChat
         String newroll = simpledF(initial, desc);
         String newrollSave = newroll;
         newroll = dice.substring(0, 6) + newroll.substring(6);
-        Pattern nickPat = Pattern.compile("от (ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно|КАК АЛЛАХ)\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+.*\\sРезультат:§?.?\\s(.*)");
+        Pattern nickPat = Pattern.compile("от (абсолютно ублюдски|ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно|КАК АЛЛАХ)[-+]{0,4}\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+.*\\sРезультат:§?.?\\s(.*)");
         Matcher nickMat = nickPat.matcher(dice);
+        System.out.println(dice);
         nickMat.find();
-        String old = nickMat.group(4);
+         String old = nickMat.group(4);
         String repl = nickMat.group(3) + "\\$" + nickMat.group(4);
         String nick = nickMat.group(3);
         if (!desc.contains("$")) {
@@ -1266,10 +1288,16 @@ public class KMChat
                     ReactionList newList = new ReactionList(name, cutArgs);
                     sprReactionList.add(newList);
                     list = newList;
+
+                    //to actualize woundsMod and armorMod
+                    for (int k = 0; k < list.size(); k++) {
+                            list.set(k, considerMods(list.get(k)));
+                        }
+
                     commandSender.sendMessage("§7Имена добавлены в новосозданный список!§f\n" + list.show());
                     return true;
                 } catch (Exception e) {
-                    System.out.println("Ошибка при добавлении имён: " + e.getMessage() + "\n" + e.getStackTrace());
+                    System.out.println("Ошибка при добавлении имён: " + e.toString() + '\n');
                     commandSender.sendMessage("§4" + e.getMessage() + "§f");
                     return false;
                 }
@@ -1292,7 +1320,11 @@ public class KMChat
                         commandSender.sendMessage("§4Нельзя добавить пустую реакцию!§f");
                         return true;
                     }
-                    list.add(cutArgs);
+                    list.add(cutArgs); 
+                    //to actualize woundsMod and armorMod
+                     for (int k = 0; k < list.size(); k++) {
+                            list.set(k, considerMods(list.get(k)));
+                        }
                     commandSender.sendMessage("§7Имена добавлены в список " + name + "!§f\n" + list.show());
                     return true;
                 } catch (Exception e) {
@@ -1354,6 +1386,7 @@ public class KMChat
                         Pattern nickPat = Pattern.compile("(ужасно|плохо|посредственно|нормально|хорошо|отлично|превосходно|легендарно)\\+{0,4}\\-{0,4}\\s(\\[.*\\]\\s)?\\(([\\p{L}0-9_-]{1,16})+");
                         for (int j = 0; j < rawdices.length; j++) {
                             dices[j] = dF(rawdices[j], players[j]);
+
                         }
 
                         bubbleSort(dices);
@@ -1452,7 +1485,8 @@ public class KMChat
                     }
                 } catch (Exception e) {
                     commandSender.sendMessage("§4Ошибка при броске реакций: " + e + "§f");
-                    //System.out.println(commandSender.getName() + ": ошибка при броске реакций: \n" + e.toString());
+                    System.out.println(commandSender.getName() + ": ошибка при броске реакций: \n" + e.getCause() + " " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
             if (comm.endsWith("turns")) {

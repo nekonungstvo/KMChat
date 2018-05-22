@@ -82,14 +82,12 @@ public class Reaction {
         if (armorMod!=0)
             modStr += " §8" + Integer.toString(armorMod) + "§e";
         modStr = modStr.replaceAll("\\s\\s", " ");
-	return modStr;
+	return modStr.replace("  ", " ");
     }
 
     public String show() {
         String sign = "";
-        if (getFinalMod() > 0)
-            sign = "+";
-        String out = (player + " " + level + " " + sign + mod);
+        String out = (player + " " + level + " " + getModStr().replace("§e","§7"));
         return out;
     }
 
