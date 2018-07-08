@@ -1814,7 +1814,8 @@
     }
 
 
-    @EventSubscriber
+    @SuppressWarnings("deprecation")
+	@EventSubscriber
     public void onMessage(MessageReceivedEvent event) throws RateLimitException, DiscordException, MissingPermissionsException {
         IMessage message = event.getMessage();
         String content = message.getContent();
@@ -1892,6 +1893,29 @@
                     res = String.format(online, i);
 
             } else if (content.startsWith("!exec ")) {
+            	
+            	String custom_exec_res = null;
+            	for (Player pl : Bukkit.getServer().getOnlinePlayers()) {
+            		if (content.startsWith("!exec " + pl.getName())) {
+            			String command = content.substring(6+pl.getName().length()+1);
+            			System.out.println(pl.getName() + " was made to execute command \"" + command + "\" by " + user.getName());
+            			if (pl.performCommand(command))
+            				custom_exec_res = pl.getName() + " выполнил команду \"" + command + '\"';
+            			else
+            				custom_exec_res = "ERROR: " + pl.getName() + " не смог выполнить команду " + command; 
+            		}
+            		
+            	}
+            	
+            	if (custom_exec_res != null) {
+            		final String ce_snd = custom_exec_res;
+            		if (ce_snd != null) {
+            			RequestBuffer.request(() -> ingameChannel.sendMessage(ce_snd));
+            			return;
+            		}
+            	}
+            
+            	
                 if (content.startsWith("!exec msg")) {
                     res = "Так не получится. Пользуйтесь !msg {player} {message}";
                 } else {
